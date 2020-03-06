@@ -63,7 +63,7 @@ Add dependency to your project
 
 All changes to master branch will be pushed to Maven repository as SNAPSHOT versions
 
-    implementation group: 'ee.bitweb', name: 'core-lib', version: '1.0.0-SNAPSHOT', changing: 'true'
+    implementation group: 'ee.bitweb', name: 'core-lib', version: '1.1.0-SNAPSHOT', changing: 'true'
 
 ## Development
 
@@ -110,7 +110,11 @@ run.
 
 ## Release notes
 
-### 1.0.0-SNAPSHOT
+### 1.1.0-SNAPSHOT
+
+* ...
+
+### 1.0.0
 
 * Initial version
 
