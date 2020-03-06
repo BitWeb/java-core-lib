@@ -1,0 +1,85 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.owasp:dependency-check-gradle:5.2.1'
+    }
+}
+
+plugins {
+    id 'java'
+}
+
+group 'ee.bitweb'
+version '1.0.0'
+
+apply plugin: 'maven-publish'
+apply plugin: 'jacoco'
+apply plugin: 'maven'
+apply plugin: 'org.owasp.dependencycheck'
+
+sourceCompatibility = 11
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifact("build/libs/core-lib-$version" + ".jar") {
+                extension 'jar'
+            }
+        }
+    }
+    repositories {
+        maven {
+            name 'nexus'
+            url "https://nexus.bitweb.ee/repository/maven-private/"
+            credentials {
+                username = project.repoUser
+                password = project.repoPassword
+            }
+        }
+    }
+}
+
+jar {
+    from sourceSets.main.allSource
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // https://mvnrepository.com/artifact/org.projectlombok/lombok
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.12'
+
+    // https://mvnrepository.com/artifact/org.springframework/spring-webmvc
+    implementation group: 'org.springframework', name: 'spring-webmvc', version: '5.+'
+
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.+'
+
+    // https://mvnrepository.com/artifact/javax.servlet/servlet-api
+    implementation group: 'javax.servlet', name: 'servlet-api', version: '2.5'
+
+    // https://mvnrepository.com/artifact/io.swagger/swagger-annotations
+    implementation group: 'io.swagger', name: 'swagger-annotations', version: '1.5.21'
+
+    // https://mvnrepository.com/artifact/io.springfox/springfox-spring-web
+    implementation group: 'io.springfox', name: 'springfox-spring-web', version: '2.9.2'
+
+    // https://mvnrepository.com/artifact/io.springfox/springfox-bean-validators
+    implementation "io.springfox:springfox-bean-validators:2.9.+"
+
+    // https://mvnrepository.com/artifact/javax.validation/validation-api
+    implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+
+    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
+    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6.+'
+}
