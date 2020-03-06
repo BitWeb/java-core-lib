@@ -24,7 +24,7 @@ sourceCompatibility = 11
 publishing {
     publications {
         maven(MavenPublication) {
-            artifact("build/libs/core-lib-$version" + ".jar") {
+            artifact("build/libs/core-$version" + ".jar") {
                 extension 'jar'
             }
         }
