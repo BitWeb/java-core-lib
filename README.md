@@ -57,13 +57,15 @@ Add dependency to your project
 
 ### Production release
 
-    implementation group: 'ee.bitweb', name: 'core-lib', version: '1.0.0'
+    // https://bitbucket.bitweb.ee/projects/BITWEB/repos/java-core-lib/browse
+    implementation group: 'ee.bitweb', name: 'core', version: '1.0.0'
 
 ### Current development version
 
 All changes to master branch will be pushed to Maven repository as SNAPSHOT versions
 
-    implementation group: 'ee.bitweb', name: 'core-lib', version: '1.1.0-SNAPSHOT', changing: 'true'
+    // https://bitbucket.bitweb.ee/projects/BITWEB/repos/java-core-lib/browse
+    implementation group: 'ee.bitweb', name: 'core', version: '1.1.0-SNAPSHOT', changing: 'true'
 
 ## Development
 
