@@ -12,7 +12,7 @@ plugins {
 }
 
 group 'ee.bitweb'
-version '1.1.0-SNAPSHOT'
+version '1.2.0-SNAPSHOT'
 
 apply plugin: 'maven-publish'
 apply plugin: 'jacoco'
@@ -62,11 +62,11 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springframework/spring-webmvc
     implementation group: 'org.springframework', name: 'spring-webmvc', version: '5.+'
 
-    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.+'
+    // https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api
+    implementation group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
 
-    // https://mvnrepository.com/artifact/javax.servlet/servlet-api
-    implementation group: 'javax.servlet', name: 'servlet-api', version: '2.5'
+    // https://mvnrepository.com/artifact/org.springframework/spring-tx
+    implementation group: 'org.springframework', name: 'spring-tx', version: '2.5.+'
 
     // https://mvnrepository.com/artifact/io.swagger/swagger-annotations
     implementation group: 'io.swagger', name: 'swagger-annotations', version: '1.5.21'
@@ -80,11 +80,11 @@ dependencies {
     // https://mvnrepository.com/artifact/javax.validation/validation-api
     implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
 
-    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
-    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6.+'
+    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.6.0'
 
-    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine
-    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.6.+'
+    // https://mvnrepository.com/artifact/org.jacoco/org.jacoco.core
+    testImplementation group: 'org.jacoco', name: 'org.jacoco.core', version: '0.8.5'
 }
 
 test {

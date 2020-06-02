@@ -10,7 +10,7 @@ public class UppercaseValidator implements ConstraintValidator<Uppercase, String
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        if (value == null) return false;
+        if (value == null) return true;
 
         return pattern.matcher(value).matches();
     }
