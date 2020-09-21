@@ -70,8 +70,8 @@ class ValidationErrorResponseTest {
         ValidationErrorRow second = new ValidationErrorRow("alpha", "NotEmpty", "must not be empty");
 
         ValidationErrorResponse response = new ValidationErrorResponse(ValidationErrorType.CONSTRAINT_VIOLATION);
-        response.getRows().add(second);
         response.getRows().add(first);
+        response.getRows().add(second);
 
         assertEquals(1, response.getRows().size());
 
