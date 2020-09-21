@@ -3,6 +3,8 @@ package ee.bitweb.core.config;
 import com.fasterxml.classmate.TypeResolver;
 import ee.bitweb.core.api.model.error.EntityNotFoundErrorResponse;
 import ee.bitweb.core.api.model.error.InternalErrorResponse;
+import ee.bitweb.core.api.model.error.ValidationErrorResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.cors.CorsConfiguration;
@@ -64,6 +66,12 @@ public abstract class AbstractSwaggerConfig {
 
     protected List<ResponseMessage> responseMessages() {
         List<ResponseMessage> messages = new ArrayList<>();
+
+        messages.add(new ResponseMessageBuilder()
+                .code(HttpStatus.BAD_REQUEST.value())
+                .message("Validation error")
+                .responseModel(new ModelRef(ValidationErrorResponse.class.getSimpleName()))
+                .build());
 
         messages.add(new ResponseMessageBuilder()
                 .code(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)

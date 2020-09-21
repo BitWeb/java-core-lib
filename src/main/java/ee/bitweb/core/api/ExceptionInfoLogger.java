@@ -1,7 +1,7 @@
 package ee.bitweb.core.api;
 
-import ee.bitweb.core.exception.CoreException;
 import ee.bitweb.core.exception.ConflictException;
+import ee.bitweb.core.exception.CoreException;
 import ee.bitweb.core.exception.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

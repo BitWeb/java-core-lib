@@ -7,13 +7,13 @@ import ee.bitweb.core.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,54 +21,78 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.stream.Collectors;
 
+import static ee.bitweb.core.api.ValidationErrorType.*;
+
 @Slf4j
 public abstract class AbstractController {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseBody
-    public ResponseEntity<Object> handleException(HttpMessageNotReadableException e, HttpServletResponse response) {
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-
+    public ValidationErrorResponse handleException(HttpMessageNotReadableException e, HttpServletResponse response) {
         log.warn(e.getMessage());
 
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setStatus(HttpStatus.BAD_REQUEST.value());
+
+        return new ValidationErrorResponse(MESSAGE_NOT_READABLE);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody
     public ValidationErrorResponse handleException(MethodArgumentNotValidException e, HttpServletResponse response) {
-        return translateBindingResult(e.getBindingResult(), response);
+        return translateBindingResult(e.getBindingResult(), response, ARGUMENT_NOT_VALID);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseBody
+    public ValidationErrorResponse handleException(MethodArgumentTypeMismatchException e, HttpServletResponse response) {
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setStatus(HttpStatus.BAD_REQUEST.value());
+
+        ValidationErrorResponse errorResponse = new ValidationErrorResponse(ARGUMENT_TYPE_MISMATCH);
+        errorResponse.getRows().add(new ValidationErrorRow(e.getName(), "InvalidType", null));
+
+        return errorResponse;
     }
 
     @ExceptionHandler(BindException.class)
     @ResponseBody
-    public ValidationErrorResponse handleException(HttpServletResponse response, BindException e) {
-        return translateBindingResult(e.getBindingResult(), response);
+    public ValidationErrorResponse handleException(
+            BindException e,
+            HttpServletResponse response
+    ) {
+        return translateBindingResult(e.getBindingResult(), response, BIND);
     }
 
-    private ValidationErrorResponse translateBindingResult(BindingResult bindingResult, HttpServletResponse response) {
-        ValidationErrorResponse validationErrorResponse = new ValidationErrorResponse(
-                bindingResult
-                        .getFieldErrors()
-                        .stream()
-                        .map(error -> new ValidationErrorRow(
-                                error.getField(),
-                                error.getCodes() != null ? error.getCodes()[0].split("\\.")[0] : null,
-                                parseMessage(error.getDefaultMessage())
-                        ))
-                        .collect(Collectors.toSet())
-        );
+    private ValidationErrorResponse translateBindingResult(
+            BindingResult bindingResult,
+            HttpServletResponse response,
+            ValidationErrorType type
+    ) {
+        ValidationErrorResponse errorResponse = new ValidationErrorResponse(type);
+        errorResponse.getRows().addAll(bindingResult.getFieldErrors().stream().map(error -> new ValidationErrorRow(
+                error.getField(),
+                error.getCodes() != null ? error.getCodes()[0].split("\\.")[0] : null,
+                parseMessage(error.getDefaultMessage())
+        )).collect(Collectors.toList()));
+
+        errorResponse.getRows().addAll(bindingResult.getGlobalErrors().stream().map(error -> new ValidationErrorRow(
+                error.getObjectName(),
+                error.getCodes() != null ? error.getCodes()[0].split("\\.")[0] : null,
+                parseMessage(error.getDefaultMessage())
+        )).collect(Collectors.toList()));
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpStatus.BAD_REQUEST.value());
 
-        return validationErrorResponse;
+        return errorResponse;
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseBody
     public ValidationErrorResponse handleException(HttpServletResponse response, ConstraintViolationException e) {
-        ValidationErrorResponse validationErrorResponse = new ValidationErrorResponse(
+        ValidationErrorResponse errorResponse = new ValidationErrorResponse(CONSTRAINT_VIOLATION);
+        errorResponse.getRows().addAll(
                 e.getConstraintViolations()
                         .stream()
                         .map(error -> new ValidationErrorRow(
@@ -76,13 +100,13 @@ public abstract class AbstractController {
                                 getValidatorName(error),
                                 parseMessage(error.getMessage())
                         ))
-                        .collect(Collectors.toSet())
+                        .collect(Collectors.toList())
         );
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpStatus.BAD_REQUEST.value());
 
-        return validationErrorResponse;
+        return errorResponse;
     }
 
     private String getFieldName(ConstraintViolation<?> error) {
