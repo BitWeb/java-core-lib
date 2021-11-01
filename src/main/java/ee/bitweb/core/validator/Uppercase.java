@@ -1,4 +1,4 @@
-package ee.bitweb.core.api.validator;
+package ee.bitweb.core.validator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
