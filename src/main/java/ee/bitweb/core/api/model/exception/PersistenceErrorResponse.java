@@ -8,7 +8,9 @@ import ee.bitweb.core.exception.persistence.Criteria;
 import ee.bitweb.core.exception.persistence.PersistenceException;
 
 import lombok.Getter;
+import lombok.ToString;
 
+@ToString
 @Getter
 public class PersistenceErrorResponse extends GenericErrorResponse {
 

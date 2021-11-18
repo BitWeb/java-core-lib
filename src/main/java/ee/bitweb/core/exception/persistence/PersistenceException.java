@@ -7,25 +7,24 @@ import java.util.Set;
 import ee.bitweb.core.exception.CoreException;
 
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.StringUtils;
 
 @Getter
 public abstract class PersistenceException extends CoreException {
 
     private final String entity;
-    private final Set<Criteria> criteria;
+    private final Set<Criteria> criteria; // todo: SonarLint: Make "criteria" transient or serializable.
 
     protected PersistenceException(String message, String entity, String field, String value) {
         this(message, entity, new HashSet<>(List.of(new Criteria(field, value))));
     }
 
     protected PersistenceException(String message, String entity, Set<Criteria> criteria) {
-        super(StringUtils.isBlank(message) ? String.format("Exception with entity %s where %s", entity, criteria) : message);
+        super(StringUtils.hasText(message) ? message : String.format("Exception with entity %s where %s", entity, criteria));
 
         this.entity = entity;
         this.criteria = criteria;
     }
 
     public abstract int getCode();
-
 }

@@ -4,10 +4,12 @@ import java.util.Comparator;
 
 import ee.bitweb.core.exception.persistence.Criteria;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
+@EqualsAndHashCode
 @RequiredArgsConstructor
 class CriteriaResponse implements Comparable<CriteriaResponse> {
 

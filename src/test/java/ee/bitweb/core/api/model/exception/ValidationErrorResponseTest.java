@@ -3,6 +3,7 @@ package ee.bitweb.core.api.model.exception;
 import ee.bitweb.core.api.ValidationErrorType;
 import ee.bitweb.core.exception.validation.FieldError;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Tag("unit")
 class ValidationErrorResponseTest {
 
     @Test

@@ -19,6 +19,5 @@ public class ValidationErrorResponse extends GenericErrorResponse {
 
     public ValidationErrorResponse(String id, ValidationException e) {
         super(id, e.getMessage());
-        this.errors.addAll(errors);
     }
 }

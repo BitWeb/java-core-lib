@@ -1,41 +1,39 @@
 package ee.bitweb.core.api;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-
 import ee.bitweb.core.exception.validation.FieldError;
 import ee.bitweb.core.exception.validation.ValidationException;
-
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.validation.BindingResult;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ExceptionConverter {
 
-    public static String CONSTRAINT_VIOLATION_MESSAGE = "CONSTRAINT_VIOLATION";
+    public static final String CONSTRAINT_VIOLATION_MESSAGE = "CONSTRAINT_VIOLATION";
 
     public static ValidationException convert(ConstraintViolationException e) {
-        Set<FieldError> fieldErrors = new HashSet<>();
-
-        fieldErrors.addAll(
-                e.getConstraintViolations()
-                        .stream()
-                        .map(error -> new FieldError(
-                                getFieldName(error),
-                                getValidatorName(error),
-                                parseMessage(error.getMessage())
-                        ))
-                        .collect(Collectors.toList())
-        );
+        Set<FieldError> fieldErrors = e
+                .getConstraintViolations()
+                .stream()
+                .map(error -> new FieldError(
+                        getFieldName(error),
+                        getValidatorName(error),
+                        parseMessage(error.getMessage())
+                ))
+                .collect(Collectors.toSet());
 
         return new ValidationException(CONSTRAINT_VIOLATION_MESSAGE, fieldErrors);
     }
 
     public static ValidationException translateBindingResult(BindingResult bindingResult) {
         Set<FieldError> fieldErrors = new HashSet<>();
+
         fieldErrors.addAll(bindingResult.getFieldErrors().stream().map(error -> new FieldError(
                 error.getField(),
                 error.getCodes() != null ? error.getCodes()[0].split("\\.")[0] : null,

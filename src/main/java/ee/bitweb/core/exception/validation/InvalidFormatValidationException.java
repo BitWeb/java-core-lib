@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * InvalidFormatValidationException.class encapsulates InvalidFormatException in order to gain access to path, value
@@ -49,7 +49,7 @@ public class InvalidFormatValidationException extends InvalidFormatException {
     private String parseFieldName(List<Reference> references) {
         ArrayList<String> fieldNames = new ArrayList<>();
         for (Reference r : references) {
-            if (StringUtils.isNotBlank(r.getFieldName())) {
+            if (StringUtils.hasText(r.getFieldName())) {
                 fieldNames.add(r.getFieldName());
             }
         }

@@ -12,14 +12,14 @@ import ee.bitweb.core.exception.validation.ValidationException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.StringUtils;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class InvalidFormatExceptionConverter {
+
     public static final String INVALID_FORMAT_REASON = "InvalidFormat";
     public static final String INVALID_VALUE_REASON = "InvalidValue";
-    public static final String UNKNOWN_VALUE = "Unknown";
 
     public static final String INVALID_VALUE_MESSAGE_FORMAT = "Value not recognized (%s), please refer to specification for available values.";
     public static final String INVALID_BOOLEAN_VALUE_MESSAGE = "Value not recognized as boolean (%s), please refer to specification";
@@ -27,7 +27,7 @@ public class InvalidFormatExceptionConverter {
     public static final String INVALID_INTEGER_VALUE_MESSAGE = "Value not recognized as integer (%s), please refer to specification";
 
     public static boolean canConvert(InvalidFormatValidationException e) {
-        return StringUtils.isNotBlank(e.getField()) && e.getValue() != null && e.getTargetClass() != null;
+        return StringUtils.hasText(e.getField()) && e.getValue() != null && e.getTargetClass() != null;
     }
 
     public static ValidationException convert(InvalidFormatValidationException e) {
@@ -52,15 +52,15 @@ public class InvalidFormatExceptionConverter {
     }
 
     protected static FieldError tryToCreateEnumErrorRow(InvalidFormatValidationException e) {
-        if (e.getTargetClass().isEnum()) {
-            return new FieldError(
-                    e.getField(),
-                    INVALID_VALUE_REASON,
-                    String.format(INVALID_VALUE_MESSAGE_FORMAT, e.getValue())
-            );
+        if (!e.getTargetClass().isEnum()) {
+            return null;
         }
 
-        return null;
+        return new FieldError(
+                e.getField(),
+                INVALID_VALUE_REASON,
+                String.format(INVALID_VALUE_MESSAGE_FORMAT, e.getValue())
+        );
     }
 
     protected static FieldError tryToCreateTemporalErrorRow(InvalidFormatValidationException e) {
@@ -80,7 +80,6 @@ public class InvalidFormatExceptionConverter {
     }
 
     protected static FieldError tryToCreateNumericErrorRow(InvalidFormatValidationException e) {
-
         if (
                 e.getTargetClass() == Long.class ||
                 e.getTargetClass() == Integer.class ||

@@ -1,4 +1,9 @@
 buildscript {
+    ext {
+        springVersion = '5.+'
+        lombokVersion = '1.18.+'
+        mockitoVersion = '4.0.+'
+    }
     repositories {
         mavenCentral()
     }
@@ -56,41 +61,50 @@ repositories {
 }
 
 dependencies {
-    // https://mvnrepository.com/artifact/org.projectlombok/lombok
-    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.12'
-
     // https://mvnrepository.com/artifact/org.springframework/spring-webmvc
-    implementation group: 'org.springframework', name: 'spring-webmvc', version: '5.+'
+    implementation group: 'org.springframework', name: 'spring-webmvc', version: "${springVersion}"
 
     // https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api
     implementation group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
 
     // https://mvnrepository.com/artifact/org.springframework/spring-tx
-    implementation group: 'org.springframework', name: 'spring-tx', version: '2.5.+'
+    implementation group: 'org.springframework', name: 'spring-tx', version: '5.+'
 
     // https://mvnrepository.com/artifact/io.swagger/swagger-annotations
     implementation group: 'io.swagger', name: 'swagger-annotations', version: '1.5.21'
 
     // https://mvnrepository.com/artifact/io.springfox/springfox-spring-web
-    implementation group: 'io.springfox', name: 'springfox-spring-web', version: '2.9.+'
+    implementation group: 'io.springfox', name: 'springfox-spring-web', version: '2.10.+'
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.4'
 
     // https://mvnrepository.com/artifact/io.springfox/springfox-bean-validators
-    implementation "io.springfox:springfox-bean-validators:2.9.+"
-
-    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
+    implementation group: 'io.springfox', name: 'springfox-bean-validators', version: '2.10.+'
 
     // https://mvnrepository.com/artifact/javax.validation/validation-api
     implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
 
+    // https://mvnrepository.com/artifact/org.projectlombok/lombok
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
+
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.6.0'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.8.1'
 
     // https://mvnrepository.com/artifact/org.jacoco/org.jacoco.core
-    testImplementation group: 'org.jacoco', name: 'org.jacoco.core', version: '0.8.5'
+    testImplementation group: 'org.jacoco', name: 'org.jacoco.core', version: '0.8.7'
+
+    // https://mvnrepository.com/artifact/org.springframework/spring-test
+    testImplementation group: 'org.springframework', name: 'spring-test', version: "${springVersion}"
+
+    // https://mvnrepository.com/artifact/org.mockito/mockito-inline
+    testImplementation group: 'org.mockito', name: 'mockito-inline', version: "${mockitoVersion}"
+
+    // https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: "${mockitoVersion}"
+
+    // https://mvnrepository.com/artifact/org.simplify4u/slf4j-mock
+    implementation group: 'org.simplify4u', name: 'slf4j-mock', version: '2.1.1'
 }
 
 test {

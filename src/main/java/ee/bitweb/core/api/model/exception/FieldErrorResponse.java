@@ -2,12 +2,14 @@ package ee.bitweb.core.api.model.exception;
 
 import java.util.Comparator;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 @ToString
 @Getter
+@EqualsAndHashCode
 @RequiredArgsConstructor
 public class FieldErrorResponse implements Comparable<FieldErrorResponse> {
 

@@ -1,17 +1,20 @@
 package ee.bitweb.core.validator;
 
+import org.springframework.util.StringUtils;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import java.util.regex.Pattern;
 
 public class UppercaseValidator implements ConstraintValidator<Uppercase, String> {
 
-    private final Pattern pattern = Pattern.compile("[A-Z0-9_]+");
-
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-        if (value == null) return true;
+        if (!StringUtils.hasText(value)) return true;
 
-        return pattern.matcher(value).matches();
+        for (int i = 0; i < value.length(); i++) {
+            if (Character.isLowerCase(value.charAt(i))) return false;
+        }
+
+        return true;
     }
 }
