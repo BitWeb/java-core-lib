@@ -8,15 +8,11 @@ import org.simplify4u.slf4jmock.LoggerMock;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 import org.slf4j.spi.MDCAdapter;
-import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;

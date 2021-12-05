@@ -104,7 +104,7 @@ dependencies {
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: "${mockitoVersion}"
 
     // https://mvnrepository.com/artifact/org.simplify4u/slf4j-mock
-    implementation group: 'org.simplify4u', name: 'slf4j-mock', version: '2.1.1'
+    testImplementation group: 'org.simplify4u', name: 'slf4j-mock', version: '2.1.1'
 }
 
 test {
