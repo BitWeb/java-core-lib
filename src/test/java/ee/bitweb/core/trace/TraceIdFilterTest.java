@@ -1,44 +1,44 @@
 package ee.bitweb.core.trace;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.simplify4u.slf4jmock.LoggerMock;
-import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-import org.slf4j.spi.MDCAdapter;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 
+import ee.bitweb.core.utils.MemoryAppender;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
 class TraceIdFilterTest {
 
-    Logger logger;
-
-    @Mock
-    MDCAdapter mdcMock;
-
     @Mock
     FilterChain chain;
 
-    @BeforeEach
-    void setUp() {
-        logger = mock(Logger.class);
-        LoggerMock.setMock(TraceIdFilter.class, logger);
-    }
+    Logger logger;
+    MemoryAppender memoryAppender;
 
-    @AfterEach
-    void tearDown() {
+    @BeforeEach
+    void beforeEach() {
         MDC.clear();
-        LoggerMock.clearMock(TraceIdFilter.class);
+        logger = (Logger) LoggerFactory.getLogger(TraceIdFilter.class);
+        memoryAppender = new MemoryAppender();
+        memoryAppender.setContext((LoggerContext) LoggerFactory.getILoggerFactory());
+        logger.setLevel(Level.DEBUG);
+        logger.addAppender(memoryAppender);
+        memoryAppender.start();
     }
 
     @Test
@@ -47,42 +47,70 @@ class TraceIdFilterTest {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/this");
         request.addHeader("test", "123test");
 
-        when(logger.isDebugEnabled()).thenReturn(true);
-
         new TraceIdFilter().logAllHeaders(request);
 
-        verify(logger).debug("Request headers: test=[123test]");
-        verifyNoMoreInteractions(logger);
+        assertEquals(1, memoryAppender.search("Request headers: test=[123test]", Level.DEBUG).size());
+        assertEquals(1, memoryAppender.getSize());
+
     }
 
     @Test
-    @DisplayName("logAllHeaders() should log headers with multiple values")
+    @DisplayName("logAllHeaders() should log headers with multiple values in DEBUG level")
     void logHeadersLogsHeadersWithMultipleValues() {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/this");
         request.addHeader("test", "test123");
         request.addHeader("test", "123test");
         request.addHeader("x-test", "some value");
 
-        when(logger.isDebugEnabled()).thenReturn(true);
-
         new TraceIdFilter().logAllHeaders(request);
 
-        verify(logger).debug("Request headers: test=[test123|123test],x-test=[some value]");
-        verifyNoMoreInteractions(logger);
+        assertEquals(1, memoryAppender.search(
+                "Request headers: test=[test123|123test],x-test=[some value]",
+                Level.DEBUG).size()
+        );
+        assertEquals(1, memoryAppender.getSize());
     }
 
     @Test
-    @DisplayName("logAllHeaders() should log mask sensitive header values")
+    @DisplayName("logAllHeaders() should not log headers with multiple values in INFO level")
+    void onLoggingMultipleValueHeadersWithInfoLevelNoLogsShouldBeCreated() {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/this");
+        request.addHeader("test", "test123");
+        request.addHeader("test", "123test");
+        request.addHeader("x-test", "some value");
+
+        logger.setLevel(Level.INFO);
+
+        new TraceIdFilter().logAllHeaders(request);
+
+        assertEquals(0, memoryAppender.getSize());
+    }
+
+    @Test
+    @DisplayName("logAllHeaders() should log mask sensitive header values in DEBUG level")
     void logHeadersMasksSensitiveHeaders() {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/this");
         request.addHeader("authorization", "123test");
 
-        when(logger.isDebugEnabled()).thenReturn(true);
+        new TraceIdFilter().logAllHeaders(request);
+
+        assertEquals(1, memoryAppender.search(
+                "Request headers: authorization=[***]",
+                Level.DEBUG).size()
+        );
+    }
+
+    @Test
+    @DisplayName("logAllHeaders() should not log mask sensitive header values in INFO level")
+    void infoLevelLoggerShouldNotLogMaskedSensitiveHeaders() {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/this");
+        request.addHeader("authorization", "123test");
+
+        logger.setLevel(Level.INFO);
 
         new TraceIdFilter().logAllHeaders(request);
 
-        verify(logger).debug("Request headers: authorization=[***]");
-        verifyNoMoreInteractions(logger);
+        assertEquals(0, memoryAppender.getSize());
     }
 
     @Test
@@ -93,8 +121,8 @@ class TraceIdFilterTest {
 
         new TraceIdFilter().addAdditionalHeaders(request);
 
-        verifyNoInteractions(mdcMock);
-        verifyNoInteractions(logger);
+        assertEquals(0, memoryAppender.getSize());
+        assertNull(MDC.getCopyOfContextMap());
     }
 
     @Test
@@ -107,9 +135,8 @@ class TraceIdFilterTest {
         TraceIdCustomizer customizer = TraceIdCustomizerImpl.builder().additionalHeader("test").build();
         new TraceIdFilter(customizer).addAdditionalHeaders(request);
 
-        verify(mdcMock).put("test", "123test");
-        verifyNoMoreInteractions(mdcMock);
-        verifyNoInteractions(logger);
+        assertEquals("123test", MDC.get("test"));
+        assertEquals(1, MDC.getCopyOfContextMap().size());
     }
 
     @Test
@@ -122,23 +149,25 @@ class TraceIdFilterTest {
         TraceIdCustomizer customizer = TraceIdCustomizerImpl.builder().additionalHeader("test").build();
         new TraceIdFilter(customizer).addAdditionalHeaders(request);
 
-        verify(mdcMock).put("test", "123test|test123");
-        verifyNoMoreInteractions(mdcMock);
-        verifyNoInteractions(logger);
+        assertEquals("123test|test123", MDC.get("test"));
+        assertEquals(1, MDC.getCopyOfContextMap().size());
+        assertEquals(0, memoryAppender.getSize());
     }
 
     @Test
     @DisplayName("addAdditionalHeaders() when using custom Customizer, logs debug message when header is not available")
     void testAdditionalHeadersLogsWhenHeaderIsNotFoundInRequest() {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/this");
-        when(logger.isDebugEnabled()).thenReturn(true);
 
         TraceIdCustomizer customizer = TraceIdCustomizerImpl.builder().additionalHeader("test").build();
         new TraceIdFilter(customizer).addAdditionalHeaders(request);
 
-        verifyNoInteractions(mdcMock);
-        verify(logger).debug("Header with name '{}' not present in request", "test");
-        verifyNoMoreInteractions(logger);
+        assertEquals(1, memoryAppender.search(
+                "Header with name 'test' not present in request",
+                Level.DEBUG).size()
+        );
+        assertEquals(1, memoryAppender.getSize());
+        assertNull(MDC.getCopyOfContextMap());
     }
 
     @Test
@@ -149,9 +178,9 @@ class TraceIdFilterTest {
 
         new TraceIdFilter().addForwardingInfo(request);
 
-        verify(mdcMock).put("x_forwarded_for", "192.168.69.145,192.168.69.1");
-        verifyNoMoreInteractions(mdcMock);
-        verifyNoInteractions(logger);
+        assertEquals("192.168.69.145,192.168.69.1", MDC.get("x_forwarded_for"));
+        assertEquals(1, MDC.getCopyOfContextMap().size());
+        assertEquals(0, memoryAppender.getSize());
     }
 
     @Test
@@ -163,9 +192,9 @@ class TraceIdFilterTest {
 
         new TraceIdFilter().addForwardingInfo(request);
 
-        verify(mdcMock).put("x_forwarded_for", "192.168.69.145|192.168.69.1");
-        verifyNoMoreInteractions(mdcMock);
-        verifyNoInteractions(logger);
+        assertEquals("192.168.69.145|192.168.69.1", MDC.get("x_forwarded_for"));
+        assertEquals(1, MDC.getCopyOfContextMap().size());
+        assertEquals(0, memoryAppender.getSize());
     }
 
     @Test
@@ -176,14 +205,14 @@ class TraceIdFilterTest {
 
         new TraceIdFilter().addForwardingInfo(request);
 
-        verify(mdcMock).put("forwarded", "for=192.0.2.43,for=198.51.100.17;by=203.0.113.60;proto=http;host=example.com;secret=ruewiu");
-        verify(mdcMock).put("forwarded_by", "203.0.113.60");
-        verify(mdcMock).put("forwarded_for", "192.0.2.43|198.51.100.17");
-        verify(mdcMock).put("forwarded_host", "example.com");
-        verify(mdcMock).put("forwarded_proto", "http");
-        verify(mdcMock).put("forwarded_extensions", "secret=ruewiu");
-        verifyNoMoreInteractions(mdcMock);
-        verifyNoInteractions(logger);
+        assertEquals("for=192.0.2.43,for=198.51.100.17;by=203.0.113.60;proto=http;host=example.com;secret=ruewiu", MDC.get("forwarded"));
+        assertEquals("203.0.113.60", MDC.get("forwarded_by"));
+        assertEquals("192.0.2.43|198.51.100.17", MDC.get("forwarded_for"));
+        assertEquals("example.com", MDC.get("forwarded_host"));
+        assertEquals("http", MDC.get("forwarded_proto"));
+        assertEquals("secret=ruewiu", MDC.get("forwarded_extensions"));
+        assertEquals(6, MDC.getCopyOfContextMap().size());
+        assertEquals(0, memoryAppender.getSize());
     }
 
     @Test
@@ -226,29 +255,30 @@ class TraceIdFilterTest {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/this");
         request.setServletPath("/this");
         MockHttpServletResponse response = new MockHttpServletResponse();
+        logger.setLevel(Level.INFO);
 
-        when(logger.isDebugEnabled()).thenReturn(false);
-        when(mdcMock.get("trace_id")).thenReturn("generated_mock");
+        try (MockedStatic<MDC> mdcMock = Mockito.mockStatic(MDC.class)) {
+            mdcMock.when(() -> MDC.get("trace_id")).thenReturn("generated_mock");
 
-        new TraceIdFilter(new MockTraceIdProvider()).doFilter(request, response, chain);
+            new TraceIdFilter(new MockTraceIdProvider()).doFilter(request, response, chain);
 
-        assertEquals("generated_mock", response.getHeader("X-Trace-ID"));
+            assertEquals("generated_mock", response.getHeader("X-Trace-ID"));
+            mdcMock.verify(() -> MDC.put("trace_id", "generated_mock"));
+            mdcMock.verify(() -> MDC.put("path", "/this"));
+            mdcMock.verify(() -> MDC.put("url", "http://localhost/this"));
+            mdcMock.verify(() -> MDC.put("method", "GET"));
 
-        verify(mdcMock).put("trace_id", "generated_mock");
-        verify(mdcMock).put("path", "/this");
-        verify(mdcMock).put("url", "http://localhost/this");
-        verify(mdcMock).put("method", "GET");
-        verify(mdcMock).put("query_string", null);
-        verify(mdcMock).put("user_agent", "MISSING");
-        verify(mdcMock).clear();
-        verifyNoMoreInteractions(mdcMock);
+            mdcMock.verify(() -> MDC.put("query_string", null));
+            mdcMock.verify(() -> MDC.put("user_agent", "MISSING"));
+            mdcMock.verify(() -> MDC.get("trace_id"));
 
-        verify(chain).doFilter(request, response);
-        verifyNoMoreInteractions(chain);
+            mdcMock.verify(MDC::clear);
+            mdcMock.verifyNoMoreInteractions();
 
-        verifyNoMoreInteractions(logger);
+            verify(chain).doFilter(request, response);
+            assertEquals(0, memoryAppender.getSize());
+        }
     }
-
     static class MockTraceIdProvider implements TraceIdProvider {
 
         @Override

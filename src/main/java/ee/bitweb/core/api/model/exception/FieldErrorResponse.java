@@ -2,6 +2,8 @@ package ee.bitweb.core.api.model.exception;
 
 import java.util.Comparator;
 
+import ee.bitweb.core.exception.validation.FieldError;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,10 @@ public class FieldErrorResponse implements Comparable<FieldErrorResponse> {
     private final String reason;
 
     private final String message;
+
+    public FieldErrorResponse(FieldError e) {
+        this(e.getField(), e.getReason(), e.getMessage());
+    }
 
     @Override
     public int compareTo(FieldErrorResponse o) {

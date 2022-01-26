@@ -1,9 +1,7 @@
 package ee.bitweb.core.api;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 
@@ -18,11 +16,13 @@ import ee.bitweb.core.trace.TraceId;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
-import org.springframework.web.server.MethodNotAllowedException;
 
 @Slf4j
 @ControllerAdvice
@@ -111,9 +110,9 @@ public class ControllerAdvisor {
     ) {
         setDefaultHeaders(response, HttpStatus.BAD_REQUEST);
 
-        // todo: debug leveliga response koos valuega ja kui ei saa siis request body ka
-
-        return new ValidationErrorResponse(getResponseId(), ExceptionConverter.convert(e));
+        return logAndReturn(
+                new ValidationErrorResponse(getResponseId(), ExceptionConverter.convert(e))
+        );
     }
 
     @ExceptionHandler(BindException.class)
@@ -124,11 +123,11 @@ public class ControllerAdvisor {
     ) {
         setDefaultHeaders(response, HttpStatus.BAD_REQUEST);
 
-        // todo: debug leveliga response koos valuega ja kui ei saa siis request body ka
-
-        return new ValidationErrorResponse(
-                getResponseId(),
-                ExceptionConverter.translateBindingResult(e.getBindingResult())
+        return logAndReturn(
+                new ValidationErrorResponse(
+                        getResponseId(),
+                        ExceptionConverter.translateBindingResult(e.getBindingResult())
+                )
         );
     }
 
@@ -204,21 +203,18 @@ public class ControllerAdvisor {
     }
 
     @ResponseBody
-    @ExceptionHandler(MethodNotAllowedException.class)
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public GenericErrorResponse handleMethodNotAllowed(
-            MethodNotAllowedException e,
+            HttpRequestMethodNotSupportedException e,
             HttpServletResponse response
     ) {
         setDefaultHeaders(response, HttpStatus.METHOD_NOT_ALLOWED);
 
         log.warn(e.getMessage(), e);
 
-        // set Allow header
-        e.getResponseHeaders().forEach((key, value) -> {
-            for (String s : value) {
-                response.setHeader(key, s);
-            }
-        });
+        if (e.getSupportedMethods() != null) {
+            response.setHeader(HttpHeaders.ALLOW, String.join(", ", e.getSupportedMethods()));
+        }
 
         return new GenericErrorResponse(
                 getResponseId(),

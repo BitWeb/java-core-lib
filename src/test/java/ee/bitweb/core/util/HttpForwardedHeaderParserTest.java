@@ -2,12 +2,16 @@ package ee.bitweb.core.util;
 
 import ee.bitweb.core.exception.InvalidArgumentException;
 import ee.bitweb.core.util.HttpForwardedHeaderParser.ForwardedHeader;
+import ee.bitweb.core.utils.MemoryAppender;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.simplify4u.slf4jmock.LoggerMock;
-import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.util.Collections;
 import java.util.List;
@@ -18,17 +22,18 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class HttpForwardedHeaderParserTest {
 
-    Logger logger;
+    ch.qos.logback.classic.Logger logger;
+    MemoryAppender memoryAppender;
 
     @BeforeEach
-    void setUp() {
-        logger = Mockito.mock(Logger.class);
-        LoggerMock.setMock(HttpForwardedHeaderParser.class, logger);
-    }
-
-    @AfterEach
-    void tearDown() {
-        LoggerMock.clearMock(HttpForwardedHeaderParser.class);
+    void beforeEach() {
+        MDC.clear();
+        logger = (Logger) LoggerFactory.getLogger(HttpForwardedHeaderParser.class);
+        memoryAppender = new MemoryAppender();
+        memoryAppender.setContext((LoggerContext) LoggerFactory.getILoggerFactory());
+        logger.setLevel(Level.DEBUG);
+        logger.addAppender(memoryAppender);
+        memoryAppender.start();
     }
 
     @Test
@@ -71,8 +76,11 @@ class HttpForwardedHeaderParserTest {
                 () -> assertEquals(0, result.getExtensions().size(), "'extensions' does not have correct number of elements")
         );
 
-        Mockito.verify(logger).debug("'{}' is not recognisable", "for=_SEVKISEK=2");
-        Mockito.verifyNoMoreInteractions(logger);
+        assertEquals(1, memoryAppender.search(
+                "'for=_SEVKISEK=2' is not recognisable",
+                Level.DEBUG).size()
+        );
+        assertEquals(1, memoryAppender.getSize());
     }
 
     @Test

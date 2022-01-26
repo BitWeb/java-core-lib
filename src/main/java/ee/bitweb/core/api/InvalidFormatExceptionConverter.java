@@ -42,13 +42,13 @@ public class InvalidFormatExceptionConverter {
             log.warn("Unrecognized Type: {}. Invalid format exception handled generically, for field {} and value {}."
                     + "Please consider adding type to given list", e.getTargetClass(), e.getField(), e.getValue());
             errors.add(new FieldError(
-                    e.getField(),
+                    ErrorMessage.INVALID_ARGUMENT.toString(),
                     INVALID_VALUE_REASON,
                     String.format(INVALID_VALUE_MESSAGE_FORMAT, e.getValue())
             ));
         }
 
-        return new ValidationException(e.getMessage(), errors);
+        return new ValidationException(ErrorMessage.INVALID_ARGUMENT.toString(), errors);
     }
 
     protected static FieldError tryToCreateEnumErrorRow(InvalidFormatValidationException e) {
