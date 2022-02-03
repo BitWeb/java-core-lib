@@ -9,30 +9,28 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'org.owasp:dependency-check-gradle:5.2.1'
+        classpath 'org.owasp:dependency-check-gradle:6.2.2'
     }
 }
 
 plugins {
     id 'java'
+    id 'jacoco'
+    id 'java-library'
+    id 'maven-publish'
+    id "org.owasp.dependencycheck" version "6.5.3"
 }
 
 group 'ee.bitweb'
 version '2.0.0'
 
-apply plugin: 'maven-publish'
-apply plugin: 'jacoco'
-apply plugin: 'maven'
-apply plugin: 'org.owasp.dependencycheck'
 
 sourceCompatibility = 11
 
 publishing {
     publications {
-        maven(MavenPublication) {
-            artifact("build/libs/core-$version" + ".jar") {
-                extension 'jar'
-            }
+        mavenJava(MavenPublication) {
+            from components.java
         }
     }
     repositories {

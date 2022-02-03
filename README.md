@@ -1,37 +1,20 @@
-# Core library for Command based services
+# BitWeb OÜ Core library
 
-This library is home for various common classes that can be used across services that use command pattern.
+Given library provides basic functionality that is required by any HTTP web service.
+Given library contains only generic functionality that is not specific to any field/subject. 
 
-## Provided classes
+## Provided features 
 
-### Web
 
-* `ee.bitweb.core.api.AbstractController` - Provides handling of the following exceptions:
-  * `HttpMessageNotReadableException`
-  * `MethodArgumentNotValidException`
-  * `BindException`
-  * `ConstraintViolationException`
-  * `EntityNotFoundException`
-  * `ConflictException`
-  * `Throwable`
-* `ee.bitweb.core.api.model.error` contains response models for above mentioned exceptions
-* `ee.bitweb.core.api.model.Response` should be used as the base class for all non-error responses
-* `ee.bitweb.core.`
+### General HTTP web request error handling for Spring Boot applications. 
 
-### Validators
+In order to enable standardised error handlers for HTTP web request hooks 
+you simply need to include `ee.bitweb.core` package in component scanning.
 
-* `@Uppercase` - validates that string contains only uppercase letters or numbers
+### Trace ID generation and propagation
 
-### Exceptions
-
-Package `ee.bitweb.core.exception`
-
-* `BusinessException` - base exception for all exceptions that don't need to be checked (extends Java's `RuntimeException`)
-* `CoreException` - base exception for all exceptions that need to be checked
-* `ConflictException` - exception to be used for cases when saving a new entity would cause a 
-`UniqueConstraintViolationException` for persistence layer
-* `EntityNotFoundException` - exception to be used when an entity is not found in database, handled automatically by
-`AbstractController`
+Given package contains Trace ID generation and propagation related features consolidated in `TraceIdFilter`
+Simply include that filter in your filter chain and you will have a trace id included in MDC. 
 
 ## Usage
 
