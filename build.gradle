@@ -22,7 +22,7 @@ plugins {
 }
 
 group 'ee.bitweb'
-version '2.0.0'
+version '2.0.0-rc-1'
 
 
 sourceCompatibility = 11
@@ -36,7 +36,7 @@ publishing {
     repositories {
         maven {
             name 'nexus'
-            url "https://nexus.bitweb.ee/repository/maven-private/"
+            url "https://nexus.bitweb.ee/repository/maven-public/"
             credentials {
                 username = project.repoUser
                 password = project.repoPassword
@@ -86,6 +86,8 @@ dependencies {
 
     // https://mvnrepository.com/artifact/javax.validation/validation-api
     implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+
+    implementation 'org.springframework.boot:spring-boot-autoconfigure:2.+'
 
     // https://mvnrepository.com/artifact/org.projectlombok/lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"

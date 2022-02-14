@@ -1,7 +1,9 @@
-package ee.bitweb.core.trace;
+package ee.bitweb.core.trace.invoker.http;
 
+import ee.bitweb.core.trace.context.TraceIdContext;
 import ee.bitweb.core.util.HttpForwardedHeaderParser;
 import ee.bitweb.core.util.HttpForwardedHeaderParser.ForwardedExtension;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.core.annotation.Order;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Order(Integer.MIN_VALUE + 20)
+@RequiredArgsConstructor
 public class TraceIdFilter implements Filter {
 
     public static final String PATH = "path";
@@ -37,27 +40,10 @@ public class TraceIdFilter implements Filter {
     private static final String FORWARDED_HEADER = "Forwarded";
     private static final String X_FORWARDED_FOR_HEADER = "X-Forwarded-For";
 
-    private final TraceIdCustomizer customizer;
-    private final TraceIdProvider provider;
-
     private final List<String> sensitiveHeaders = List.of("authorization");
-
-    public TraceIdFilter() {
-        this(TraceIdCustomizerImpl.standard());
-    }
-
-    public TraceIdFilter(TraceIdCustomizer customizer) {
-        this(customizer, new TraceIdProviderImpl(customizer));
-    }
-
-    public TraceIdFilter(TraceIdProvider provider) {
-        this(TraceIdCustomizerImpl.standard(), provider);
-    }
-
-    public TraceIdFilter(TraceIdCustomizer customizer, TraceIdProvider provider) {
-        this.customizer = customizer;
-        this.provider = provider;
-    }
+    private final TraceIdFilterConfig configuration;
+    private final TraceIdContext context;
+    private final HttpServletRequestTraceIdResolver resolver;
 
     @Override
     public void doFilter(
@@ -66,8 +52,7 @@ public class TraceIdFilter implements Filter {
         if (request instanceof HttpServletRequest) {
             HttpServletRequest httpServletRequest = (HttpServletRequest) request;
 
-            TraceId.set(provider.generate(httpServletRequest));
-
+            resolver.resolve(httpServletRequest);
             MDC.put(PATH, httpServletRequest.getServletPath());
             MDC.put(URL, getUrl(httpServletRequest));
             MDC.put(METHOD, httpServletRequest.getMethod());
@@ -78,7 +63,7 @@ public class TraceIdFilter implements Filter {
             addAdditionalHeaders(httpServletRequest);
 
             if (response instanceof HttpServletResponse) {
-                ((HttpServletResponse) response).addHeader(customizer.getHeaderName(), TraceId.get());
+                ((HttpServletResponse) response).addHeader(configuration.getHeaderName(), context.get());
             }
 
             logAllHeaders(httpServletRequest);
@@ -87,7 +72,7 @@ public class TraceIdFilter implements Filter {
         try {
             chain.doFilter(request, response);
         } finally {
-            MDC.clear();
+            context.clear();
         }
     }
 
@@ -127,13 +112,14 @@ public class TraceIdFilter implements Filter {
     }
 
     void addAdditionalHeaders(HttpServletRequest request) {
-        for (AdditionalHeader additionalHeader : customizer.getAdditionalHeaders()) {
-            String header = createHeaderValues(request, additionalHeader.getHeader());
+
+        for (TraceIdFilterConfig.AdditionalHeader additionalHeader : configuration.getAdditionalHeaders()) {
+            String header = createHeaderValues(request, additionalHeader.getHeaderName());
 
             if (header != null) {
-                MDC.put(additionalHeader.getMdc(), header);
+                MDC.put(additionalHeader.getContextKey(), header);
             } else if (log.isDebugEnabled()) {
-                log.debug("Header with name '{}' not present in request", additionalHeader.getHeader());
+                log.debug("Header with name '{}' not present in request", additionalHeader.getHeaderName());
             }
         }
     }

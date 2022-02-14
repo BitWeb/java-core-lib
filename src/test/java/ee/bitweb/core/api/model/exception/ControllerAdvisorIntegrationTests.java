@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.*;
 import org.springframework.boot.test.context.*;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.*;
 import org.springframework.test.web.servlet.request.*;
 
@@ -25,7 +26,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc
-@SpringBootTest(classes= TestSpringApplication.class, properties = { "brais.object-mapper.auto-configuration=true" })
+@ActiveProfiles("MockedInvokerTraceIdCreator")
+@SpringBootTest(
+        classes= TestSpringApplication.class,
+        properties = {
+                "ee.bitweb.core.trace.auto-configuration=true",
+                "ee.bitweb.core.controller-advice.enabled=true"
+        }
+)
 class ControllerAdvisorIntegrationTests {
 
     private static final String TRACE_ID_HEADER_NAME = "X-Trace-ID";
@@ -45,7 +53,7 @@ class ControllerAdvisorIntegrationTests {
                 .andDo(print())
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$", aMapWithSize(2)))
-                .andExpect(jsonPath("$.id", startsWith("1234567890_")))
+                .andExpect(jsonPath("$.id", is("1234567890_generated-trace-id")))
                 .andExpect(jsonPath("$.message", is("INTERNAL_SERVER_ERROR")));
     }
 
@@ -58,7 +66,7 @@ class ControllerAdvisorIntegrationTests {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$", aMapWithSize(3)))
-                .andExpect(jsonPath("$.id", startsWith("1234567890_")))
+                .andExpect(jsonPath("$.id", is("1234567890_generated-trace-id")))
                 .andExpect(jsonPath("$.message", is("INVALID_ARGUMENT")))
                 .andExpect(jsonPath("$.errors", hasSize(1)))
                 .andExpect(jsonPath("$.errors[0]", aMapWithSize(3)))
@@ -76,7 +84,7 @@ class ControllerAdvisorIntegrationTests {
                 .andDo(print())
                 .andExpect(status().isMethodNotAllowed())
                 .andExpect(jsonPath("$", aMapWithSize(2)))
-                .andExpect(jsonPath("$.id", startsWith("1234567890_")))
+                .andExpect(jsonPath("$.id", is("1234567890_generated-trace-id")))
                 .andExpect(jsonPath("$.message", is("METHOD_NOT_ALLOWED")));
     }
 
@@ -90,7 +98,7 @@ class ControllerAdvisorIntegrationTests {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$", aMapWithSize(3)))
-                .andExpect(jsonPath("$.id", startsWith("1234567890_")))
+                .andExpect(jsonPath("$.id", is("1234567890_generated-trace-id")))
                 .andExpect(jsonPath("$.message", is("INVALID_ARGUMENT")))
                 .andExpect(jsonPath("$.errors", hasSize(1)))
                 .andExpect(jsonPath("$.errors[0]", aMapWithSize(3)))
@@ -108,7 +116,7 @@ class ControllerAdvisorIntegrationTests {
                 .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$", aMapWithSize(4)))
-                .andExpect(jsonPath("$.id", is("1234567890_")))
+                .andExpect(jsonPath("$.id", is("1234567890_generated-trace-id")))
                 .andExpect(jsonPath("$.message", is("Entity MyEntity not found")))
                 .andExpect(jsonPath("$.entity", is("MyEntity")))
                 .andExpect(jsonPath("$.criteria", hasSize(1)))
@@ -126,7 +134,7 @@ class ControllerAdvisorIntegrationTests {
                 .andDo(print())
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$", aMapWithSize(4)))
-                .andExpect(jsonPath("$.id", startsWith("1234567890_")))
+                .andExpect(jsonPath("$.id", is("1234567890_generated-trace-id")))
                 .andExpect(jsonPath("$.message", is("Some conflict information")))
                 .andExpect(jsonPath("$.entity", is("MyEntity")))
                 .andExpect(jsonPath("$.criteria", hasSize(1)))
@@ -231,7 +239,7 @@ class ControllerAdvisorIntegrationTests {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$", aMapWithSize(2)))
-                .andExpect(jsonPath("$.id", is("1234567890_")))
+                .andExpect(jsonPath("$.id", is("1234567890_generated-trace-id")))
                 .andExpect(jsonPath("$.message", is("MESSAGE_NOT_READABLE")));
     }
 
@@ -269,7 +277,7 @@ class ControllerAdvisorIntegrationTests {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$", aMapWithSize(2)))
-                .andExpect(jsonPath("$.id", is("1234567890_")))
+                .andExpect(jsonPath("$.id", is("1234567890_generated-trace-id")))
                 .andExpect(jsonPath("$.message", is("CONTENT_TYPE_NOT_VALID")));
     }
 
@@ -363,7 +371,7 @@ class ControllerAdvisorIntegrationTests {
         mockMvc.perform(mockMvcBuilder)
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.id", startsWith("1234567890")))
+                .andExpect(jsonPath("$.id", is("1234567890_generated-trace-id")))
                 .andExpect(jsonPath("$.message", is("INVALID_ARGUMENT")))
                 .andExpect(jsonPath("$.errors[0].field", is("nestedTestObject.zonedDateTimeField")))
                 .andExpect(jsonPath("$.errors[0].reason", is(reason)))
@@ -399,7 +407,7 @@ class ControllerAdvisorIntegrationTests {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$", aMapWithSize(3)))
-                .andExpect(jsonPath("$.id", is("1234567890_")))
+                .andExpect(jsonPath("$.id", is("1234567890_generated-trace-id")))
                 .andExpect(jsonPath("$.message", is("INVALID_ARGUMENT")))
                 .andExpect(jsonPath("$.errors[0]", aMapWithSize(3)))
                 .andExpect(jsonPath("$.errors[0].field", is(field)))
@@ -414,7 +422,7 @@ class ControllerAdvisorIntegrationTests {
     private JSONObject getValidationErrorResponse(String message, List<JSONObject> errors) {
         JSONObject response = new JSONObject();
         JSONArray jsonErrors = new JSONArray(errors);
-        response.put("id", "1234567890_");
+        response.put("id", "1234567890_generated-trace-id");
         response.put("message", message);
         response.put("errors", jsonErrors);
 

@@ -11,11 +11,13 @@ import ee.bitweb.core.api.model.exception.PersistenceErrorResponse;
 import ee.bitweb.core.api.model.exception.ValidationErrorResponse;
 import ee.bitweb.core.exception.persistence.PersistenceException;
 import ee.bitweb.core.exception.validation.InvalidFormatValidationException;
-import ee.bitweb.core.trace.TraceId;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import ee.bitweb.core.trace.context.TraceIdContext;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,9 +36,13 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 
 @Slf4j
 @ControllerAdvice
+@RequiredArgsConstructor
+@ConditionalOnProperty(value = "ee.bitweb.core.controller-advice.enabled", havingValue = "true")
 public class ControllerAdvisor {
 
     private static final String DEFAULT_CONTENT_TYPE = MediaType.APPLICATION_JSON_VALUE;
+
+    private final TraceIdContext traceIdContext;
 
     @ResponseBody
     @ExceptionHandler(PersistenceException.class)
@@ -239,7 +245,7 @@ public class ControllerAdvisor {
     }
 
     private String getResponseId() {
-        return TraceId.get();
+        return traceIdContext.get();
     }
 
     private <T> T logAndReturn(T body) {

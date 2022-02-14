@@ -1,20 +1,16 @@
 package ee.bitweb.core.trace;
 
-import java.util.List;
-
 /**
  * Allows creating your own implementation for configuring TraceId. Can be used to create Properties class in Spring Boot
  * context.
  */
-public interface TraceIdCustomizer {
+public interface TraceIdFormConfig {
 
-    String getHeaderName();
+    //String getHeaderName();
 
     String getPrefix();
 
-    char getDelimiter();
+    Character getDelimiter();
 
-    int getLength();
-
-    List<AdditionalHeader> getAdditionalHeaders();
+    Integer getLength();
 }
