@@ -5,34 +5,26 @@ Given library contains only generic functionality that is not specific to any fi
 
 ## Provided features 
 
+On order to enable component scanning, include package in component scanning eg. `scanBasePackages = {"ee.bitweb.core", ...}`
 
 ### General HTTP web request error handling for Spring Boot applications. 
 
 In order to enable standardised error handlers for HTTP web request hooks 
-you simply need to include `ee.bitweb.core` package in component scanning.
+you simply need to include property `ee.bitweb.core.controller-advice.enabled=true` in application properties.
 
 ### Trace ID generation and propagation
 
 Given package contains Trace ID generation and propagation related features consolidated in `TraceIdFilter`
-Simply include that filter in your filter chain and you will have a trace id included in MDC. 
+Trace ID is easily autoconfigurable by adding `ee.bitweb.core.trace.auto-configuration=true` to application properties.
 
 ## Usage
-
-Add your credentials to `~/.gradle/gradle.properties`:
-
-    nexusUsername=USERNAME
-    nexusPassword=PASSWORD
 
 Add BitWeb's private Maven repository to your build.gradle file
 
     repositories {
         mavenCentral()
         maven {
-            url "https://nexus.bitweb.ee/repository/maven-private/"
-            credentials {
-                username = "${nexusUsername}"
-                password = "${nexusPassword}"
-            }
+            url "https://nexus.bitweb.ee/repository/maven-public/"
         }
     }
 
@@ -41,7 +33,7 @@ Add dependency to your project
 ### Production release
 
     // https://bitbucket.bitweb.ee/projects/BITWEB/repos/java-core-lib/browse
-    implementation group: 'ee.bitweb', name: 'core', version: '1.0.0'
+    implementation group: 'ee.bitweb', name: 'core', version: '2.0.0'
 
 ### Current development version
 
@@ -59,11 +51,7 @@ add `mavenLocal()` as the first repository in repositories list, like so:
         mavenLocal()
         mavenCentral()
         maven {
-            url "https://nexus.bitweb.ee/repository/maven-private/"
-            credentials {
-                username = "${nexusUsername}"
-                password = "${nexusPassword}"
-            }
+            url "https://nexus.bitweb.ee/repository/maven-public/"
         }
     }
 
