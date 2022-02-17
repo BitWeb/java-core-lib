@@ -1,6 +1,6 @@
 package ee.bitweb.core.exception;
 
-public class CoreException extends Exception {
+public class CoreException extends RuntimeException {
 
     public CoreException(String message) {
         super(message);

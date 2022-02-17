@@ -1,9 +1,9 @@
 package ee.bitweb.core.config;
 
 import com.fasterxml.classmate.TypeResolver;
-import ee.bitweb.core.api.model.error.EntityNotFoundErrorResponse;
-import ee.bitweb.core.api.model.error.InternalErrorResponse;
-import ee.bitweb.core.api.model.error.ValidationErrorResponse;
+import ee.bitweb.core.api.model.exception.GenericErrorResponse;
+import ee.bitweb.core.api.model.exception.PersistenceErrorResponse;
+import ee.bitweb.core.api.model.exception.ValidationErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,8 +34,8 @@ public abstract class AbstractSwaggerConfig {
                 .apis(RequestHandlerSelectors.basePackage(basePackage))
                 .paths(PathSelectors.any())
                 .build()
-                .additionalModels(typeResolver.resolve(InternalErrorResponse.class))
-                .additionalModels(typeResolver.resolve(EntityNotFoundErrorResponse.class))
+                .additionalModels(typeResolver.resolve(GenericErrorResponse.class))
+                .additionalModels(typeResolver.resolve(PersistenceErrorResponse.class))
                 .globalResponseMessage(RequestMethod.GET, responseMessages)
                 .globalResponseMessage(RequestMethod.POST, responseMessages)
                 .globalResponseMessage(RequestMethod.PUT, responseMessages)
@@ -76,13 +76,13 @@ public abstract class AbstractSwaggerConfig {
         messages.add(new ResponseMessageBuilder()
                 .code(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
                 .message("Internal error")
-                .responseModel(new ModelRef(InternalErrorResponse.class.getSimpleName()))
+                .responseModel(new ModelRef(GenericErrorResponse.class.getSimpleName()))
                 .build());
 
         messages.add(new ResponseMessageBuilder()
                 .code(HttpServletResponse.SC_NOT_FOUND)
                 .message("Entity not found")
-                .responseModel(new ModelRef(EntityNotFoundErrorResponse.class.getSimpleName()))
+                .responseModel(new ModelRef(PersistenceErrorResponse.class.getSimpleName()))
                 .build());
 
         return messages;

@@ -1,55 +1,30 @@
-# Core library for Command based services
+# BitWeb OÜ Core library
 
-This library is home for various common classes that can be used across services that use command pattern.
+Given library provides basic functionality that is required by any HTTP web service.
+Given library contains only generic functionality that is not specific to any field/subject. 
 
-## Provided classes
+## Provided features 
 
-### Web
+On order to enable component scanning, include package in component scanning eg. `scanBasePackages = {"ee.bitweb.core", ...}`
 
-* `ee.bitweb.core.api.AbstractController` - Provides handling of the following exceptions:
-  * `HttpMessageNotReadableException`
-  * `MethodArgumentNotValidException`
-  * `BindException`
-  * `ConstraintViolationException`
-  * `EntityNotFoundException`
-  * `ConflictException`
-  * `Throwable`
-* `ee.bitweb.core.api.model.error` contains response models for above mentioned exceptions
-* `ee.bitweb.core.api.model.Response` should be used as the base class for all non-error responses
-* `ee.bitweb.core.`
+### General HTTP web request error handling for Spring Boot applications. 
 
-### Validators
+In order to enable standardised error handlers for HTTP web request hooks 
+you simply need to include property `ee.bitweb.core.controller-advice.enabled=true` in application properties.
 
-* `@Uppercase` - validates that string contains only uppercase letters or numbers
+### Trace ID generation and propagation
 
-### Exceptions
-
-Package `ee.bitweb.core.exception`
-
-* `BusinessException` - base exception for all exceptions that don't need to be checked (extends Java's `RuntimeException`)
-* `CoreException` - base exception for all exceptions that need to be checked
-* `ConflictException` - exception to be used for cases when saving a new entity would cause a 
-`UniqueConstraintViolationException` for persistence layer
-* `EntityNotFoundException` - exception to be used when an entity is not found in database, handled automatically by
-`AbstractController`
+Given package contains Trace ID generation and propagation related features consolidated in `TraceIdFilter`
+Trace ID is easily autoconfigurable by adding `ee.bitweb.core.trace.auto-configuration=true` to application properties.
 
 ## Usage
-
-Add your credentials to `~/.gradle/gradle.properties`:
-
-    nexusUsername=USERNAME
-    nexusPassword=PASSWORD
 
 Add BitWeb's private Maven repository to your build.gradle file
 
     repositories {
         mavenCentral()
         maven {
-            url "https://nexus.bitweb.ee/repository/maven-private/"
-            credentials {
-                username = "${nexusUsername}"
-                password = "${nexusPassword}"
-            }
+            url "https://nexus.bitweb.ee/repository/maven-public/"
         }
     }
 
@@ -58,7 +33,7 @@ Add dependency to your project
 ### Production release
 
     // https://bitbucket.bitweb.ee/projects/BITWEB/repos/java-core-lib/browse
-    implementation group: 'ee.bitweb', name: 'core', version: '1.0.0'
+    implementation group: 'ee.bitweb', name: 'core', version: '2.0.0'
 
 ### Current development version
 
@@ -76,11 +51,7 @@ add `mavenLocal()` as the first repository in repositories list, like so:
         mavenLocal()
         mavenCentral()
         maven {
-            url "https://nexus.bitweb.ee/repository/maven-private/"
-            credentials {
-                username = "${nexusUsername}"
-                password = "${nexusPassword}"
-            }
+            url "https://nexus.bitweb.ee/repository/maven-public/"
         }
     }
 
