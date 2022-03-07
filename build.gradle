@@ -22,7 +22,7 @@ plugins {
 }
 
 group 'ee.bitweb'
-version '2.0.0'
+version '2.0.1'
 
 
 sourceCompatibility = 11
@@ -80,6 +80,9 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.4'
+
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.module/jackson-module-kotlin
+    implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.12.0'
 
     // https://mvnrepository.com/artifact/io.springfox/springfox-bean-validators
     implementation group: 'io.springfox', name: 'springfox-bean-validators', version: '2.10.+'

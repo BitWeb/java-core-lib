@@ -83,6 +83,12 @@ run.
 
 ## Release notes
 
+### 2.0.1 
+
+* SBA request actuator/health threw classdefNotFoundException in jackson serializer.
+Had to downgrade kotlin version to 2.12.0.
+Bugfix thread: https://github.com/FasterXML/jackson-module-kotlin/issues/523
+
 ### 1.1.0-SNAPSHOT
 
 * ...
