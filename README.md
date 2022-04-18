@@ -8,18 +8,39 @@ Given library contains only generic functionality that is not specific to any fi
 On order to enable component scanning, include package in component scanning eg. `scanBasePackages = {"ee.bitweb.core", ...}`
 
 ### General HTTP web request error handling for Spring Boot applications. 
-
+###### Since 2.0.0
 In order to enable standardised error handlers for HTTP web request hooks 
 you simply need to include property `ee.bitweb.core.controller-advice.enabled=true` in application properties.
 
 ### Trace ID generation and propagation
-
+###### Since 2.0.0
 Given package contains Trace ID generation and propagation related features consolidated in `TraceIdFilter`
 Trace ID is easily autoconfigurable by adding `ee.bitweb.core.trace.auto-configuration=true` to application properties.
 
+### Spring Boot Actuator Security
+###### Since 2.1.0
+Simplifies securing Spring Boot Actuator endpoints to authorise only one user. Health endpoint has special security
+configuration to allow unauthorised access by different monitoring tools. Actuator must be configured to only 
+show basic data (`when_authorized`) or show no data at all (`never`) with property
+`management.endpoint.health.show-details` , otherwise information about the application and it's contents may leak in
+the form of used databases and other connections. This may open up indirect attack vectors.
+
+For basic usage, just two config options are needed:
+
+    ee.bitweb.core.actuator.security.enabled=true
+    ee.bitweb.core.actuator.security.user.password=my-secret-password-123
+
+Full configuration options:
+* `ee.bitweb.core.actuator.security.enabled` - enables or disables security configuration, default `false`
+* `ee.bitweb.core.actuator.security.role` - specifies the role that is allowed to access actuator endpoints, default `ACTUATOR`
+* `ee.bitweb.core.actuator.security.health-endpoint-roles` - list of roles that are allowed to view health endpoint, default `ACTUATOR,ANONYMOUS`
+* `ee.bitweb.core.actuator.security.user.name` - name of the user that is allowed, default `actuator-user`
+* `ee.bitweb.core.actuator.security.user.password` - password of the user that is allowed, defaults to random string
+* `ee.bitweb.core.actuator.security.user.roles` - list of roles to assign to the user, default `ACTUATOR`
+
 ## Usage
 
-Add BitWeb's private Maven repository to your build.gradle file
+Add BitWeb's public Maven repository to your build.gradle file
 
     repositories {
         mavenCentral()
@@ -33,14 +54,11 @@ Add dependency to your project
 ### Production release
 
     // https://bitbucket.bitweb.ee/projects/BITWEB/repos/java-core-lib/browse
-    implementation group: 'ee.bitweb', name: 'core', version: '2.0.0'
+    implementation group: 'ee.bitweb', name: 'core', version: '2.1.0'
 
 ### Current development version
 
-All changes to master branch will be pushed to Maven repository as SNAPSHOT versions
-
-    // https://bitbucket.bitweb.ee/projects/BITWEB/repos/java-core-lib/browse
-    implementation group: 'ee.bitweb', name: 'core', version: '1.1.0-SNAPSHOT', changing: 'true'
+Development versions are not provided at this point.
 
 ## Development
 
@@ -55,8 +73,8 @@ add `mavenLocal()` as the first repository in repositories list, like so:
         }
     }
 
-After this is done, you'll need to run `gradle install` in this project, to generate the jar file and add it to the
-local Maven Repository in your machine. Then, in the project that's using this library, you need 
+After this is done, you'll need to run `gradle publishToMavenLocal` in this project, to generate the jar file and add it
+to the local Maven Repository in your machine. Then, in the project that's using this library, you need 
 [reimport](https://www.jetbrains.com/help/idea/work-with-gradle-projects.html#gradle_refresh_project) the Gradle project.
 In some cases reimport might not be needed.
 
@@ -74,14 +92,11 @@ release notes section of this document. Documentation must be done before making
 * **Patch** - Bug fixes. No features added to public API
 * **SNAPSHOT** - Indicates version in progress. DO NOT use snapshot versions for production or staging
 
-Versions will be released at least before any project that uses this library, moves to staging environment. 
-
-## Docker
-
-Dockerfile is only for running tests in Bamboo, this is a library **NOT** an application, so there is no main class to 
-run.
-
 ## Release notes
+
+### 2.1.0
+
+* Added Spring Boot Actuator security configuration
 
 ### 2.0.1 
 
@@ -89,9 +104,9 @@ run.
 Had to downgrade kotlin version to 2.12.0.
 Bugfix thread: https://github.com/FasterXML/jackson-module-kotlin/issues/523
 
-### 1.1.0-SNAPSHOT
+### 2.0.0
 
-* ...
+* Major rewrite, not at all compatible with 1.*
 
 ### 1.0.0
 
