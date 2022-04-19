@@ -3,7 +3,7 @@ buildscript {
         springBootVersion = '2.6.6'
         springVersion = '5.+'
         lombokVersion = '1.18.+'
-        mockitoVersion = '4.0.+'
+        mockitoVersion = '4.4.+'
     }
     repositories {
         mavenCentral()
@@ -79,19 +79,22 @@ dependencies {
     implementation group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
 
     // https://mvnrepository.com/artifact/org.springframework/spring-tx
-    implementation group: 'org.springframework', name: 'spring-tx', version: '5.+'
+    implementation group: 'org.springframework', name: 'spring-tx', version: "${springVersion}"
 
     // https://mvnrepository.com/artifact/io.swagger/swagger-annotations
-    implementation group: 'io.swagger', name: 'swagger-annotations', version: '1.5.21'
+    implementation group: 'io.swagger', name: 'swagger-annotations', version: '1.6.6'
 
     // https://mvnrepository.com/artifact/io.springfox/springfox-spring-web
     implementation group: 'io.springfox', name: 'springfox-spring-web', version: '2.10.+'
 
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.2.2'
+
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.4'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.2'
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.module/jackson-module-kotlin
-    implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.12.0'
+    implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.13.2'
 
     // https://mvnrepository.com/artifact/io.springfox/springfox-bean-validators
     implementation group: 'io.springfox', name: 'springfox-bean-validators', version: '2.10.+'
@@ -106,29 +109,22 @@ dependencies {
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
 
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.8.1'
-
-    // https://mvnrepository.com/artifact/org.jacoco/org.jacoco.core
-    testImplementation group: 'org.jacoco', name: 'org.jacoco.core', version: '0.8.7'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.8.2'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
-    testImplementation (group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: "${springBootVersion}")
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: "${springBootVersion}"
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
-    testImplementation (group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: "${springBootVersion}")
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: "${springBootVersion}"
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
-    testImplementation (group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: "${springBootVersion}")
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: "${springBootVersion}"
 
-    // https://mvnrepository.com/artifact/org.springframework/spring-test
-    testImplementation group: 'org.springframework', name: 'spring-test', version: "${springVersion}"
-
-    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.15.0'
-
+    // https://mvnrepository.com/artifact/org.projectlombok/lombok
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
 
     // https://mvnrepository.com/artifact/org.json/json
-    testImplementation group: 'org.json', name: 'json', version: '20210307'
+    testImplementation group: 'org.json', name: 'json', version: '20220320'
 
     // https://mvnrepository.com/artifact/org.mockito/mockito-inline
     testImplementation group: 'org.mockito', name: 'mockito-inline', version: "${mockitoVersion}"
