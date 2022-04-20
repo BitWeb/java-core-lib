@@ -2,6 +2,7 @@ package ee.bitweb.core.actuator;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @Component
 @Validated
 @ConfigurationProperties(prefix = "ee.bitweb.core.actuator.security")
+@ConditionalOnProperty(value = "ee.bitweb.core.actuator.security.enabled", havingValue = "true")
 public class ActuatorSecurityProperties {
 
     private static final String DEFAULT_ROLE = "ACTUATOR";

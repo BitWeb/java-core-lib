@@ -106,8 +106,4 @@ class ActuatorAuthenticationProviderTest {
 
         verifyNoMoreInteractions(actuatorUser, actuatorSecurityProperties, authentication);
     }
-
-    @Test
-    void test() {
-    }
 }
