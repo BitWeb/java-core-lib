@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 
 @Slf4j
 @SuperBuilder
@@ -13,10 +12,10 @@ import org.slf4j.MDC;
 public abstract class ScheduledJob<T extends ScheduledRunnable> {
 
     private T runnable;
-    private SchedulerTraceIdResolver schedulerTraceIdResolver;
+    private SchedulerTraceIdResolver traceIdResolver;
 
     public void run() {
-        schedulerTraceIdResolver.resolve();
+        traceIdResolver.resolve();
 
         log.info("Started {}", getClass().getName());
 
@@ -28,6 +27,6 @@ public abstract class ScheduledJob<T extends ScheduledRunnable> {
 
         log.info("Finished {}", getClass().getName());
 
-        MDC.clear();
+        traceIdResolver.getContext().clear();
     }
 }

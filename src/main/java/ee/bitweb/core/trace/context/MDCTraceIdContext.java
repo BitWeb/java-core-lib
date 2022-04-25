@@ -32,4 +32,8 @@ public final class MDCTraceIdContext implements TraceIdContext{
         MDC.clear();
     }
 
+    @Override
+    public void put(String key, String value) {
+        MDC.put(key, value);
+    }
 }

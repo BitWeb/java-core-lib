@@ -54,7 +54,7 @@ class ScheduledJobTest {
         testJob = TestJob
                 .builder()
                 .runnable(scheduledRunnable)
-                .schedulerTraceIdResolver(schedulerTraceIdResolver)
+                .traceIdResolver(schedulerTraceIdResolver)
                 .build();
     }
 
