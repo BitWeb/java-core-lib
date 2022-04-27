@@ -2,12 +2,14 @@ package ee.bitweb.core.trace.invoker.scheduler;
 
 import ee.bitweb.core.trace.creator.TraceIdCreator;
 import ee.bitweb.core.trace.context.TraceIdContext;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.StringUtils;
 
 @RequiredArgsConstructor
 public class SchedulerTraceIdResolver {
 
+    @Getter
     private final TraceIdContext context;
     private final TraceIdCreator creator;
 

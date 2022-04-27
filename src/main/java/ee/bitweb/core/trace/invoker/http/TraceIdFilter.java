@@ -53,11 +53,11 @@ public class TraceIdFilter implements Filter {
             HttpServletRequest httpServletRequest = (HttpServletRequest) request;
 
             resolver.resolve(httpServletRequest);
-            MDC.put(PATH, httpServletRequest.getServletPath());
-            MDC.put(URL, getUrl(httpServletRequest));
-            MDC.put(METHOD, httpServletRequest.getMethod());
-            MDC.put(QUERY_STRING, httpServletRequest.getQueryString());
-            MDC.put(USER_AGENT, getUserAgent(httpServletRequest));
+            context.put(PATH, httpServletRequest.getServletPath());
+            context.put(URL, getUrl(httpServletRequest));
+            context.put(METHOD, httpServletRequest.getMethod());
+            context.put(QUERY_STRING, httpServletRequest.getQueryString());
+            context.put(USER_AGENT, getUserAgent(httpServletRequest));
 
             addForwardingInfo(httpServletRequest);
             addAdditionalHeaders(httpServletRequest);
@@ -93,18 +93,18 @@ public class TraceIdFilter implements Filter {
     void addForwardingInfo(HttpServletRequest request) {
         String forwardedFor = createHeaderValues(request, X_FORWARDED_FOR_HEADER);
         if (forwardedFor != null) {
-            MDC.put(X_FORWARDED_FOR, forwardedFor);
+            context.put(X_FORWARDED_FOR, forwardedFor);
         }
 
         if (request.getHeader(FORWARDED_HEADER) != null) {
             var result = HttpForwardedHeaderParser.parse(request.getHeaders(FORWARDED_HEADER));
-            MDC.put(FORWARDED, createHeaderValues(request, FORWARDED_HEADER));
+            context.put(FORWARDED, createHeaderValues(request, FORWARDED_HEADER));
 
-            MDC.put(FORWARDED_BY, String.join("|", result.getBy()));
-            MDC.put(FORWARDED_FOR, String.join("|", result.getAFor()));
-            MDC.put(FORWARDED_HOST, String.join("|", result.getHost()));
-            MDC.put(FORWARDED_PROTO, String.join("|", result.getProto()));
-            MDC.put(
+            context.put(FORWARDED_BY, String.join("|", result.getBy()));
+            context.put(FORWARDED_FOR, String.join("|", result.getAFor()));
+            context.put(FORWARDED_HOST, String.join("|", result.getHost()));
+            context.put(FORWARDED_PROTO, String.join("|", result.getProto()));
+            context.put(
                     FORWARDED_EXTENSIONS,
                     result.getExtensions().stream().map(ForwardedExtension::toString).collect(Collectors.joining("|"))
             );
@@ -117,7 +117,7 @@ public class TraceIdFilter implements Filter {
             String header = createHeaderValues(request, additionalHeader.getHeaderName());
 
             if (header != null) {
-                MDC.put(additionalHeader.getContextKey(), header);
+                context.put(additionalHeader.getContextKey(), header);
             } else if (log.isDebugEnabled()) {
                 log.debug("Header with name '{}' not present in request", additionalHeader.getHeaderName());
             }
