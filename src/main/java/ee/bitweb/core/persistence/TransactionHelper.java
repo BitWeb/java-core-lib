@@ -1,15 +1,15 @@
 package ee.bitweb.core.persistence;
 
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TransactionHelper {
 
-    private TransactionHelper() {
-    }
-
     public static void afterCommit(Runnable runnable) {
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override
             public void afterCommit() {
                 runnable.run();
