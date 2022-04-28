@@ -38,6 +38,27 @@ Full configuration options:
 * `ee.bitweb.core.actuator.security.user.password` - password of the user that is allowed, defaults to random string
 * `ee.bitweb.core.actuator.security.user.roles` - list of roles to assign to the user, default `ACTUATOR`
 
+### Retrofit features
+###### Since 2.1.0
+Introduces a more convenient builder for retrofit api creation. `ee.bitweb.core.retrofit.builder.RetrofitApiBuilder`
+builder has no requirements to use, it has logging interceptor set up out of the box. In addition it uses
+preconfigured JSON payload converter with predefined ObjectMapper to included `JavaTimeModule`.
+
+Spring context aware `ee.bitweb.core.retrofit.builder.SpringAwareRetrofitBuilder` bean is also created when 
+`ee.bitweb.core.retrofit.auto-configuration=true` property is set in configuration. It will automatically detect all
+interceptor beans that implement `ee.bitweb.core.retrofit.interceptor.InterceptorBean` interface and add those to all
+api-s. 
+
+If both `ee.bitweb.core.trace.auto-configuration=true` and `ee.bitweb.core.retrofit.auto-configuration=true` properties
+are set, then TraceId propagation interceptor is automatically loaded to the list of preloaded interceptors for
+`ee.bitweb.core.retrofit.builder.SpringAwareRetrofitBuilder`
+
+Basic `ee.bitweb.core.retrofit.interceptor.auth.AuthTokenInjectInterceptor` is also provided that can be used to 
+propagate auth tokens between internal services. It is not autoconfigured in no way, to AVOID ACCIDENTAL LEAKAGE
+of tokens to external services. In order to use that interceptor you must provide implementation of 
+`ee.bitweb.core.retrofit.interceptor.auth.TokenProvider` interface. 
+
+
 ## Usage
 
 Add BitWeb's public Maven repository to your build.gradle file

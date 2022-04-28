@@ -397,6 +397,20 @@ class ControllerAdvisorIntegrationTests {
         testFieldPost("longField", "\"" + val + "\"", reason, message);
     }
 
+    @Test
+    void onRetrofitExceptionItIsPropagated() throws Exception {
+        MockHttpServletRequestBuilder mockMvcBuilder = get(TestPingController.BASE_URL + "/retrofit-exception")
+                .header(TRACE_ID_HEADER_NAME, "1234567890")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(mockMvcBuilder)
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$", aMapWithSize(1)))
+                .andExpect(jsonPath("$.error", is("message")));
+    }
+
     private void testFieldPost(String field, String value, String expectedReason, String expectedMessage) throws Exception {
         MockHttpServletRequestBuilder mockMvcBuilder = post(TestPingController.BASE_URL)
                 .header(TRACE_ID_HEADER_NAME, "1234567890")
