@@ -3,7 +3,6 @@ package ee.bitweb.core.retrofit.interceptor;
 import ee.bitweb.core.trace.context.TraceIdContext;
 import ee.bitweb.core.trace.invoker.http.TraceIdFilterConfig;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
@@ -13,8 +12,6 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 
-
-@Slf4j
 @Component
 @RequiredArgsConstructor
 @ConditionalOnExpression(value = "${ee.bitweb.core.trace.auto-configuration:false} and ${ee.bitweb.core.retrofit.auto-configuration:false}")
