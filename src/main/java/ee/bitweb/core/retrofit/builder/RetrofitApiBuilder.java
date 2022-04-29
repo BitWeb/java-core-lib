@@ -21,10 +21,14 @@ public class RetrofitApiBuilder<T> {
     public static final HttpLoggingInterceptor DEFAULT_LOGGING_INTERCEPTOR = new HttpLoggingInterceptor()
             .setLevel(HttpLoggingInterceptor.Level.BASIC);
 
-    public static final ObjectMapper DEFAULT_OBJECT_MAPPER = new ObjectMapper()
-            .registerModule(new JavaTimeModule())
-            .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    public static final ObjectMapper DEFAULT_OBJECT_MAPPER = new ObjectMapper();
+
+    static {
+        DEFAULT_OBJECT_MAPPER.registerModule(new JavaTimeModule())
+                .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .disable(DeserializationFeature.ACCEPT_FLOAT_AS_INT);
+    }
 
     private static final JacksonConverterFactory DEFAULT_CONVERTER_FACTORY = JacksonConverterFactory.create(DEFAULT_OBJECT_MAPPER);
 

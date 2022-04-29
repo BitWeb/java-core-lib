@@ -44,9 +44,6 @@ public class SpringAwareRetrofitBuilderTests {
     private TraceIdFilterConfig config;
 
     @Autowired
-    private Converter.Factory converterFactory;
-
-    @Autowired
     @Qualifier("interceptor1")
     private RequestCountInterceptor interceptor1;
 

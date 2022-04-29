@@ -1,5 +1,7 @@
 package ee.bitweb.core.retrofit.builder;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.bitweb.core.retrofit.helpers.ExternalServiceApi;
 import ee.bitweb.core.retrofit.helpers.MockServerHelper;
 import ee.bitweb.core.retrofit.helpers.RequestCountInterceptor;
@@ -9,6 +11,9 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockserver.integration.ClientAndServer;
+import retrofit2.Converter;
+import retrofit2.converter.jackson.JacksonConverterFactory;
+
 import java.util.List;
 
 @Tag("unit")
@@ -30,7 +35,7 @@ class RetrofitApiBuilderTests {
 
     @Test
     void defaultBuilderWorksAsExpected() throws Exception {
-        mockServerGet(externalService, "message", 1);
+        mockServerGet(externalService, "message", "1");
         ExternalServiceApi api = RetrofitApiBuilder.create(
                 BASE_URL,
                 ExternalServiceApi.class
@@ -45,7 +50,7 @@ class RetrofitApiBuilderTests {
 
     @Test
     void addedInterceptorShouldBeUsedOnRequest() throws Exception {
-        mockServerGet(externalService, "message", 1);
+        mockServerGet(externalService, "message", "1");
         RequestCountInterceptor customInterceptor = new RequestCountInterceptor();
 
         ExternalServiceApi api = RetrofitApiBuilder.create(
@@ -65,7 +70,7 @@ class RetrofitApiBuilderTests {
 
     @Test
     void addedMultipleInterceptorsShouldAllBeUsedOnRequest() throws Exception {
-        mockServerGet(externalService, "message", 1);
+        mockServerGet(externalService, "message", "1");
         RequestCountInterceptor customInterceptor1 = new RequestCountInterceptor();
         RequestCountInterceptor customInterceptor2 = new RequestCountInterceptor();
 
@@ -90,7 +95,7 @@ class RetrofitApiBuilderTests {
 
     @Test
     void onAddedCustomClientIsApplied() throws Exception {
-        mockServerGet(externalService, "message", 1);
+        mockServerGet(externalService, "message", "1");
         RequestCountInterceptor interceptor = new RequestCountInterceptor();
 
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder().addInterceptor(interceptor);
@@ -112,7 +117,7 @@ class RetrofitApiBuilderTests {
 
     @Test
     void clearInterceptorsRemovesInterceptors() throws Exception {
-        mockServerGet(externalService, "message", 1);
+        mockServerGet(externalService, "message", "1");
         RequestCountInterceptor interceptor = new RequestCountInterceptor();
 
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder().addInterceptor(interceptor);
@@ -134,7 +139,7 @@ class RetrofitApiBuilderTests {
 
     @Test
     void removeInterceptorRemovesProvidedInterceptorOnly() throws Exception {
-        mockServerGet(externalService, "message", 1);
+        mockServerGet(externalService, "message", "1");
 
         RequestCountInterceptor customInterceptor1 = new RequestCountInterceptor();
         RequestCountInterceptor customInterceptor2 = new RequestCountInterceptor();
@@ -158,7 +163,30 @@ class RetrofitApiBuilderTests {
         );
     }
 
-    private static void mockServerGet(ClientAndServer server, String message, Integer value) {
+    @Test
+    void addedCustomConverterIsApplied() throws Exception {
+        mockServerGet(externalService, "message", 1.1);
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(DeserializationFeature.ACCEPT_FLOAT_AS_INT);
+        Converter.Factory converter = JacksonConverterFactory.create(mapper);
+
+        ExternalServiceApi api = RetrofitApiBuilder.create(
+                BASE_URL,
+                ExternalServiceApi.class
+        ).converter(
+                converter
+        ).build();
+
+        ExternalServiceApi.Payload response = api.get().execute().body();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals("message", response.getMessage()),
+                () -> Assertions.assertEquals(1, response.getValue())
+        );
+    }
+
+    private static void mockServerGet(ClientAndServer server, String message, Object value) {
         MockServerHelper.setupMockGetRequest(
                 server,
                 "/request",
@@ -168,7 +196,7 @@ class RetrofitApiBuilderTests {
         );
     }
 
-    private static JSONObject createPayload(String message, Integer value) {
+    private static JSONObject createPayload(String message, Object value) {
         JSONObject payload = new JSONObject();
 
         payload.put("message", message);
