@@ -3,6 +3,7 @@ package ee.bitweb.core.retrofit.interceptor.auth;
 import ee.bitweb.core.retrofit.builder.RetrofitApiBuilder;
 import ee.bitweb.core.retrofit.helpers.ExternalServiceApi;
 import ee.bitweb.core.retrofit.helpers.MockServerHelper;
+import ee.bitweb.core.retrofit.interceptor.auth.criteria.WhitelistCriteria;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +23,7 @@ public class AuthTokenInjectInterceptorTests {
     private static final String HEADER_NAME = "x-auth-token";
     private static ClientAndServer externalService;
 
+
     @Mock
     private TokenProvider provider;
 
@@ -36,7 +38,7 @@ public class AuthTokenInjectInterceptorTests {
     }
 
     @Test
-    void onExistingTokenShouldBeAddedToRequest() throws Exception {
+    void onExistingTokenWithPassingCriteriaShouldBeAddedToRequest() throws Exception {
         Mockito.doReturn("token-value").when(provider).get();
 
         MockServerHelper.setupMockGetRequest(
@@ -50,13 +52,26 @@ public class AuthTokenInjectInterceptorTests {
                 createPayload("message", 1).toString()
         );
 
+        ExternalServiceApi api = createBuilder()
+                .add(
+                        new AuthTokenInjectInterceptor(
+                                HEADER_NAME,
+                                provider,
+                                new WhitelistCriteria(
+                                        List.of(
+                                                "http://localhost"
+                                        )
+                                )
+                        )
+                ).build();
+
         Assertions.assertAll(
-                () -> Assertions.assertEquals("message", createApi().get().execute().body().getMessage())
+                () -> Assertions.assertEquals("message", api.get().execute().body().getMessage())
         );
     }
 
-    @Test
-    void onMissingTraceIdInContextShouldThrowException() throws Exception {
+    @Test // TODO need to find a way to verify that header was missing
+    void onMissingTokenShouldNotAddHeader() throws Exception {
         MockServerHelper.setupMockGetRequest(
                 externalService,
                 "/request",
@@ -65,19 +80,39 @@ public class AuthTokenInjectInterceptorTests {
                 createPayload("message", 1).toString()
         );
 
+        ExternalServiceApi api = createBuilder()
+                .add(
+                        new AuthTokenInjectInterceptor(
+                                HEADER_NAME,
+                                provider,
+                                new WhitelistCriteria(List.of("http://localhost")
+                                )
+                        )
+                ).build();
+
         Assertions.assertAll(
                 () -> Assertions.assertEquals("message", createApi().get().execute().body().getMessage())
+        );
+
+    }
+
+    private RetrofitApiBuilder<ExternalServiceApi> createBuilder() {
+        return RetrofitApiBuilder.create(
+                BASE_URL,
+                ExternalServiceApi.class
         );
     }
 
     private ExternalServiceApi createApi() {
-
-        return RetrofitApiBuilder.create(
-                BASE_URL,
-                ExternalServiceApi.class
-        ).add(
-                new AuthTokenInjectInterceptor(HEADER_NAME, provider)
-        ).build();
+        return createBuilder()
+                .add(
+                        new AuthTokenInjectInterceptor(
+                                HEADER_NAME,
+                                provider,
+                                new WhitelistCriteria(List.of("http://localhost")
+                                )
+                        )
+                ).build();
     }
 
     private static JSONObject createPayload(String message, Integer value) {

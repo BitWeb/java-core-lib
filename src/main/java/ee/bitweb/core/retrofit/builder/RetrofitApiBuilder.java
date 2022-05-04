@@ -3,8 +3,6 @@ package ee.bitweb.core.retrofit.builder;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -12,16 +10,14 @@ import retrofit2.Converter;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class RetrofitApiBuilder<T> {
 
-    public static final HttpLoggingInterceptor DEFAULT_LOGGING_INTERCEPTOR = new HttpLoggingInterceptor()
-            .setLevel(HttpLoggingInterceptor.Level.BASIC);
-
     public static final ObjectMapper DEFAULT_OBJECT_MAPPER = new ObjectMapper();
+    public static final LoggingLevel DEFAULT_LOGGING_LEVEL = LoggingLevel.BASIC;
 
     static {
         DEFAULT_OBJECT_MAPPER.registerModule(new JavaTimeModule())
@@ -32,21 +28,28 @@ public class RetrofitApiBuilder<T> {
 
     private static final JacksonConverterFactory DEFAULT_CONVERTER_FACTORY = JacksonConverterFactory.create(DEFAULT_OBJECT_MAPPER);
 
-    private static final List<Interceptor> STANDARD_INTERCEPTORS = List.of(
-            DEFAULT_LOGGING_INTERCEPTOR
-    );
-
     private final String url;
     private final Class<T> definition;
+    private final HttpLoggingInterceptor loggingInterceptor;
 
     private Converter.Factory converterFactory;
-    private OkHttpClient.Builder clientBuilder = createDefaultBuilder();
+    private OkHttpClient.Builder clientBuilder;
 
     public static <T> RetrofitApiBuilder<T>  create(String baseUrl, Class<T> definition) {
         return new RetrofitApiBuilder<>(
                 baseUrl,
-                definition
+                definition,
+                new HttpLoggingInterceptor()
+                        .setLevel(DEFAULT_LOGGING_LEVEL.getLevel())
         );
+    }
+
+    private RetrofitApiBuilder(String url, Class<T> definition, HttpLoggingInterceptor loggingInterceptor) {
+        this.url = url;
+        this.definition = definition;
+        this.loggingInterceptor = loggingInterceptor;
+
+        clientBuilder = createDefaultBuilder(loggingInterceptor);
     }
 
     public RetrofitApiBuilder<T> emptyInterceptors() {
@@ -63,6 +66,41 @@ public class RetrofitApiBuilder<T> {
 
     public RetrofitApiBuilder<T> remove(Interceptor interceptor) {
         clientBuilder.interceptors().remove(interceptor);
+
+        return this;
+    }
+
+    public RetrofitApiBuilder<T> removeAll(Class<? extends Interceptor> definition) {
+        List<Interceptor> candidates = new ArrayList<>();
+
+        for (Interceptor c : clientBuilder.interceptors()) {
+            if (c.getClass() == definition) {
+                candidates.add(c);
+            }
+        }
+
+        for (Interceptor c : candidates) {
+            this.remove(c);
+        }
+
+        return this;
+    }
+
+    public RetrofitApiBuilder<T> replaceAllOfType(Interceptor interceptor) {
+        removeAll(interceptor.getClass());
+        add(interceptor);
+
+        return this;
+    }
+
+    public RetrofitApiBuilder<T> loggingLevel(LoggingLevel level) {
+        loggingInterceptor.setLevel(level.getLevel());
+
+        return this;
+    }
+
+    public RetrofitApiBuilder<T> suppressedHeaders(List<String> headers) {
+        headers.forEach(loggingInterceptor::redactHeader);
 
         return this;
     }
@@ -94,9 +132,9 @@ public class RetrofitApiBuilder<T> {
                 .build().create(definition);
     }
 
-    private OkHttpClient.Builder createDefaultBuilder() {
+    private OkHttpClient.Builder createDefaultBuilder(HttpLoggingInterceptor loggingInterceptor) {
         var httpClientBuilder = new OkHttpClient.Builder();
-        httpClientBuilder.interceptors().addAll(STANDARD_INTERCEPTORS);
+        httpClientBuilder.interceptors().add(loggingInterceptor);
 
         return httpClientBuilder;
     }

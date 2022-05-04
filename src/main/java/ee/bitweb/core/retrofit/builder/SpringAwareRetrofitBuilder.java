@@ -1,5 +1,6 @@
 package ee.bitweb.core.retrofit.builder;
 
+import ee.bitweb.core.retrofit.RetrofitProperties;
 import ee.bitweb.core.retrofit.interceptor.InterceptorBean;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -16,11 +17,14 @@ public class SpringAwareRetrofitBuilder {
 
     private final List<InterceptorBean> defaultInterceptors;
     private final Converter.Factory defaultConverterFactory;
+    private final RetrofitProperties properties;
 
     public <T> RetrofitApiBuilder<T> create(String baseUrl, Class<T> definition) {
 
         return RetrofitApiBuilder.create(baseUrl, definition)
                 .addAll(new ArrayList<>(defaultInterceptors))
+                .loggingLevel(properties.getLogging().getLevel())
+                .suppressedHeaders(properties.getLogging().getSupressedHeaders())
                 .converter(defaultConverterFactory);
     }
 }
