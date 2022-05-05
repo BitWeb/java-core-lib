@@ -24,7 +24,7 @@ public class SpringAwareRetrofitBuilder {
         return RetrofitApiBuilder.create(baseUrl, definition)
                 .addAll(new ArrayList<>(defaultInterceptors))
                 .loggingLevel(properties.getLogging().getLevel())
-                .suppressedHeaders(properties.getLogging().getSupressedHeaders())
+                .suppressedHeaders(properties.getLogging().getSuppressedHeaders())
                 .converter(defaultConverterFactory);
     }
 }

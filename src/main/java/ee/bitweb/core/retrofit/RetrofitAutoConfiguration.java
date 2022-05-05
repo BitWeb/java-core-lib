@@ -27,7 +27,7 @@ public class RetrofitAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(value = "ee.bitweb.core.retrofit.authTokenInjector.enabled", havingValue = "true")
+    @ConditionalOnProperty(value = "ee.bitweb.core.retrofit.auth-token-injector.enabled", havingValue = "true")
     public AuthTokenInjectInterceptor defaultAuthTokenInjectInterceptor(
             RetrofitProperties properties,
             TokenProvider provider,
@@ -41,7 +41,7 @@ public class RetrofitAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(value = "ee.bitweb.core.retrofit.authTokenInjector.enabled", havingValue = "true")
+    @ConditionalOnProperty(value = "ee.bitweb.core.retrofit.auth-token-injector.enabled", havingValue = "true")
     public AuthTokenCriteria defaultCriteria(RetrofitProperties properties) {
         return new WhitelistCriteria(properties.getAuthTokenInjector().getWhitelistUrls());
     }

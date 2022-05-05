@@ -40,7 +40,7 @@ public class RetrofitProperties {
 
         @NotNull
         private LoggingLevel level = LoggingLevel.BASIC;
-        private List<@NotBlank String> supressedHeaders = new ArrayList<>();
+        private List<@NotBlank String> suppressedHeaders = new ArrayList<>();
     }
 
     @Getter

@@ -3,6 +3,7 @@ package ee.bitweb.core.retrofit.builder;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@Slf4j
 public class RetrofitApiBuilder<T> {
 
     public static final ObjectMapper DEFAULT_OBJECT_MAPPER = new ObjectMapper();
@@ -124,10 +126,17 @@ public class RetrofitApiBuilder<T> {
     }
 
     public T build() {
+        Converter.Factory factory = converterFactory != null ? converterFactory : DEFAULT_CONVERTER_FACTORY;
+
+        log.info(
+                "Built Retrofit API for host {} with definition {}, interceptors {} and converter factory {}",
+                url, definition.getName(), clientBuilder.interceptors(), factory
+        );
+
         return new Retrofit
                 .Builder()
                 .baseUrl(url)
-                .addConverterFactory(converterFactory != null ? converterFactory : DEFAULT_CONVERTER_FACTORY)
+                .addConverterFactory(factory)
                 .client(clientBuilder.build())
                 .build().create(definition);
     }

@@ -3,18 +3,16 @@ package ee.bitweb.core.retrofit.interceptor.auth;
 import ee.bitweb.core.retrofit.interceptor.InterceptorBean;
 import ee.bitweb.core.retrofit.interceptor.auth.criteria.AuthTokenCriteria;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 
-@Component
+@ToString
 @RequiredArgsConstructor
-@ConditionalOnExpression(value = "${ee.bitweb.core.retrofit.authTokenInjector.enabled:false} and ${ee.bitweb.core.retrofit.auto-configuration:false}")
 public class AuthTokenInjectInterceptor implements InterceptorBean {
 
     private final String header;
