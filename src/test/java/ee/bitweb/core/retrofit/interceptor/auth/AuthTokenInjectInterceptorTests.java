@@ -14,6 +14,7 @@ import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.Header;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
@@ -59,7 +60,7 @@ public class AuthTokenInjectInterceptorTests {
                                 provider,
                                 new WhitelistCriteria(
                                         List.of(
-                                                "http://localhost"
+                                                Pattern.compile("http://localhost")
                                         )
                                 )
                         )
@@ -85,7 +86,7 @@ public class AuthTokenInjectInterceptorTests {
                         new AuthTokenInjectInterceptor(
                                 HEADER_NAME,
                                 provider,
-                                new WhitelistCriteria(List.of("http://localhost")
+                                new WhitelistCriteria(List.of(Pattern.compile("http://localhost"))
                                 )
                         )
                 ).build();
@@ -109,7 +110,7 @@ public class AuthTokenInjectInterceptorTests {
                         new AuthTokenInjectInterceptor(
                                 HEADER_NAME,
                                 provider,
-                                new WhitelistCriteria(List.of("http://localhost")
+                                new WhitelistCriteria(List.of(Pattern.compile("http://localhost"))
                                 )
                         )
                 ).build();

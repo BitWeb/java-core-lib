@@ -15,6 +15,10 @@ import retrofit2.Converter;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
 @Configuration
 @RequiredArgsConstructor
 @ConditionalOnProperty(value = "ee.bitweb.core.retrofit.auto-configuration", havingValue = "true")
@@ -43,6 +47,11 @@ public class RetrofitAutoConfiguration {
     @Bean
     @ConditionalOnProperty(value = "ee.bitweb.core.retrofit.auth-token-injector.enabled", havingValue = "true")
     public AuthTokenCriteria defaultCriteria(RetrofitProperties properties) {
-        return new WhitelistCriteria(properties.getAuthTokenInjector().getWhitelistUrls());
+        List<Pattern> patterns = new ArrayList<>();
+
+        for (String entry : properties.getAuthTokenInjector().getWhitelistUrls()) {
+            patterns.add(Pattern.compile(entry));
+        }
+        return new WhitelistCriteria(patterns);
     }
 }

@@ -5,18 +5,19 @@ import lombok.RequiredArgsConstructor;
 import okhttp3.Interceptor;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 public class BlacklistCriteria implements AuthTokenCriteria {
 
-    private final List<String> blacklist;
+    private final List<Pattern> blacklist;
 
     @Override
     public boolean shouldApply(TokenProvider provider, Interceptor.Chain chain) {
         String url = chain.request().url().toString();
 
-        for (String entry : blacklist) {
-            if (url.contains(entry)) {
+        for (Pattern entry : blacklist) {
+            if (entry.matcher(url).matches()) {
                 return false;
             }
         }
