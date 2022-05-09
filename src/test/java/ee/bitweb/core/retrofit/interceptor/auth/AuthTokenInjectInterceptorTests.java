@@ -3,7 +3,9 @@ package ee.bitweb.core.retrofit.interceptor.auth;
 import ee.bitweb.core.retrofit.builder.RetrofitApiBuilder;
 import ee.bitweb.core.retrofit.helpers.ExternalServiceApi;
 import ee.bitweb.core.retrofit.helpers.MockServerHelper;
+import ee.bitweb.core.retrofit.interceptor.auth.criteria.BlacklistCriteria;
 import ee.bitweb.core.retrofit.interceptor.auth.criteria.WhitelistCriteria;
+import io.swagger.models.HttpMethod;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +14,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.Header;
+import org.mockserver.model.NottableString;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -23,7 +26,6 @@ public class AuthTokenInjectInterceptorTests {
     private static final String BASE_URL = "http://localhost:12350";
     private static final String HEADER_NAME = "x-auth-token";
     private static ClientAndServer externalService;
-
 
     @Mock
     private TokenProvider provider;
@@ -39,18 +41,18 @@ public class AuthTokenInjectInterceptorTests {
     }
 
     @Test
-    void onExistingTokenWithPassingCriteriaShouldBeAddedToRequest() throws Exception {
+    void onExistingTokenWithWhitelistPassingCriteriaShouldBeAddedToRequest() {
         Mockito.doReturn("token-value").when(provider).get();
 
-        MockServerHelper.setupMockGetRequest(
+        MockServerHelper.mock(
                 externalService,
-                "/request",
-                List.of(
-                        new Header(HEADER_NAME, "token-value")
-                ),
-                200,
-                1,
-                createPayload("message", 1).toString()
+                MockServerHelper.requestBuilder("/request", HttpMethod.GET)
+                        .withHeaders(
+                                new Header(HEADER_NAME, "token-value")
+                        ),
+                MockServerHelper.responseBuilder(200)
+                        .withBody(createPayload("message", 1).toString())
+
         );
 
         ExternalServiceApi api = createBuilder()
@@ -60,7 +62,7 @@ public class AuthTokenInjectInterceptorTests {
                                 provider,
                                 new WhitelistCriteria(
                                         List.of(
-                                                Pattern.compile("http://localhost")
+                                                Pattern.compile("^http?:\\/\\/localhost:\\d{3,5}\\/.*")
                                         )
                                 )
                         )
@@ -71,14 +73,15 @@ public class AuthTokenInjectInterceptorTests {
         );
     }
 
-    @Test // TODO need to find a way to verify that header was missing
-    void onMissingTokenShouldNotAddHeader() throws Exception {
-        MockServerHelper.setupMockGetRequest(
+    @Test
+    void onMissingTokenShouldNotAddHeader() {
+        MockServerHelper.mock(
                 externalService,
-                "/request",
-                200,
-                1,
-                createPayload("message", 1).toString()
+                MockServerHelper.requestBuilder("/request", HttpMethod.GET)
+                        .withHeader(NottableString.not(HEADER_NAME)),
+                MockServerHelper.responseBuilder(200)
+                        .withBody(createPayload("message", 1).toString())
+
         );
 
         ExternalServiceApi api = createBuilder()
@@ -86,15 +89,110 @@ public class AuthTokenInjectInterceptorTests {
                         new AuthTokenInjectInterceptor(
                                 HEADER_NAME,
                                 provider,
-                                new WhitelistCriteria(List.of(Pattern.compile("http://localhost"))
+                                new WhitelistCriteria(
+                                        List.of(
+                                                Pattern.compile("^http?:\\/\\/localhost:\\d{3,5}\\/.*")
+                                        )
                                 )
                         )
                 ).build();
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals("message", createApi().get().execute().body().getMessage())
+                () -> Assertions.assertEquals("message", api.get().execute().body().getMessage())
+        );
+    }
+
+    @Test
+    void onNoMatchingWhitelistCriteriaShouldNotAddHeader() {
+        Mockito.doReturn("token-value").when(provider).get();
+        MockServerHelper.mock(
+                externalService,
+                MockServerHelper.requestBuilder("/request", HttpMethod.GET)
+                        .withHeader(NottableString.not(HEADER_NAME)),
+                MockServerHelper.responseBuilder(200)
+                        .withBody(createPayload("message", 1).toString())
+
         );
 
+        ExternalServiceApi api = createBuilder()
+                .add(
+                        new AuthTokenInjectInterceptor(
+                                HEADER_NAME,
+                                provider,
+                                new WhitelistCriteria(
+                                        List.of(
+                                                Pattern.compile("^http?:\\/\\/localhost")
+                                        )
+                                )
+                        )
+                ).build();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals("message", api.get().execute().body().getMessage())
+        );
+    }
+
+    @Test
+    void onNoMatchingBlacklistCriteriaShouldAddHeader() {
+        Mockito.doReturn("token-value").when(provider).get();
+        MockServerHelper.mock(
+                externalService,
+                MockServerHelper.requestBuilder("/request", HttpMethod.GET)
+                        .withHeaders(
+                                new Header(HEADER_NAME, "token-value")
+                        ),
+                MockServerHelper.responseBuilder(200)
+                        .withBody(createPayload("message", 1).toString())
+
+        );
+
+        ExternalServiceApi api = createBuilder()
+                .add(
+                        new AuthTokenInjectInterceptor(
+                                HEADER_NAME,
+                                provider,
+                                new BlacklistCriteria(
+                                        List.of(
+                                                Pattern.compile("^http?:\\/\\/localhost")
+                                        )
+                                )
+                        )
+                ).build();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals("message", api.get().execute().body().getMessage())
+        );
+    }
+
+    @Test
+    void onMatchingBlacklistCriteriaShouldNotAddHeader() {
+        Mockito.doReturn("token-value").when(provider).get();
+
+        MockServerHelper.mock(
+                externalService,
+                MockServerHelper.requestBuilder("/request", HttpMethod.GET)
+                        .withHeader(NottableString.not(HEADER_NAME)),
+                MockServerHelper.responseBuilder(200)
+                        .withBody(createPayload("message", 1).toString())
+
+        );
+
+        ExternalServiceApi api = createBuilder()
+                .add(
+                        new AuthTokenInjectInterceptor(
+                                HEADER_NAME,
+                                provider,
+                                new BlacklistCriteria(
+                                        List.of(
+                                                Pattern.compile("^http?:\\/\\/localhost:\\d{3,5}\\/.*")
+                                        )
+                                )
+                        )
+                ).build();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals("message", api.get().execute().body().getMessage())
+        );
     }
 
     private RetrofitApiBuilder<ExternalServiceApi> createBuilder() {
@@ -102,18 +200,6 @@ public class AuthTokenInjectInterceptorTests {
                 BASE_URL,
                 ExternalServiceApi.class
         );
-    }
-
-    private ExternalServiceApi createApi() {
-        return createBuilder()
-                .add(
-                        new AuthTokenInjectInterceptor(
-                                HEADER_NAME,
-                                provider,
-                                new WhitelistCriteria(List.of(Pattern.compile("http://localhost"))
-                                )
-                        )
-                ).build();
     }
 
     private static JSONObject createPayload(String message, Integer value) {

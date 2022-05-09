@@ -3,6 +3,7 @@ package ee.bitweb.core.retrofit;
 import ee.bitweb.core.retrofit.builder.RetrofitApiBuilder;
 import ee.bitweb.core.retrofit.helpers.ExternalServiceApi;
 import ee.bitweb.core.retrofit.helpers.MockServerHelper;
+import io.swagger.models.HttpMethod;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,12 +32,13 @@ public class RetrofitExecutorTests {
     void onSuccessfulRequestShouldReturnResult() {
         ExternalServiceApi api = RetrofitApiBuilder.create(BASE_URL, ExternalServiceApi.class).build();
 
-        MockServerHelper.setupMockGetRequest(
+        MockServerHelper.mock(
                 externalService,
-                "/data-request",
-                200,
-                1,
-                wrapInResponse(createPayload("message", 1)).toString()
+                MockServerHelper.requestBuilder("/data-request", HttpMethod.GET),
+                MockServerHelper.responseBuilder(200)
+                        .withBody(
+                                wrapInResponse(createPayload("message", 1)).toString()
+                        )
         );
 
         ExternalServiceApi.Payload response = RetrofitRequestExecutor.execute(api.getWrappedInResponse());
@@ -51,12 +53,11 @@ public class RetrofitExecutorTests {
     void onServiceErrorShouldThrowRetrofitException() {
         ExternalServiceApi api = RetrofitApiBuilder.create(BASE_URL, ExternalServiceApi.class).build();
 
-        MockServerHelper.setupMockGetRequest(
+        MockServerHelper.mock(
                 externalService,
-                "/data-request",
-                500,
-                1,
-                "SOME CUSTOM ERROR MESSAGE"
+                MockServerHelper.requestBuilder("/data-request", HttpMethod.GET),
+                MockServerHelper.responseBuilder(500)
+                        .withBody("SOME CUSTOM ERROR MESSAGE")
         );
 
         RetrofitException exception = Assertions.assertThrows(
@@ -80,12 +81,13 @@ public class RetrofitExecutorTests {
     void onEmptyDataResponseShouldThrowRetrofitException() {
         ExternalServiceApi api = RetrofitApiBuilder.create(BASE_URL, ExternalServiceApi.class).build();
 
-        MockServerHelper.setupMockGetRequest(
+        MockServerHelper.mock(
                 externalService,
-                "/data-request",
-                200,
-                1,
-                wrapInResponse(null).toString()
+                MockServerHelper.requestBuilder("/data-request", HttpMethod.GET),
+                MockServerHelper.responseBuilder(200)
+                        .withBody(
+                                wrapInResponse(null).toString()
+                        )
         );
 
         RetrofitException exception = Assertions.assertThrows(
@@ -109,12 +111,13 @@ public class RetrofitExecutorTests {
     void onSuccessfulRawRequestShouldReturnResult() {
         ExternalServiceApi api = RetrofitApiBuilder.create(BASE_URL, ExternalServiceApi.class).build();
 
-        MockServerHelper.setupMockGetRequest(
+        MockServerHelper.mock(
                 externalService,
-                "/request",
-                200,
-                1,
-                createPayload("message", 1).toString()
+                MockServerHelper.requestBuilder("/request", HttpMethod.GET),
+                MockServerHelper.responseBuilder(200)
+                        .withBody(
+                                createPayload("message", 1).toString()
+                        )
         );
 
         ExternalServiceApi.Payload response = RetrofitRequestExecutor.executeRaw(api.get());
@@ -129,12 +132,11 @@ public class RetrofitExecutorTests {
     void onServiceErrorWithRawRequestShouldThrowRetrofitException() {
         ExternalServiceApi api = RetrofitApiBuilder.create(BASE_URL, ExternalServiceApi.class).build();
 
-        MockServerHelper.setupMockGetRequest(
+        MockServerHelper.mock(
                 externalService,
-                "/request",
-                500,
-                1,
-                "SOME CUSTOM ERROR MESSAGE"
+                MockServerHelper.requestBuilder("/request", HttpMethod.GET),
+                MockServerHelper.responseBuilder(500)
+                        .withBody("SOME CUSTOM ERROR MESSAGE")
         );
 
         RetrofitException exception = Assertions.assertThrows(

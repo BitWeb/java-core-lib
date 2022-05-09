@@ -2,6 +2,7 @@ package ee.bitweb.core.retrofit.interceptor.auth;
 
 import ee.bitweb.core.retrofit.interceptor.InterceptorBean;
 import ee.bitweb.core.retrofit.interceptor.auth.criteria.AuthTokenCriteria;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import okhttp3.Request;
@@ -11,6 +12,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 
+@Getter
 @ToString
 @RequiredArgsConstructor
 public class AuthTokenInjectInterceptor implements InterceptorBean {

@@ -1,12 +1,14 @@
 package ee.bitweb.core.retrofit.interceptor.auth.criteria;
 
 import ee.bitweb.core.retrofit.interceptor.auth.TokenProvider;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import okhttp3.Interceptor;
 import java.util.List;
 import java.util.regex.Pattern;
 
+@Getter
 @ToString
 @RequiredArgsConstructor
 public class WhitelistCriteria implements AuthTokenCriteria {

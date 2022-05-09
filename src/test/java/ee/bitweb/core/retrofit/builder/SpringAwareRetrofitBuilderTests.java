@@ -6,21 +6,19 @@ import ee.bitweb.core.retrofit.helpers.MockServerHelper;
 import ee.bitweb.core.retrofit.helpers.RequestCountInterceptor;
 import ee.bitweb.core.trace.context.TraceIdContext;
 import ee.bitweb.core.trace.invoker.http.TraceIdFilterConfig;
+import io.swagger.models.HttpMethod;
 import org.json.JSONObject;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.Header;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import retrofit2.Converter;
 
 import java.util.List;
 
+@Tag("integration")
 @SpringBootTest(
         classes= TestSpringApplication.class,
         properties = {
@@ -161,13 +159,14 @@ public class SpringAwareRetrofitBuilderTests {
     }
 
     private static void mockServerGet(ClientAndServer server, List<Header> headers, String message, Integer value) {
-        MockServerHelper.setupMockGetRequest(
+        MockServerHelper.mock(
                 server,
-                "/request",
-                headers,
-                200,
-                1,
-                createPayload(message, value).toString()
+                MockServerHelper.requestBuilder("/request", HttpMethod.GET)
+                        .withHeaders(headers),
+                MockServerHelper.responseBuilder(200)
+                        .withBody(
+                                createPayload(message, value).toString()
+                        )
         );
     }
 

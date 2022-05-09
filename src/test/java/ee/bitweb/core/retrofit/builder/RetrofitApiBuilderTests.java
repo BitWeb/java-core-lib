@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.bitweb.core.retrofit.helpers.ExternalServiceApi;
 import ee.bitweb.core.retrofit.helpers.MockServerHelper;
 import ee.bitweb.core.retrofit.helpers.RequestCountInterceptor;
+import io.swagger.models.HttpMethod;
 import okhttp3.OkHttpClient;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
@@ -187,12 +188,13 @@ class RetrofitApiBuilderTests {
     }
 
     private static void mockServerGet(ClientAndServer server, String message, Object value) {
-        MockServerHelper.setupMockGetRequest(
+        MockServerHelper.mock(
                 server,
-                "/request",
-                200,
-                1,
-                createPayload(message, value).toString()
+                MockServerHelper.requestBuilder("/request", HttpMethod.GET),
+                MockServerHelper.responseBuilder(200)
+                        .withBody(
+                                createPayload(message, value).toString()
+                        )
         );
     }
 
