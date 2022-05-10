@@ -54,9 +54,14 @@ are set, then TraceId propagation interceptor is automatically loaded to the lis
 `ee.bitweb.core.retrofit.builder.SpringAwareRetrofitBuilder`
 
 Basic `ee.bitweb.core.retrofit.interceptor.auth.AuthTokenInjectInterceptor` is also provided that can be used to 
-propagate auth tokens between internal services. It is not autoconfigured in no way, to AVOID ACCIDENTAL LEAKAGE
-of tokens to external services. In order to use that interceptor you must provide implementation of 
-`ee.bitweb.core.retrofit.interceptor.auth.TokenProvider` interface. 
+propagate auth tokens between internal services. 
+It can be autoconfigured as default interceptor bean by setting property `ee.bitweb.core.retrofit.auth-token-injector.enabled=true`
+you will also need to specify the header name via. `ee.bitweb.core.retrofit.auth-token-injector.headerName` property. 
+Interceptor will add tokens to request that pass a whitelist. You can specify the contents of that whitelist with
+`ee.bitweb.core.retrofit.auth-token-injector.whitelist-urls[]` property which takes regex patterns as values. 
+For example ee.bitweb.core.retrofit.auth-token-injector.whitelist-urls[0]=^http?:\\/\\/localhost:\\d{3,5}\\/.*
+Lastly, you must provide implementation of `ee.bitweb.core.retrofit.interceptor.auth.TokenProvider` interface. 
+In case of an autoconfiguration, it must be declared as bean 
 
 
 ## Usage
@@ -118,6 +123,7 @@ release notes section of this document. Documentation must be done before making
 ### 2.1.0
 
 * Added Spring Boot Actuator security configuration
+* Added Retrofit api builder and auto configuration
 
 ### 2.0.1 
 
