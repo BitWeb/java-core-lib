@@ -1,11 +1,11 @@
 package ee.bitweb.core.retrofit;
 
 import ee.bitweb.core.retrofit.builder.LoggingLevel;
-import ee.bitweb.core.trace.invoker.http.TraceIdFilterConfig;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
@@ -51,7 +51,7 @@ public class RetrofitProperties {
 
         private boolean enabled;
 
-        private String headerName = TraceIdFilterConfig.DEFAULT_HEADER_NAME;
+        private String headerName = HttpHeaders.AUTHORIZATION;
 
         private List<@NotBlank String> whitelistUrls = new ArrayList<>();
 
