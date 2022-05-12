@@ -1,18 +1,15 @@
 package ee.bitweb.core.scheduled;
 
 import ee.bitweb.core.trace.invoker.scheduler.SchedulerTraceIdResolver;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@SuperBuilder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@RequiredArgsConstructor
 public abstract class ScheduledJob<T extends ScheduledRunnable> {
 
-    private T runnable;
-    private SchedulerTraceIdResolver traceIdResolver;
+    private final T runnable;
+    private final SchedulerTraceIdResolver traceIdResolver;
 
     public void run() {
         traceIdResolver.resolve();

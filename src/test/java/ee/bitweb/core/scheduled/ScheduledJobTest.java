@@ -8,8 +8,6 @@ import ee.bitweb.core.trace.creator.TraceIdCreatorImpl;
 import ee.bitweb.core.trace.invoker.scheduler.SchedulerTraceIdFormConfig;
 import ee.bitweb.core.trace.invoker.scheduler.SchedulerTraceIdResolver;
 import ee.bitweb.core.utils.MemoryAppender;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -51,11 +49,7 @@ class ScheduledJobTest {
                 new TraceIdCreatorImpl(new SchedulerTraceIdFormConfig())
         );
 
-        testJob = TestJob
-                .builder()
-                .runnable(scheduledRunnable)
-                .traceIdResolver(schedulerTraceIdResolver)
-                .build();
+        testJob = new TestJob(scheduledRunnable, schedulerTraceIdResolver);
     }
 
     @Test
@@ -102,9 +96,11 @@ class ScheduledJobTest {
         );
     }
 
-    @SuperBuilder
-    @NoArgsConstructor
     static class TestJob extends ScheduledJob<ScheduledRunnable> {
+
+        public TestJob(ScheduledRunnable runnable, SchedulerTraceIdResolver traceIdResolver) {
+            super(runnable, traceIdResolver);
+        }
 
         public void runTestJob() {
             run();
