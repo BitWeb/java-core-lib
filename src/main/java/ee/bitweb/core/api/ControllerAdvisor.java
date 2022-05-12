@@ -14,6 +14,7 @@ import ee.bitweb.core.exception.validation.InvalidFormatValidationException;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import ee.bitweb.core.retrofit.RetrofitException;
 import ee.bitweb.core.trace.context.TraceIdContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +44,17 @@ public class ControllerAdvisor {
     private static final String DEFAULT_CONTENT_TYPE = MediaType.APPLICATION_JSON_VALUE;
 
     private final TraceIdContext traceIdContext;
+
+    @ResponseBody
+    @ExceptionHandler(RetrofitException.class)
+    public String handleRetrofitException(
+            HttpServletResponse response,
+            RetrofitException e
+    ) {
+        setDefaultHeaders(response, e.getHttpStatus() != null ? e.getHttpStatus() : HttpStatus.INTERNAL_SERVER_ERROR);
+
+        return e.getErrorBody();
+    }
 
     @ResponseBody
     @ExceptionHandler(PersistenceException.class)

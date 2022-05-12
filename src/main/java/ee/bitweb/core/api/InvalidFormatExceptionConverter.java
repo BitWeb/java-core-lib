@@ -51,7 +51,7 @@ public class InvalidFormatExceptionConverter {
         return new ValidationException(ErrorMessage.INVALID_ARGUMENT.toString(), errors);
     }
 
-    protected static FieldError tryToCreateEnumErrorRow(InvalidFormatValidationException e) {
+    private static FieldError tryToCreateEnumErrorRow(InvalidFormatValidationException e) {
         if (!e.getTargetClass().isEnum()) {
             return null;
         }
@@ -63,7 +63,7 @@ public class InvalidFormatExceptionConverter {
         );
     }
 
-    protected static FieldError tryToCreateTemporalErrorRow(InvalidFormatValidationException e) {
+    private static FieldError tryToCreateTemporalErrorRow(InvalidFormatValidationException e) {
         if (
             e.getTargetClass() == ZonedDateTime.class ||
             e.getTargetClass() == LocalDate.class ||
@@ -79,7 +79,7 @@ public class InvalidFormatExceptionConverter {
         return null;
     }
 
-    protected static FieldError tryToCreateNumericErrorRow(InvalidFormatValidationException e) {
+    private static FieldError tryToCreateNumericErrorRow(InvalidFormatValidationException e) {
         if (
                 e.getTargetClass() == Long.class ||
                 e.getTargetClass() == Integer.class ||
@@ -111,7 +111,7 @@ public class InvalidFormatExceptionConverter {
         return null;
     }
 
-    protected static FieldError tryToCreateBooleanErrorRow(InvalidFormatValidationException e) {
+    private static FieldError tryToCreateBooleanErrorRow(InvalidFormatValidationException e) {
         if (e.getTargetClass() == Boolean.class) {
             return new FieldError(
                     e.getField(),
@@ -123,7 +123,7 @@ public class InvalidFormatExceptionConverter {
         return null;
     }
 
-    protected static void addIfNotNull(Collection<FieldError> set, FieldError row) {
+    private static void addIfNotNull(Collection<FieldError> set, FieldError row) {
         if (row != null) {
             set.add(row);
         }

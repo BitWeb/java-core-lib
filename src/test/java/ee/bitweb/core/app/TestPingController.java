@@ -18,8 +18,10 @@ import ee.bitweb.core.exception.persistence.ConflictException;
 import ee.bitweb.core.exception.persistence.Criteria;
 import ee.bitweb.core.exception.persistence.EntityNotFoundException;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import ee.bitweb.core.retrofit.RetrofitException;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -59,6 +61,11 @@ public class TestPingController {
     @GetMapping("/base-exception")
     public void throwsBaseException() {
         throw new CoreException("CLASSIFIED_MESSAGE");
+    }
+
+    @GetMapping("/retrofit-exception")
+    public void throwsRetrofitException() {
+        throw new RetrofitException("Exception message", "http://example.com", HttpStatus.NOT_FOUND, "{\"error\": \"message\"}");
     }
 
     @GetMapping("/not-found-exception")

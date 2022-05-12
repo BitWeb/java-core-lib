@@ -1,9 +1,10 @@
 buildscript {
     ext {
-        springBootVersion = '2.6.6'
+        springBootVersion = '2.6.+'
         springVersion = '5.+'
         lombokVersion = '1.18.+'
         mockitoVersion = '4.4.+'
+        retrofitVersion = '2.9.0'
     }
     repositories {
         mavenCentral()
@@ -105,6 +106,15 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-autoconfigure
     implementation group: 'org.springframework.boot', name: 'spring-boot-autoconfigure', version: "${springBootVersion}"
 
+    // https://mvnrepository.com/artifact/com.squareup.retrofit2/retrofit
+    implementation group: 'com.squareup.retrofit2', name: 'retrofit', version: "${retrofitVersion}"
+
+    // https://mvnrepository.com/artifact/com.squareup.retrofit2/converter-jackson
+    implementation group: 'com.squareup.retrofit2', name: 'converter-jackson', version: "${retrofitVersion}"
+
+    // https://mvnrepository.com/artifact/com.squareup.okhttp3/logging-interceptor
+    implementation group: 'com.squareup.okhttp3', name: 'logging-interceptor', version: '4.9.1'
+
     // https://mvnrepository.com/artifact/org.projectlombok/lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
 
@@ -131,6 +141,11 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: "${mockitoVersion}"
+
+    // https://mvnrepository.com/artifact/org.mock-server/mockserver-netty
+    testImplementation ("org.mock-server:mockserver-netty:5.13.2") {
+        exclude group: 'junit', module: 'junit'
+    }
 }
 
 test {
