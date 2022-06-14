@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @EqualsAndHashCode
 @RequiredArgsConstructor
-class CriteriaResponse implements Comparable<CriteriaResponse> {
+public class CriteriaResponse implements Comparable<CriteriaResponse> {
 
     private static final Comparator<String> NULL_SAFE_STRING_COMPARATOR = Comparator.nullsFirst(
             String::compareToIgnoreCase

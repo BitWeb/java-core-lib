@@ -120,6 +120,10 @@ release notes section of this document. Documentation must be done before making
 
 ## Release notes
 
+### 2.1.1
+
+* Fix API documentation error: `Error resolving $ref pointer "https://xxx/api-docs/v1#/components/schemas/CriteriaResponse". Token "CriteriaResponse" does not exist.`
+
 ### 2.1.0
 
 * Added Spring Boot Actuator security configuration
