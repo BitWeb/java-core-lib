@@ -27,6 +27,9 @@ public class TraceIdFilterConfig {
     @NotNull
     private List<@Valid AdditionalHeader> additionalHeaders = new ArrayList<>();
 
+    @NotNull
+    private List<@NotBlank String> sensitiveHeaders = List.of("authorization");
+
     @Getter
     @Setter
     @AllArgsConstructor

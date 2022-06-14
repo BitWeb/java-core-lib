@@ -40,7 +40,6 @@ public class TraceIdFilter implements Filter {
     private static final String FORWARDED_HEADER = "Forwarded";
     private static final String X_FORWARDED_FOR_HEADER = "X-Forwarded-For";
 
-    private final List<String> sensitiveHeaders = List.of("authorization");
     private final TraceIdFilterConfig configuration;
     private final TraceIdContext context;
     private final HttpServletRequestTraceIdResolver resolver;
@@ -134,7 +133,7 @@ public class TraceIdFilter implements Filter {
             String key = headerNames.nextElement();
             String value;
 
-            if (sensitiveHeaders.contains(key)) {
+            if (configuration.getSensitiveHeaders().contains(key)) {
                 value = "***";
             } else {
                 value = createHeaderValues(request, key);

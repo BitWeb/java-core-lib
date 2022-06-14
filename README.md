@@ -123,6 +123,7 @@ release notes section of this document. Documentation must be done before making
 ### 2.1.1
 
 * Fix API documentation error: `Error resolving $ref pointer "https://xxx/api-docs/v1#/components/schemas/CriteriaResponse". Token "CriteriaResponse" does not exist.`
+* Fix TraceIdFilterConfig: Added sensitiveHeaders to configuration making it configurable as opposed to being locked as filter private attribute
 
 ### 2.1.0
 
