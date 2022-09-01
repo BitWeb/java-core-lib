@@ -114,7 +114,6 @@ public class AutoConfigurationTests {
         assertEquals(3, traceIdFilterConfig.getEnabledFeatures().size());
     }
 
-
     private void assertInvokerTraceIdCreator() {
         assertNotNull(invokerTraceIdCreator);
         assertEquals(15, invokerTraceIdCreator.generate(null).length());
