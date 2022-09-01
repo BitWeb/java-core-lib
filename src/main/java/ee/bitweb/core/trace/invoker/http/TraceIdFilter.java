@@ -5,7 +5,6 @@ import ee.bitweb.core.util.HttpForwardedHeaderParser;
 import ee.bitweb.core.util.HttpForwardedHeaderParser.ForwardedExtension;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 
@@ -52,14 +51,14 @@ public class TraceIdFilter implements Filter {
             HttpServletRequest httpServletRequest = (HttpServletRequest) request;
 
             resolver.resolve(httpServletRequest);
-            context.put(PATH, httpServletRequest.getServletPath());
-            context.put(URL, getUrl(httpServletRequest));
-            context.put(METHOD, httpServletRequest.getMethod());
-            context.put(QUERY_STRING, httpServletRequest.getQueryString());
-            context.put(USER_AGENT, getUserAgent(httpServletRequest));
 
-            addForwardingInfo(httpServletRequest);
+            addPathIfEnabled(httpServletRequest);
+            addUrlIfEnabled(httpServletRequest);
+            addMethodIfEnabled(httpServletRequest);
+            addQueryStringIfEnabled(httpServletRequest);
+            addForwardingInfoIfEnabled(httpServletRequest);
             addAdditionalHeaders(httpServletRequest);
+            addUserAgentIfEnabled(httpServletRequest);
 
             if (response instanceof HttpServletResponse) {
                 ((HttpServletResponse) response).addHeader(configuration.getHeaderName(), context.get());
@@ -75,10 +74,34 @@ public class TraceIdFilter implements Filter {
         }
     }
 
-    String getUserAgent(HttpServletRequest httpServletRequest) {
-        String header = httpServletRequest.getHeader(HttpHeaders.USER_AGENT);
+    private void addPathIfEnabled(HttpServletRequest httpServletRequest) {
+        if (configuration.getEnabledFeatures().contains(Feature.ADD_PATH)) {
+            context.put(PATH, httpServletRequest.getServletPath());
+        }
+    }
 
-        return header != null ? header : USER_AGENT_MISSING;
+    private void addUrlIfEnabled(HttpServletRequest httpServletRequest) {
+        if (configuration.getEnabledFeatures().contains(Feature.ADD_URL)) {
+            context.put(URL, getUrl(httpServletRequest));
+        }
+    }
+
+    private void addMethodIfEnabled(HttpServletRequest httpServletRequest) {
+        if (configuration.getEnabledFeatures().contains(Feature.ADD_METHOD)) {
+            context.put(METHOD, httpServletRequest.getMethod());
+        }
+    }
+
+    private void addQueryStringIfEnabled(HttpServletRequest httpServletRequest) {
+        if (configuration.getEnabledFeatures().contains(Feature.ADD_QUERY_STRING)) {
+            context.put(QUERY_STRING, httpServletRequest.getQueryString());
+        }
+    }
+
+    private void addUserAgentIfEnabled(HttpServletRequest httpServletRequest) {
+        if (configuration.getEnabledFeatures().contains(Feature.ADD_USER_AGENT)) {
+            context.put(USER_AGENT, getUserAgent(httpServletRequest));
+        }
     }
 
     String getUrl(HttpServletRequest request) {
@@ -89,7 +112,15 @@ public class TraceIdFilter implements Filter {
         return url + "?" + queryString;
     }
 
-    void addForwardingInfo(HttpServletRequest request) {
+    String getUserAgent(HttpServletRequest httpServletRequest) {
+        String header = httpServletRequest.getHeader(HttpHeaders.USER_AGENT);
+
+        return header != null ? header : USER_AGENT_MISSING;
+    }
+
+    void addForwardingInfoIfEnabled(HttpServletRequest request) {
+        if (!configuration.getEnabledFeatures().contains(Feature.ADD_FORWARDED_FOR_DATA)) return;
+
         String forwardedFor = createHeaderValues(request, X_FORWARDED_FOR_HEADER);
         if (forwardedFor != null) {
             context.put(X_FORWARDED_FOR, forwardedFor);
@@ -159,5 +190,14 @@ public class TraceIdFilter implements Filter {
         }
 
         return builder.toString();
+    }
+
+    public enum Feature {
+        ADD_PATH,
+        ADD_URL,
+        ADD_METHOD,
+        ADD_QUERY_STRING,
+        ADD_FORWARDED_FOR_DATA,
+        ADD_USER_AGENT
     }
 }

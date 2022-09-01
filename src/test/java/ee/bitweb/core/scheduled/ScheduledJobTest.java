@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;

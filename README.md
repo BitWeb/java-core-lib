@@ -13,6 +13,14 @@ In order to enable standardised error handlers for HTTP web request hooks
 you simply need to include property `ee.bitweb.core.controller-advice.enabled=true` in application properties.
 
 ### Trace ID generation and propagation
+
+###### Since 2.2.0
+Separated additional MDC entries into separate features that TraceIdFilter can add optionally. By default all additional
+entries are enabled as they were previously.
+Features can be fine tuned with new property `ee.bitweb.core.trace.invoker.http.enabledFeatures` property, for example 
+`ee.bitweb.core.trace.invoker.http.enabledFeatures=ADD_URL,ADD_METHOD,ADD_USER_AGENT` to only add URL, Http method and user agent to mdc.
+List of features can be observed in class `TraceIdFilter.Feature` class.
+
 ###### Since 2.0.0
 Given package contains Trace ID generation and propagation related features consolidated in `TraceIdFilter`
 Trace ID is easily autoconfigurable by adding `ee.bitweb.core.trace.auto-configuration=true` to application properties.
@@ -119,6 +127,11 @@ release notes section of this document. Documentation must be done before making
 * **SNAPSHOT** - Indicates version in progress. DO NOT use snapshot versions for production or staging
 
 ## Release notes
+
+### 2.2.0
+* Separated additional MDC entries into separate features that TraceIdFilter can add optionally. By default all additional
+  entries are enabled as they were previously.
+* Added `ee.bitweb.core.trace.thread.MDCTaskDecorator` class to simplify MDC and SecurityContext propagation to threads in thread pools. 
 
 ### 2.1.1
 
