@@ -6,6 +6,7 @@ import ee.bitweb.core.retrofit.helpers.RequestCountInterceptor;
 import ee.bitweb.core.trace.context.TraceIdContext;
 import ee.bitweb.core.trace.invoker.http.TraceIdFilterConfig;
 import ee.bitweb.http.server.mock.MockServer;
+import io.netty.handler.codec.http.HttpMethod;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -13,7 +14,6 @@ import org.mockserver.model.Header;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpMethod;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
@@ -27,12 +27,12 @@ import java.util.List;
         }
 )
 @ActiveProfiles("retrofit")
-public class SpringAwareRetrofitBuilderTests {
+class SpringAwareRetrofitBuilderTests {
 
     private static final String BASE_URL = "http://localhost:";
 
     @RegisterExtension
-    private static final MockServer server = new MockServer();
+    private static final MockServer server = new MockServer(HttpMethod.GET, "/request");
 
 
 
@@ -154,7 +154,7 @@ public class SpringAwareRetrofitBuilderTests {
 
     private static void mockServerGet(List<Header> headers, String message, Integer value) {
         server.mock(
-                server.requestBuilder(HttpMethod.GET, "/request")
+                server.requestBuilder()
                         .withHeaders(headers),
                 server.responseBuilder(200)
                         .withBody(

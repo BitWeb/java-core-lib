@@ -3,12 +3,12 @@ package ee.bitweb.core.retrofit;
 import ee.bitweb.core.retrofit.builder.RetrofitApiBuilder;
 import ee.bitweb.core.retrofit.helpers.ExternalServiceApi;
 import ee.bitweb.http.server.mock.MockServer;
+import io.netty.handler.codec.http.HttpMethod;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 
 @Tag("unit")

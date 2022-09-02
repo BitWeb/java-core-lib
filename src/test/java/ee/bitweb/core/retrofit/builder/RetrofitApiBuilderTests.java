@@ -5,13 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.bitweb.core.retrofit.helpers.ExternalServiceApi;
 import ee.bitweb.core.retrofit.helpers.RequestCountInterceptor;
 import ee.bitweb.http.server.mock.MockServer;
+import io.netty.handler.codec.http.HttpMethod;
 import okhttp3.OkHttpClient;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpMethod;
 import retrofit2.Converter;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
@@ -24,7 +24,7 @@ class RetrofitApiBuilderTests {
     private static final String BASE_URL = "http://localhost:";
 
     @RegisterExtension
-    private static final MockServer server = new MockServer();
+    private static final MockServer server = new MockServer(HttpMethod.GET, "/request");
 
     @Test
     void defaultBuilderWorksAsExpected() throws Exception {
@@ -181,7 +181,7 @@ class RetrofitApiBuilderTests {
 
     private static void mockServerGet(String message, Object value) {
         server.mock(
-                server.requestBuilder(HttpMethod.GET,"/request"),
+                server.requestBuilder(),
                 server.responseBuilder(200)
                         .withBody(
                                 createPayload(message, value).toString()

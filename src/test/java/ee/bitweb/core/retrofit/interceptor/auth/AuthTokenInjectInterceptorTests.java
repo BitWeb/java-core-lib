@@ -5,6 +5,7 @@ import ee.bitweb.core.retrofit.helpers.ExternalServiceApi;
 import ee.bitweb.core.retrofit.interceptor.auth.criteria.BlacklistCriteria;
 import ee.bitweb.core.retrofit.interceptor.auth.criteria.WhitelistCriteria;
 import ee.bitweb.http.server.mock.MockServer;
+import io.netty.handler.codec.http.HttpMethod;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,20 +15,19 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockserver.model.Header;
 import org.mockserver.model.NottableString;
-import org.springframework.http.HttpMethod;
 
 import java.util.List;
 import java.util.regex.Pattern;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
-public class AuthTokenInjectInterceptorTests {
+class AuthTokenInjectInterceptorTests {
 
     private static final String BASE_URL = "http://localhost:";
     private static final String HEADER_NAME = "x-auth-token";
 
     @RegisterExtension
-    private static MockServer server = new MockServer(HttpMethod.GET, "/request");
+    private static final MockServer server = new MockServer(HttpMethod.GET, "/request");
 
     @Mock
     private TokenProvider provider;
@@ -149,8 +149,7 @@ public class AuthTokenInjectInterceptorTests {
         Mockito.doReturn("token-value").when(provider).get();
 
         server.mock(
-                server.requestBuilder(HttpMethod.GET, "/request")
-                        .withHeader(NottableString.not(HEADER_NAME)),
+                server.requestBuilder().withHeader(NottableString.not(HEADER_NAME)),
                 server.responseBuilder(200)
                         .withBody(createPayload("message", 1).toString())
 
