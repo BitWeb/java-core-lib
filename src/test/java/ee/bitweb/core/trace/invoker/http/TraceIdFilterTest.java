@@ -22,6 +22,8 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import javax.servlet.FilterChain;
 
+import java.util.Collections;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.times;
@@ -188,7 +190,7 @@ class TraceIdFilterTest {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/this");
         request.addHeader("x-forwarded-for", "192.168.69.145,192.168.69.1");
 
-        createFilter().addForwardingInfo(request);
+        createFilter().addForwardingInfoIfEnabled(request);
 
         assertEquals("192.168.69.145,192.168.69.1", MDC.get("x_forwarded_for"));
         assertEquals(1, MDC.getCopyOfContextMap().size());
@@ -202,7 +204,7 @@ class TraceIdFilterTest {
         request.addHeader("x-forwarded-for", "192.168.69.145");
         request.addHeader("x-forwarded-for", "192.168.69.1");
 
-        createFilter().addForwardingInfo(request);
+        createFilter().addForwardingInfoIfEnabled(request);
 
         assertEquals("192.168.69.145|192.168.69.1", MDC.get("x_forwarded_for"));
         assertEquals(1, MDC.getCopyOfContextMap().size());
@@ -215,7 +217,7 @@ class TraceIdFilterTest {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/this");
         request.addHeader("forwarded", "for=192.0.2.43,for=198.51.100.17;by=203.0.113.60;proto=http;host=example.com;secret=ruewiu");
 
-        createFilter().addForwardingInfo(request);
+        createFilter().addForwardingInfoIfEnabled(request);
 
         assertEquals("for=192.0.2.43,for=198.51.100.17;by=203.0.113.60;proto=http;host=example.com;secret=ruewiu", MDC.get("forwarded"));
         assertEquals("203.0.113.60", MDC.get("forwarded_by"));
@@ -266,6 +268,8 @@ class TraceIdFilterTest {
     void testDoFilter() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/this");
         request.setServletPath("/this");
+        request.addHeader("User-Agent", "some-user-agent");
+
         MockHttpServletResponse response = new MockHttpServletResponse();
         logger.setLevel(Level.INFO);
 
@@ -281,7 +285,42 @@ class TraceIdFilterTest {
             mdcMock.verify(() -> MDC.put("method", "GET"));
 
             mdcMock.verify(() -> MDC.put("query_string", null));
-            mdcMock.verify(() -> MDC.put("user_agent", "MISSING"));
+            mdcMock.verify(() -> MDC.put("user_agent", "some-user-agent"));
+            mdcMock.verify(() -> MDC.get("trace_id"), times(2));
+
+            mdcMock.verify(MDC::clear);
+            mdcMock.verifyNoMoreInteractions();
+
+            verify(chain).doFilter(request, response);
+            assertEquals(0, memoryAppender.getSize());
+        }
+    }
+
+    @Test
+    @DisplayName("all disabled features are disabled")
+    void testForDisabledFeatures() throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/this");
+        request.setServletPath("/this");
+        request.addHeader("User-Agent", "some-user-agent");
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        logger.setLevel(Level.INFO);
+
+        try (MockedStatic<MDC> mdcMock = Mockito.mockStatic(MDC.class)) {
+            mdcMock.when(() -> MDC.get("trace_id")).thenReturn("generated_mock");
+
+            TraceIdFilterConfig config = new TraceIdFilterConfig();
+            config.setEnabledFeatures(Collections.EMPTY_LIST);
+
+            createFilter(config).doFilter(request, response, chain);
+
+            assertEquals("generated_mock", response.getHeader("X-Trace-ID"));
+            mdcMock.verify(() -> MDC.put("trace_id", "generated_mock"));
+            mdcMock.verify(() -> MDC.put("path", "/this"), times(0));
+            mdcMock.verify(() -> MDC.put("url", "http://localhost/this"), times(0));
+            mdcMock.verify(() -> MDC.put("method", "GET"), times(0));
+            mdcMock.verify(() -> MDC.put("query_string", null), times(0));
+            mdcMock.verify(() -> MDC.put("user_agent", "some-user-agent"), times(0));
             mdcMock.verify(() -> MDC.get("trace_id"), times(2));
 
             mdcMock.verify(MDC::clear);

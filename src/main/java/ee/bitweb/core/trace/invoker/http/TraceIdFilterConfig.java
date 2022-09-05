@@ -30,6 +30,9 @@ public class TraceIdFilterConfig {
     @NotNull
     private List<@NotBlank String> sensitiveHeaders = List.of("authorization");
 
+    @NotNull
+    private List<TraceIdFilter.Feature> enabledFeatures = List.of(TraceIdFilter.Feature.values());
+
     @Getter
     @Setter
     @AllArgsConstructor

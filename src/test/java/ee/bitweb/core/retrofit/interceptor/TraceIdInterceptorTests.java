@@ -2,42 +2,35 @@ package ee.bitweb.core.retrofit.interceptor;
 
 import ee.bitweb.core.retrofit.builder.RetrofitApiBuilder;
 import ee.bitweb.core.retrofit.helpers.ExternalServiceApi;
-import ee.bitweb.core.retrofit.helpers.MockServerHelper;
 import ee.bitweb.core.trace.context.TraceIdContext;
 import ee.bitweb.core.trace.invoker.http.TraceIdFilterConfig;
-import io.swagger.models.HttpMethod;
+import ee.bitweb.http.server.mock.MockServer;
+import io.netty.handler.codec.http.HttpMethod;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.Header;
+
 import java.util.List;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
 public class TraceIdInterceptorTests {
 
-    private static final String BASE_URL = "http://localhost:12347";
-    private static ClientAndServer externalService;
+    private static final String BASE_URL = "http://localhost:";
+
+    @RegisterExtension
+    private static final MockServer server = new MockServer(HttpMethod.GET, "/request");
 
     @Mock
     TraceIdContext context;
 
     @Mock
     TraceIdFilterConfig config;
-
-    @BeforeAll
-    public static void setup() {
-        externalService = ClientAndServer.startClientAndServer(12347);
-    }
-
-    @BeforeEach
-    void reset() {
-        externalService.reset();
-    }
 
     @Test
     void onExistingTraceIdItIsAddedToRequest() {
@@ -67,7 +60,7 @@ public class TraceIdInterceptorTests {
 
     private ExternalServiceApi createApi() {
         return RetrofitApiBuilder.create(
-                BASE_URL,
+                BASE_URL  + server.getPort(),
                 ExternalServiceApi.class
         ).add(
                 new TraceIdInterceptor(config, context)
@@ -76,7 +69,6 @@ public class TraceIdInterceptorTests {
 
     private void createMockRequest() {
         mockServerGet(
-                externalService,
                 List.of(
                         new Header(config.getHeaderName(), "some-trace-id-value")
                 ),
@@ -85,15 +77,10 @@ public class TraceIdInterceptorTests {
         );
     }
 
-    private static void mockServerGet(ClientAndServer server, List<Header> headers, String message, Integer value) {
-        MockServerHelper.mock(
-                server,
-                MockServerHelper.requestBuilder("/request", HttpMethod.GET)
-                        .withHeaders(headers),
-                MockServerHelper.responseBuilder(200)
-                        .withBody(
-                                createPayload(message, value).toString()
-                        )
+    private static void mockServerGet(List<Header> headers, String message, Integer value) {
+        server.mock(
+                server.requestBuilder().withHeaders(headers),
+                server.responseBuilder(200, createPayload(message, value))
         );
     }
 

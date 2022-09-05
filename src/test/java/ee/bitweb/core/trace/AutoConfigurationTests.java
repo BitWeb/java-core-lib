@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.*;
                 "ee.bitweb.core.trace.invoker.http.additionalHeaders[0].headerName=customHeaderName1",
                 "ee.bitweb.core.trace.invoker.http.additionalHeaders[1].contextKey=contextKey2",
                 "ee.bitweb.core.trace.invoker.http.additionalHeaders[1].headerName=customHeaderName2",
+                "ee.bitweb.core.trace.invoker.http.enabledFeatures=ADD_URL,ADD_METHOD,ADD_USER_AGENT"
         }
 )
 public class AutoConfigurationTests {
@@ -107,6 +108,10 @@ public class AutoConfigurationTests {
     private void assertTraceIdFilterConfig() {
         assertNotNull(traceIdFilterConfig);
         assertEquals("Custom-ID", traceIdFilterConfig.getHeaderName());
+        assertTrue(traceIdFilterConfig.getEnabledFeatures().contains(TraceIdFilter.Feature.ADD_URL));
+        assertTrue(traceIdFilterConfig.getEnabledFeatures().contains(TraceIdFilter.Feature.ADD_METHOD));
+        assertTrue(traceIdFilterConfig.getEnabledFeatures().contains(TraceIdFilter.Feature.ADD_USER_AGENT));
+        assertEquals(3, traceIdFilterConfig.getEnabledFeatures().size());
     }
 
     private void assertInvokerTraceIdCreator() {

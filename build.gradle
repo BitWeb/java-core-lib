@@ -23,7 +23,7 @@ plugins {
 }
 
 group 'ee.bitweb'
-version '2.1.1'
+version '2.2.0'
 
 
 sourceCompatibility = 11
@@ -61,6 +61,9 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven {
+        url "https://nexus.bitweb.ee/repository/maven-public/"
+    }
 }
 
 dependencies {
@@ -135,6 +138,8 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.json/json
     testImplementation group: 'org.json', name: 'json', version: '20220320'
+
+    testImplementation group: 'ee.bitweb', name: 'test-core-lib', version: '1.0.0'
 
     // https://mvnrepository.com/artifact/org.mockito/mockito-inline
     testImplementation group: 'org.mockito', name: 'mockito-inline', version: "${mockitoVersion}"

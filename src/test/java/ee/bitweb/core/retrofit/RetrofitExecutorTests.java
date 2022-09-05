@@ -2,43 +2,36 @@ package ee.bitweb.core.retrofit;
 
 import ee.bitweb.core.retrofit.builder.RetrofitApiBuilder;
 import ee.bitweb.core.retrofit.helpers.ExternalServiceApi;
-import ee.bitweb.core.retrofit.helpers.MockServerHelper;
-import io.swagger.models.HttpMethod;
+import ee.bitweb.http.server.mock.MockServer;
+import io.netty.handler.codec.http.HttpMethod;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockserver.integration.ClientAndServer;
 import org.springframework.http.HttpStatus;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
 public class RetrofitExecutorTests {
 
-    private static final String BASE_URL = "http://localhost:12349";
-    private static ClientAndServer externalService;
+    private static final String BASE_URL = "http://localhost:";
+
+    @RegisterExtension
+    private static final MockServer server = new MockServer(HttpMethod.GET, "/data-request");
+
+    private static ExternalServiceApi api;
 
     @BeforeAll
-    public static void setup() {
-        externalService = ClientAndServer.startClientAndServer(12349);
-    }
-
-    @BeforeEach
-    void reset() {
-        externalService.reset();
+    public static void beforeAll() {
+        api = RetrofitApiBuilder.create(BASE_URL + server.getPort(), ExternalServiceApi.class).build();
     }
 
     @Test
     void onSuccessfulRequestShouldReturnResult() {
-        ExternalServiceApi api = RetrofitApiBuilder.create(BASE_URL, ExternalServiceApi.class).build();
-
-        MockServerHelper.mock(
-                externalService,
-                MockServerHelper.requestBuilder("/data-request", HttpMethod.GET),
-                MockServerHelper.responseBuilder(200)
-                        .withBody(
-                                wrapInResponse(createPayload("message", 1)).toString()
-                        )
+        server.mock(
+                server.requestBuilder(),
+                server.responseBuilder(200, wrapInResponse(createPayload("message", 1)))
         );
 
         ExternalServiceApi.Payload response = RetrofitRequestExecutor.execute(api.getWrappedInResponse());
@@ -51,12 +44,9 @@ public class RetrofitExecutorTests {
 
     @Test
     void onServiceErrorShouldThrowRetrofitException() {
-        ExternalServiceApi api = RetrofitApiBuilder.create(BASE_URL, ExternalServiceApi.class).build();
-
-        MockServerHelper.mock(
-                externalService,
-                MockServerHelper.requestBuilder("/data-request", HttpMethod.GET),
-                MockServerHelper.responseBuilder(500)
+        server.mock(
+                server.requestBuilder(),
+                server.responseBuilder(500)
                         .withBody("SOME CUSTOM ERROR MESSAGE")
         );
 
@@ -67,27 +57,21 @@ public class RetrofitExecutorTests {
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals(
-                        "UNSUCCESSFUL_REQUEST_ERROR : Request url: http://localhost:12349/data-request, " +
+                        "UNSUCCESSFUL_REQUEST_ERROR : Request url: " + BASE_URL + server.getPort() + "/data-request, " +
                                 "status: 500 INTERNAL_SERVER_ERROR, body: SOME CUSTOM ERROR MESSAGE",
                         exception.getMessage()
                 ),
                 () -> Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getHttpStatus()),
-                () -> Assertions.assertEquals("http://localhost:12349/data-request", exception.getUrl()),
+                () -> Assertions.assertEquals(BASE_URL + server.getPort() + "/data-request", exception.getUrl()),
                 () -> Assertions.assertEquals("SOME CUSTOM ERROR MESSAGE", exception.getErrorBody())
         );
     }
 
     @Test
     void onEmptyDataResponseShouldThrowRetrofitException() {
-        ExternalServiceApi api = RetrofitApiBuilder.create(BASE_URL, ExternalServiceApi.class).build();
-
-        MockServerHelper.mock(
-                externalService,
-                MockServerHelper.requestBuilder("/data-request", HttpMethod.GET),
-                MockServerHelper.responseBuilder(200)
-                        .withBody(
-                                wrapInResponse(null).toString()
-                        )
+        server.mock(
+                server.requestBuilder(),
+                server.responseBuilder(200, wrapInResponse(null))
         );
 
         RetrofitException exception = Assertions.assertThrows(
@@ -97,27 +81,21 @@ public class RetrofitExecutorTests {
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals(
-                        "EMPTY_RESPONSE_BODY_ERROR : Request url: http://localhost:12349/data-request, " +
+                        "EMPTY_RESPONSE_BODY_ERROR : Request url: " + BASE_URL + server.getPort() + "/data-request, " +
                                 "status: 200 OK, body: null",
                         exception.getMessage()
                 ),
                 () -> Assertions.assertEquals(HttpStatus.OK, exception.getHttpStatus()),
-                () -> Assertions.assertEquals("http://localhost:12349/data-request", exception.getUrl()),
+                () -> Assertions.assertEquals(BASE_URL + server.getPort() + "/data-request", exception.getUrl()),
                 () -> Assertions.assertNull(exception.getErrorBody())
         );
     }
 
     @Test
     void onSuccessfulRawRequestShouldReturnResult() {
-        ExternalServiceApi api = RetrofitApiBuilder.create(BASE_URL, ExternalServiceApi.class).build();
-
-        MockServerHelper.mock(
-                externalService,
-                MockServerHelper.requestBuilder("/request", HttpMethod.GET),
-                MockServerHelper.responseBuilder(200)
-                        .withBody(
-                                createPayload("message", 1).toString()
-                        )
+        server.mock(
+                server.requestBuilder("/request"),
+                server.responseBuilder(200, createPayload("message", 1))
         );
 
         ExternalServiceApi.Payload response = RetrofitRequestExecutor.executeRaw(api.get());
@@ -130,12 +108,9 @@ public class RetrofitExecutorTests {
 
     @Test
     void onServiceErrorWithRawRequestShouldThrowRetrofitException() {
-        ExternalServiceApi api = RetrofitApiBuilder.create(BASE_URL, ExternalServiceApi.class).build();
-
-        MockServerHelper.mock(
-                externalService,
-                MockServerHelper.requestBuilder("/request", HttpMethod.GET),
-                MockServerHelper.responseBuilder(500)
+        server.mock(
+                server.requestBuilder("/request"),
+                server.responseBuilder(500)
                         .withBody("SOME CUSTOM ERROR MESSAGE")
         );
 
@@ -146,12 +121,12 @@ public class RetrofitExecutorTests {
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals(
-                        "UNSUCCESSFUL_REQUEST_ERROR : Request url: http://localhost:12349/request, " +
+                        "UNSUCCESSFUL_REQUEST_ERROR : Request url: " + BASE_URL + server.getPort() + "/request, " +
                                 "status: 500 INTERNAL_SERVER_ERROR, body: SOME CUSTOM ERROR MESSAGE",
                         exception.getMessage()
                 ),
                 () -> Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getHttpStatus()),
-                () -> Assertions.assertEquals("http://localhost:12349/request", exception.getUrl()),
+                () -> Assertions.assertEquals(BASE_URL + server.getPort() + "/request", exception.getUrl()),
                 () -> Assertions.assertEquals("SOME CUSTOM ERROR MESSAGE", exception.getErrorBody())
         );
     }

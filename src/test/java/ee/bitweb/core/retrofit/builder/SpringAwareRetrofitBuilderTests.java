@@ -2,14 +2,14 @@ package ee.bitweb.core.retrofit.builder;
 
 import ee.bitweb.core.TestSpringApplication;
 import ee.bitweb.core.retrofit.helpers.ExternalServiceApi;
-import ee.bitweb.core.retrofit.helpers.MockServerHelper;
 import ee.bitweb.core.retrofit.helpers.RequestCountInterceptor;
 import ee.bitweb.core.trace.context.TraceIdContext;
 import ee.bitweb.core.trace.invoker.http.TraceIdFilterConfig;
-import io.swagger.models.HttpMethod;
+import ee.bitweb.http.server.mock.MockServer;
+import io.netty.handler.codec.http.HttpMethod;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
-import org.mockserver.integration.ClientAndServer;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockserver.model.Header;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -27,10 +27,14 @@ import java.util.List;
         }
 )
 @ActiveProfiles("retrofit")
-public class SpringAwareRetrofitBuilderTests {
+class SpringAwareRetrofitBuilderTests {
 
-    private static final String BASE_URL = "http://localhost:12346";
-    private static ClientAndServer externalService;
+    private static final String BASE_URL = "http://localhost:";
+
+    @RegisterExtension
+    private static final MockServer server = new MockServer(HttpMethod.GET, "/request");
+
+
 
     @Autowired
     private SpringAwareRetrofitBuilder builder;
@@ -49,15 +53,9 @@ public class SpringAwareRetrofitBuilderTests {
     @Qualifier("interceptor2")
     private RequestCountInterceptor interceptor2;
 
-    @BeforeAll
-    public static void setup() {
-        externalService = ClientAndServer.startClientAndServer(12346);
-    }
-
     @BeforeEach
     void reset() {
         context.clear();
-        externalService.reset();
         interceptor1.reset();
         interceptor2.reset();
     }
@@ -66,14 +64,13 @@ public class SpringAwareRetrofitBuilderTests {
     void byDefaultTraceIdInterceptorIsAdded() throws Exception {
         context.set("some-trace-id-value");
         mockServerGet(
-                externalService,
                 List.of(
                     new Header(config.getHeaderName(), "some-trace-id-value")
                 ),
                 "message",
                 1
         );
-        ExternalServiceApi api = builder.create(BASE_URL, ExternalServiceApi.class).build();
+        ExternalServiceApi api = builder.create(BASE_URL  + server.getPort(), ExternalServiceApi.class).build();
 
         ExternalServiceApi.Payload response = api.get().execute().body();
         Assertions.assertAll(
@@ -86,14 +83,13 @@ public class SpringAwareRetrofitBuilderTests {
     void interceptorBeansAreIncludedInApi() throws Exception {
         context.set("some-trace-id-value");
         mockServerGet(
-                externalService,
                 List.of(
                         new Header(config.getHeaderName(), "some-trace-id-value")
                 ),
                 "message",
                 1
         );
-        ExternalServiceApi api = builder.create(BASE_URL, ExternalServiceApi.class).build();
+        ExternalServiceApi api = builder.create(BASE_URL  + server.getPort(), ExternalServiceApi.class).build();
 
         ExternalServiceApi.Payload response = api.get().execute().body();
         Assertions.assertAll(
@@ -108,7 +104,6 @@ public class SpringAwareRetrofitBuilderTests {
     void defaultInterceptorsAreRemovable()  throws Exception {
         context.set("some-trace-id-value");
         mockServerGet(
-                externalService,
                 List.of(
                         new Header(config.getHeaderName(), "some-trace-id-value")
                 ),
@@ -116,7 +111,7 @@ public class SpringAwareRetrofitBuilderTests {
                 1
         );
         ExternalServiceApi api = builder
-                .create(BASE_URL, ExternalServiceApi.class)
+                .create(BASE_URL  + server.getPort(), ExternalServiceApi.class)
                 .remove(interceptor2).build();
 
         ExternalServiceApi.Payload response = api.get().execute().body();
@@ -132,7 +127,6 @@ public class SpringAwareRetrofitBuilderTests {
     void addedCustomInterceptorIsAppliedToApi() throws Exception {
         context.set("some-trace-id-value");
         mockServerGet(
-                externalService,
                 List.of(
                         new Header(config.getHeaderName(), "some-trace-id-value")
                 ),
@@ -142,7 +136,7 @@ public class SpringAwareRetrofitBuilderTests {
         RequestCountInterceptor customInterceptor = new RequestCountInterceptor();
 
         ExternalServiceApi api = builder.create(
-                BASE_URL,
+                BASE_URL  + server.getPort(),
                 ExternalServiceApi.class
         ).add(
                 customInterceptor
@@ -158,15 +152,11 @@ public class SpringAwareRetrofitBuilderTests {
         );
     }
 
-    private static void mockServerGet(ClientAndServer server, List<Header> headers, String message, Integer value) {
-        MockServerHelper.mock(
-                server,
-                MockServerHelper.requestBuilder("/request", HttpMethod.GET)
+    private static void mockServerGet(List<Header> headers, String message, Integer value) {
+        server.mock(
+                server.requestBuilder()
                         .withHeaders(headers),
-                MockServerHelper.responseBuilder(200)
-                        .withBody(
-                                createPayload(message, value).toString()
-                        )
+                server.responseBuilder(200, createPayload(message, value))
         );
     }
 

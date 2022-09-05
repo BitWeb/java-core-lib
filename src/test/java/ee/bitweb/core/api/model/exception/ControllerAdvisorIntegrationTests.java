@@ -7,11 +7,10 @@ import ee.bitweb.core.api.InvalidFormatExceptionConverter;
 import ee.bitweb.core.app.TestPingController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import ee.bitweb.http.api.response.Criteria;
+import ee.bitweb.http.api.response.ResponseAssertions;
+import ee.bitweb.http.api.response.Error;
 import org.junit.jupiter.api.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.*;
 import org.springframework.boot.test.context.*;
@@ -49,12 +48,9 @@ class ControllerAdvisorIntegrationTests {
         MockHttpServletRequestBuilder mockMvcBuilder = get(TestPingController.BASE_URL + "/base-exception")
                 .header(TRACE_ID_HEADER_NAME, "1234567890");
 
-        mockMvc.perform(mockMvcBuilder)
-                .andDo(print())
-                .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$", aMapWithSize(2)))
-                .andExpect(jsonPath("$.id", is("1234567890_generated-trace-id")))
-                .andExpect(jsonPath("$.message", is("INTERNAL_SERVER_ERROR")));
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        ResponseAssertions.assertInternalServerError(result);
+        assertIdField(result);
     }
 
     @Test
@@ -62,17 +58,9 @@ class ControllerAdvisorIntegrationTests {
         MockHttpServletRequestBuilder mockMvcBuilder = get(TestPingController.BASE_URL + "/with-request-param")
                 .header(TRACE_ID_HEADER_NAME, "1234567890");
 
-        mockMvc.perform(mockMvcBuilder)
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$", aMapWithSize(3)))
-                .andExpect(jsonPath("$.id", is("1234567890_generated-trace-id")))
-                .andExpect(jsonPath("$.message", is("INVALID_ARGUMENT")))
-                .andExpect(jsonPath("$.errors", hasSize(1)))
-                .andExpect(jsonPath("$.errors[0]", aMapWithSize(3)))
-                .andExpect(jsonPath("$.errors[0].field", is("id")))
-                .andExpect(jsonPath("$.errors[0].reason", is("MissingValue")))
-                .andExpect(jsonPath("$.errors[0].message", is("Request parameter is required")));
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        ResponseAssertions.assertValidationErrorResponse(result, Error.missingRequestParam("id"));
+        assertIdField(result);
     }
 
     @Test
@@ -80,12 +68,9 @@ class ControllerAdvisorIntegrationTests {
         MockHttpServletRequestBuilder mockMvcBuilder = post(TestPingController.BASE_URL + "/with-request-param")
                 .header(TRACE_ID_HEADER_NAME, "1234567890");
 
-        mockMvc.perform(mockMvcBuilder)
-                .andDo(print())
-                .andExpect(status().isMethodNotAllowed())
-                .andExpect(jsonPath("$", aMapWithSize(2)))
-                .andExpect(jsonPath("$.id", is("1234567890_generated-trace-id")))
-                .andExpect(jsonPath("$.message", is("METHOD_NOT_ALLOWED")));
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        ResponseAssertions.assertMethodNotAllowedError(result);
+        assertIdField(result);
     }
 
     @Test
@@ -94,17 +79,9 @@ class ControllerAdvisorIntegrationTests {
                 .param("id", "asd")
                 .header(TRACE_ID_HEADER_NAME, "1234567890");
 
-        mockMvc.perform(mockMvcBuilder)
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$", aMapWithSize(3)))
-                .andExpect(jsonPath("$.id", is("1234567890_generated-trace-id")))
-                .andExpect(jsonPath("$.message", is("INVALID_ARGUMENT")))
-                .andExpect(jsonPath("$.errors", hasSize(1)))
-                .andExpect(jsonPath("$.errors[0]", aMapWithSize(3)))
-                .andExpect(jsonPath("$.errors[0].field", is("id")))
-                .andExpect(jsonPath("$.errors[0].reason", is("InvalidType")))
-                .andExpect(jsonPath("$.errors[0].message", is("Request parameter is invalid")));
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        ResponseAssertions.assertValidationErrorResponse(result, Error.invalidTypeRequestParam("id"));
+        assertIdField(result);
     }
 
     @Test
@@ -112,17 +89,14 @@ class ControllerAdvisorIntegrationTests {
         MockHttpServletRequestBuilder mockMvcBuilder = get(TestPingController.BASE_URL + "/not-found-exception")
                 .header(TRACE_ID_HEADER_NAME, "1234567890");
 
-        mockMvc.perform(mockMvcBuilder)
-                .andDo(print())
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$", aMapWithSize(4)))
-                .andExpect(jsonPath("$.id", is("1234567890_generated-trace-id")))
-                .andExpect(jsonPath("$.message", is("Entity MyEntity not found")))
-                .andExpect(jsonPath("$.entity", is("MyEntity")))
-                .andExpect(jsonPath("$.criteria", hasSize(1)))
-                .andExpect(jsonPath("$.criteria[0]", aMapWithSize(2)))
-                .andExpect(jsonPath("$.criteria[0].field", is("id")))
-                .andExpect(jsonPath("$.criteria[0].value", is("SomeVal")));
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        ResponseAssertions.assertNotFoundResponse(
+                result,
+                "MyEntity",
+                "Entity MyEntity not found",
+                new Criteria("id", "SomeVal")
+        );
+        assertIdField(result);
     }
 
     @Test
@@ -130,17 +104,14 @@ class ControllerAdvisorIntegrationTests {
         MockHttpServletRequestBuilder mockMvcBuilder = get(TestPingController.BASE_URL + "/conflict")
                 .header(TRACE_ID_HEADER_NAME, "1234567890");
 
-        mockMvc.perform(mockMvcBuilder)
-                .andDo(print())
-                .andExpect(status().isConflict())
-                .andExpect(jsonPath("$", aMapWithSize(4)))
-                .andExpect(jsonPath("$.id", is("1234567890_generated-trace-id")))
-                .andExpect(jsonPath("$.message", is("Some conflict information")))
-                .andExpect(jsonPath("$.entity", is("MyEntity")))
-                .andExpect(jsonPath("$.criteria", hasSize(1)))
-                .andExpect(jsonPath("$.criteria[0]", aMapWithSize(2)))
-                .andExpect(jsonPath("$.criteria[0].field", is("id")))
-                .andExpect(jsonPath("$.criteria[0].value", is("SomeVal")));
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        ResponseAssertions.assertConflictErrorResponse(
+                result,
+                "MyEntity",
+                "Some conflict information",
+                new Criteria("id", "SomeVal")
+        );
+        assertIdField(result);
     }
 
     @Test
@@ -148,22 +119,15 @@ class ControllerAdvisorIntegrationTests {
         MockHttpServletRequestBuilder mockMvcBuilder = get(TestPingController.BASE_URL + "/constraint-violation")
                 .header(TRACE_ID_HEADER_NAME, "1234567890");
 
-        MvcResult result = mockMvc.perform(mockMvcBuilder)
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andReturn();
-
-        JSONAssert.assertEquals(
-                getValidationErrorResponse(
-                        "CONSTRAINT_VIOLATION",
-                        List.of(
-                                fieldError("simpleProperty", "NotBlank", "must not be blank"),
-                                fieldError("simpleProperty", "NotNull", "must not be null")
-                        )
-                ),
-                new JSONObject(result.getResponse().getContentAsString()),
-                JSONCompareMode.NON_EXTENSIBLE
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        ResponseAssertions.assertConstraintViolationErrorResponse(
+                result,
+                List.of(
+                        Error.notBlank("simpleProperty"),
+                        Error.notNull("simpleProperty")
+                )
         );
+        assertIdField(result);
     }
 
     @Test
@@ -175,24 +139,17 @@ class ControllerAdvisorIntegrationTests {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(mapper.writeValueAsString(data));
 
-        MvcResult result = mockMvc.perform(mockMvcBuilder)
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andReturn();
-
-        JSONAssert.assertEquals(
-                getValidationErrorResponse(
-                        "INVALID_ARGUMENT",
-                        List.of(
-                                fieldError("complexProperty", "NotNull", "must not be null"),
-                                fieldError("complexProperty", "NotBlank", "must not be blank"),
-                                fieldError("objects", "NotNull", "must not be null"),
-                                fieldError("objects", "NotEmpty", "must not be empty")
-                        )
-                ),
-                new JSONObject(result.getResponse().getContentAsString()),
-                JSONCompareMode.NON_EXTENSIBLE
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        ResponseAssertions.assertValidationErrorResponse(
+                result,
+                List.of(
+                        Error.notBlank("complexProperty"),
+                        Error.notNull("complexProperty"),
+                        Error.notEmpty("objects"),
+                        Error.notNull("objects")
+                )
         );
+        assertIdField(result);
     }
 
     @Test
@@ -205,24 +162,17 @@ class ControllerAdvisorIntegrationTests {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(mapper.writeValueAsString(data));
 
-        MvcResult result = mockMvc.perform(mockMvcBuilder)
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andReturn();
-
-        JSONAssert.assertEquals(
-                getValidationErrorResponse(
-                        "INVALID_ARGUMENT",
-                        List.of(
-                                fieldError("complexProperty", "NotNull", "must not be null"),
-                                fieldError("complexProperty", "NotBlank", "must not be blank"),
-                                fieldError("objects[0].simpleProperty", "NotNull", "must not be null"),
-                                fieldError("objects[0].simpleProperty", "NotBlank", "must not be blank")
-                        )
-                ),
-                new JSONObject(result.getResponse().getContentAsString()),
-                JSONCompareMode.NON_EXTENSIBLE
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        ResponseAssertions.assertValidationErrorResponse(
+                result,
+                List.of(
+                        Error.notBlank("complexProperty"),
+                        Error.notNull("complexProperty"),
+                        Error.notBlank("objects[0].simpleProperty"),
+                        Error.notNull("objects[0].simpleProperty")
+                )
         );
+        assertIdField(result);
     }
 
     @Test
@@ -235,12 +185,10 @@ class ControllerAdvisorIntegrationTests {
                 .contentType(MediaType.TEXT_XML_VALUE)
                 .content(mapper.writeValueAsString(data));
 
-        mockMvc.perform(mockMvcBuilder)
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$", aMapWithSize(2)))
-                .andExpect(jsonPath("$.id", is("1234567890_generated-trace-id")))
-                .andExpect(jsonPath("$.message", is("MESSAGE_NOT_READABLE")));
+
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        ResponseAssertions.assertMessageNotReadableError(result);
+        assertIdField(result);
     }
 
     @Test
@@ -251,21 +199,16 @@ class ControllerAdvisorIntegrationTests {
                 .header(TRACE_ID_HEADER_NAME, "1234567890")
                 .content(mapper.writeValueAsString(data));
 
-        MvcResult result = mockMvc.perform(mockMvcBuilder)
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andReturn();
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        ResponseAssertions.assertValidationErrorResponse(
+                result,
+                List.of(
+                        Error.notBlank("simpleProperty"),
+                        Error.notNull("simpleProperty")
 
-        JSONAssert.assertEquals(
-                getValidationErrorResponse("INVALID_ARGUMENT",
-                        List.of(
-                                fieldError("simpleProperty", "NotNull", "must not be null"),
-                                fieldError("simpleProperty", "NotBlank", "must not be blank")
-                        )
-                ),
-                new JSONObject(result.getResponse().getContentAsString()),
-                JSONCompareMode.NON_EXTENSIBLE
+                )
         );
+        assertIdField(result);
     }
 
     @Test
@@ -273,26 +216,21 @@ class ControllerAdvisorIntegrationTests {
         MockHttpServletRequestBuilder mockMvcBuilder = post(TestPingController.BASE_URL + "/import")
                 .header(TRACE_ID_HEADER_NAME, "1234567890");
 
-        mockMvc.perform(mockMvcBuilder)
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$", aMapWithSize(2)))
-                .andExpect(jsonPath("$.id", is("1234567890_generated-trace-id")))
-                .andExpect(jsonPath("$.message", is("CONTENT_TYPE_NOT_VALID")));
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        ResponseAssertions.assertContentTypeInvalidError(result);
+        assertIdField(result);
     }
 
     @Test
     void onInvalidContentTypeWithMultipartRequestShouldReturnBadRequestError() throws Exception {
         MockHttpServletRequestBuilder mockMvcBuilder = post(TestPingController.BASE_URL + "/import")
                 .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON);
+                .accept(MediaType.APPLICATION_JSON)
+                .header(TRACE_ID_HEADER_NAME, "1234567890");
 
-        mockMvc.perform(mockMvcBuilder)
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$", aMapWithSize(2)))
-                .andExpect(jsonPath("$.id", is(notNullValue())))
-                .andExpect(jsonPath("$.message", is("CONTENT_TYPE_NOT_VALID")));
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        ResponseAssertions.assertContentTypeInvalidError(result);
+        assertIdField(result);
     }
 
     @Test
@@ -301,20 +239,14 @@ class ControllerAdvisorIntegrationTests {
                 multipart(TestPingController.BASE_URL + "/import")
                         .header(TRACE_ID_HEADER_NAME, "1234567890");
 
-        MvcResult result = mockMvc.perform(mockMvcBuilder)
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andReturn();
-
-        JSONAssert.assertEquals(
-                getValidationErrorResponse("INVALID_ARGUMENT",
-                        List.of(
-                                fieldError("file", "RequestPartPresent", "Required request part 'file' is not present")
-                        )
-                ),
-                new JSONObject(result.getResponse().getContentAsString()),
-                JSONCompareMode.NON_EXTENSIBLE
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        ResponseAssertions.assertValidationErrorResponse(
+                result,
+                List.of(
+                    Error.requestPartMissing("file")
+                )
         );
+        assertIdField(result);
     }
 
     @Test
@@ -359,8 +291,6 @@ class ControllerAdvisorIntegrationTests {
     @Test
     void onInvalidNestedObjectFieldShouldReturnBadRequestError() throws Exception {
         String val = "whatever";
-        String reason = InvalidFormatExceptionConverter.INVALID_FORMAT_REASON;
-        String message = format(InvalidFormatExceptionConverter.INVALID_VALUE_MESSAGE_FORMAT, val);
 
         MockHttpServletRequestBuilder mockMvcBuilder = post(TestPingController.BASE_URL)
                 .content("{\"nestedTestObject\": {\"zonedDateTimeField\": \"whatever\"}}")
@@ -368,14 +298,14 @@ class ControllerAdvisorIntegrationTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON);
 
-        mockMvc.perform(mockMvcBuilder)
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.id", is("1234567890_generated-trace-id")))
-                .andExpect(jsonPath("$.message", is("INVALID_ARGUMENT")))
-                .andExpect(jsonPath("$.errors[0].field", is("nestedTestObject.zonedDateTimeField")))
-                .andExpect(jsonPath("$.errors[0].reason", is(reason)))
-                .andExpect(jsonPath("$.errors[0].message", is(message)));
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        ResponseAssertions.assertValidationErrorResponse(
+                result,
+                List.of(
+                        Error.genericInvalidFormat("nestedTestObject.zonedDateTimeField", val)
+                )
+        );
+        assertIdField(result);
     }
 
     @Test
@@ -417,38 +347,21 @@ class ControllerAdvisorIntegrationTests {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"" + field + "\": " + value + "}");
 
-        mockMvc.perform(mockMvcBuilder)
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$", aMapWithSize(3)))
-                .andExpect(jsonPath("$.id", is("1234567890_generated-trace-id")))
-                .andExpect(jsonPath("$.message", is("INVALID_ARGUMENT")))
-                .andExpect(jsonPath("$.errors[0]", aMapWithSize(3)))
-                .andExpect(jsonPath("$.errors[0].field", is(field)))
-                .andExpect(jsonPath("$.errors[0].reason", is(expectedReason)))
-                .andExpect(jsonPath("$.errors[0].message", is(expectedMessage)));
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        ResponseAssertions.assertValidationErrorResponse(
+                result,
+                List.of(
+                        new Error(field, expectedReason, expectedMessage)
+                )
+        );
+        assertIdField(result);
     }
 
     private static String format(String pattern, String value) {
         return String.format(pattern, value);
     }
 
-    private JSONObject getValidationErrorResponse(String message, List<JSONObject> errors) {
-        JSONObject response = new JSONObject();
-        JSONArray jsonErrors = new JSONArray(errors);
-        response.put("id", "1234567890_generated-trace-id");
-        response.put("message", message);
-        response.put("errors", jsonErrors);
-
-        return response;
-    }
-
-    private JSONObject fieldError(String field, String reason, String message) {
-        JSONObject fieldError = new JSONObject();
-        fieldError.put("field", field);
-        fieldError.put("reason", reason);
-        fieldError.put("message", message);
-
-        return fieldError;
+    private static void assertIdField(ResultActions actions) throws Exception {
+        actions.andExpect(jsonPath("$.id", is("1234567890_generated-trace-id")));
     }
 }
