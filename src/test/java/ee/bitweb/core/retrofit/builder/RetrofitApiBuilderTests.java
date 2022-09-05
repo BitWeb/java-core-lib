@@ -182,10 +182,7 @@ class RetrofitApiBuilderTests {
     private static void mockServerGet(String message, Object value) {
         server.mock(
                 server.requestBuilder(),
-                server.responseBuilder(200)
-                        .withBody(
-                                createPayload(message, value).toString()
-                        )
+                server.responseBuilder(200, createPayload(message, value))
         );
     }
 
