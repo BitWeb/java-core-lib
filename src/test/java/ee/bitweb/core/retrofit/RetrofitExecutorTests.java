@@ -31,10 +31,7 @@ public class RetrofitExecutorTests {
     void onSuccessfulRequestShouldReturnResult() {
         server.mock(
                 server.requestBuilder(),
-                server.responseBuilder(200)
-                        .withBody(
-                                wrapInResponse(createPayload("message", 1)).toString()
-                        )
+                server.responseBuilder(200, wrapInResponse(createPayload("message", 1)))
         );
 
         ExternalServiceApi.Payload response = RetrofitRequestExecutor.execute(api.getWrappedInResponse());
@@ -74,10 +71,7 @@ public class RetrofitExecutorTests {
     void onEmptyDataResponseShouldThrowRetrofitException() {
         server.mock(
                 server.requestBuilder(),
-                server.responseBuilder(200)
-                        .withBody(
-                                wrapInResponse(null).toString()
-                        )
+                server.responseBuilder(200, wrapInResponse(null))
         );
 
         RetrofitException exception = Assertions.assertThrows(
@@ -101,10 +95,7 @@ public class RetrofitExecutorTests {
     void onSuccessfulRawRequestShouldReturnResult() {
         server.mock(
                 server.requestBuilder("/request"),
-                server.responseBuilder(200)
-                        .withBody(
-                                createPayload("message", 1).toString()
-                        )
+                server.responseBuilder(200, createPayload("message", 1))
         );
 
         ExternalServiceApi.Payload response = RetrofitRequestExecutor.executeRaw(api.get());

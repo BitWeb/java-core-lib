@@ -39,9 +39,7 @@ class AuthTokenInjectInterceptorTests {
 
         server.mock(
                 server.requestBuilder().withHeaders(new Header(HEADER_NAME, "token-value")),
-                server.responseBuilder(200)
-                        .withBody(createPayload("message", 1).toString())
-
+                server.responseBuilder(200, createPayload("message", 1))
         );
 
         ExternalServiceApi api = createBuilder()
@@ -66,9 +64,7 @@ class AuthTokenInjectInterceptorTests {
     void onMissingTokenShouldNotAddHeader() {
         server.mock(
                 server.requestBuilder().withHeader(NottableString.not(HEADER_NAME)),
-                server.responseBuilder(200)
-                        .withBody(createPayload("message", 1).toString())
-
+                server.responseBuilder(200, createPayload("message", 1))
         );
 
         ExternalServiceApi api = createBuilder()
@@ -94,8 +90,7 @@ class AuthTokenInjectInterceptorTests {
         Mockito.doReturn("token-value").when(provider).get();
         server.mock(
                 server.requestBuilder().withHeader(NottableString.not(HEADER_NAME)),
-                server.responseBuilder(200)
-                        .withBody(createPayload("message", 1).toString())
+                server.responseBuilder(200, createPayload("message", 1))
         );
 
         ExternalServiceApi api = createBuilder()
@@ -121,9 +116,7 @@ class AuthTokenInjectInterceptorTests {
         Mockito.doReturn("token-value").when(provider).get();
         server.mock(
                 server.requestBuilder().withHeaders(new Header(HEADER_NAME, "token-value")),
-                server.responseBuilder(200)
-                        .withBody(createPayload("message", 1).toString())
-
+                server.responseBuilder(200, createPayload("message", 1))
         );
 
         ExternalServiceApi api = createBuilder()
@@ -150,9 +143,7 @@ class AuthTokenInjectInterceptorTests {
 
         server.mock(
                 server.requestBuilder().withHeader(NottableString.not(HEADER_NAME)),
-                server.responseBuilder(200)
-                        .withBody(createPayload("message", 1).toString())
-
+                server.responseBuilder(200, createPayload("message", 1))
         );
 
         ExternalServiceApi api = createBuilder()

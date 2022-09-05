@@ -80,10 +80,7 @@ public class TraceIdInterceptorTests {
     private static void mockServerGet(List<Header> headers, String message, Integer value) {
         server.mock(
                 server.requestBuilder().withHeaders(headers),
-                server.responseBuilder(200)
-                        .withBody(
-                                createPayload(message, value).toString()
-                        )
+                server.responseBuilder(200, createPayload(message, value))
         );
     }
 
