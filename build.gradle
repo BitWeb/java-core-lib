@@ -50,15 +50,6 @@ jar {
     from sourceSets.main.allSource
 }
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-    testCompileOnly {
-        extendsFrom testAnnotationProcessor
-    }
-}
-
 repositories {
     mavenCentral()
     maven {
@@ -153,11 +144,61 @@ dependencies {
     }
 }
 
+task copyDependencies(type: Copy) {
+    from configurations.annotationProcessor
+    into './build/dependencies'
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
+
 test {
     useJUnitPlatform()
 }
 
-task copyDependencies(type: Copy) {
-    from configurations.annotationProcessor
-    into './build/dependencies'
+task unitTest(type: Test) {
+    group("verification")
+
+    useJUnitPlatform {
+        excludeTags "integration"
+    }
+}
+
+task integrationTest(type: Test) {
+    group("verification")
+
+    useJUnitPlatform {
+        includeTags 'integration'
+    }
+}
+
+task jacocoUnitTestReport(type: JacocoReport) {
+    sourceSets sourceSets.main
+    executionData unitTest
+
+    reports {
+        xml.enabled true
+    }
+}
+
+task jacocoIntegrationTestReport(type: JacocoReport) {
+    sourceSets sourceSets.main
+    executionData integrationTest
+
+    reports {
+        xml.enabled true
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    testCompileOnly {
+        extendsFrom testAnnotationProcessor
+    }
+    deployerJars
 }
