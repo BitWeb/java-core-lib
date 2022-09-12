@@ -17,6 +17,7 @@ definitions:
           - gradle
           - docker
         script:
+          - ./deploy/injectGradleCredentials.sh "$NEXUS_USERNAME" "$NEXUS_PASSWORD" "gradle.properties"
           - export TESTCONTAINERS_RYUK_DISABLED=true
           - gradle unitTest --fail-fast --no-daemon
           - gradle integrationTest --fail-fast --no-daemon
