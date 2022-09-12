@@ -1,0 +1,43 @@
+image: gradle:7.5.1-jdk11
+
+clone:
+  depth: full # SonarCloud scanner needs the full history to assign issues properly
+
+definitions:
+  services:
+    docker:
+      memory: 2048
+
+  steps:
+    - step: &testLint
+        name: Test and lint
+        services:
+          - docker
+        caches:
+          - gradle
+          - docker
+        script:
+          - export TESTCONTAINERS_RYUK_DISABLED=true
+          - gradle unitTest --fail-fast --no-daemon
+          - gradle integrationTest --fail-fast --no-daemon
+          - gradle jacocoUnitTestReport jacocoIntegrationTestReport --no-daemon
+        artifacts:
+          - build/reports/tests/**
+
+    - step: &buildAndPublish
+        name: Build and publish
+        trigger: manual
+        caches:
+          - gradle
+        script:
+          - ./deploy/injectGradleCredentials.sh "$NEXUS_USERNAME" "$NEXUS_PASSWORD" "gradle.properties"
+          - gradle publish --no-daemon
+
+pipelines:
+  pull-requests:
+    '**':
+      - step: *testLint
+  branches:
+    master:
+      - step: *testLint
+      - step: *buildAndPublish
