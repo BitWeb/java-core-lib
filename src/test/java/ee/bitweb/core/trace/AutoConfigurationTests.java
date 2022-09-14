@@ -10,6 +10,7 @@ import ee.bitweb.core.trace.invoker.scheduler.SchedulerTraceIdFormConfig;
 import ee.bitweb.core.trace.invoker.scheduler.SchedulerTraceIdResolver;
 import ee.bitweb.core.trace.thread.ThreadTraceIdFormConfig;
 import ee.bitweb.core.trace.thread.ThreadTraceIdResolver;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -22,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Tag("integration")
 @SpringBootTest(
         properties = {
                 "ee.bitweb.core.trace.auto-configuration=true",

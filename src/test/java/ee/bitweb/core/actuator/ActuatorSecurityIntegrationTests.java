@@ -2,6 +2,7 @@ package ee.bitweb.core.actuator;
 
 import ee.bitweb.core.TestSpringApplication;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
@@ -22,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Tag("integration")
 @AutoConfigureMockMvc
 @ActiveProfiles("MockedInvokerTraceIdCreator")
 @SpringBootTest(
@@ -30,7 +32,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 "ee.bitweb.core.actuator.security.enabled=true",
                 "ee.bitweb.core.actuator.security.user.roles=ACTUATOR",
                 "management.endpoints.web.exposure.include=*",
-                "management.endpoint.health.show-details=when_authorized"
+                "management.endpoint.health.probes.enabled=true",
+                "management.endpoint.health.show-details=when-authorized",
         }
 )
 class ActuatorSecurityIntegrationTests {
@@ -95,8 +98,11 @@ class ActuatorSecurityIntegrationTests {
         mockMvc.perform(request)
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", aMapWithSize(1)))
-                .andExpect(jsonPath("$.status", is("UP")));
+                .andExpect(jsonPath("$", aMapWithSize(2)))
+                .andExpect(jsonPath("$.status", is("UP")))
+                .andExpect(jsonPath("$.groups", hasSize(2)))
+                .andExpect(jsonPath("$.groups[0]", is("liveness")))
+                .andExpect(jsonPath("$.groups[1]", is("readiness")));
     }
 
     @Test
@@ -108,9 +114,12 @@ class ActuatorSecurityIntegrationTests {
         mockMvc.perform(request)
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", aMapWithSize(2)))
+                .andExpect(jsonPath("$", aMapWithSize(3)))
                 .andExpect(jsonPath("$.status", is("UP")))
-                .andExpect(jsonPath("$.components", aMapWithSize(greaterThan(1))));
+                .andExpect(jsonPath("$.components", aMapWithSize(greaterThan(1))))
+                .andExpect(jsonPath("$.groups", hasSize(2)))
+                .andExpect(jsonPath("$.groups[0]", is("liveness")))
+                .andExpect(jsonPath("$.groups[1]", is("readiness")));
     }
 
     private MockHttpServletRequestBuilder buildRequest() {
