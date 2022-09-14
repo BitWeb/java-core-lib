@@ -71,6 +71,28 @@ For example ee.bitweb.core.retrofit.auth-token-injector.whitelist-urls[0]=^http?
 Lastly, you must provide implementation of `ee.bitweb.core.retrofit.interceptor.auth.TokenProvider` interface. 
 In case of an autoconfiguration, it must be declared as bean 
 
+### Scheduled jobs
+###### Since 2.1.0
+Introducing a more convenient way of creating scheduled jobs and reduces boilerplate code. Usage:
+
+    @Component
+    public class ProductionOrderUpdateScheduler extends ScheduledJob<ProductionOrderRowImportComponent> {
+    
+        public ProductionOrderUpdateScheduler(
+            final ProductionOrderRowImportComponent runnable,
+            final SchedulerTraceIdResolver traceIdResolver
+        ) {
+            super(runnable, traceIdResolver);
+        }
+    
+        @Scheduled(cron = "${scheduled.production-order-row.cron}")
+        public void schedule() {
+            run();
+        }
+    }
+
+`ProductionOrderRowImportComponent` class just needs to implement `ScheduledRunnable` interface and `ScheduledJob` handles
+logging, errors and trace id. Requires trace id functionality to be enabled. 
 
 ## Usage
 
@@ -128,6 +150,11 @@ release notes section of this document. Documentation must be done before making
 
 ## Release notes
 
+### 2.3.0
+* Introduces option to configure logging levels in `ControllerAdvisor`. All exceptions caught now have a configurable 
+  logging level. In addition, logging can be turned off. Uncaught exceptions cannot be configured and are always logged
+  in error level. See `ee.bitweb.core.api.ControllerAdvisorProperties` for full list of options.
+
 ### 2.2.0
 * Separated additional MDC entries into separate features that TraceIdFilter can add optionally. By default all additional
   entries are enabled as they were previously.
@@ -142,10 +169,12 @@ release notes section of this document. Documentation must be done before making
 
 * Added Spring Boot Actuator security configuration
 * Added Retrofit api builder and auto configuration
+* Added `ScheduledJob` class and `ScheduledRunnable` annotation to reduce boilerplate code for scheduled jobs. Handles 
+  logging, errors and trace logic.
 
 ### 2.0.1 
 
-* SBA request actuator/health threw classdefNotFoundException in jackson serializer.
+* SBA request actuator/health threw ClassDefNotFoundException in jackson serializer.
 Had to downgrade kotlin version to 2.12.0.
 Bugfix thread: https://github.com/FasterXML/jackson-module-kotlin/issues/523
 
