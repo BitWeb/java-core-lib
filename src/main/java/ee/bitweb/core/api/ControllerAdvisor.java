@@ -45,6 +45,8 @@ public class ControllerAdvisor {
 
     private final TraceIdContext traceIdContext;
 
+    private final ControllerAdvisorProperties properties;
+
     @ResponseBody
     @ExceptionHandler(RetrofitException.class)
     public String handleRetrofitException(
@@ -52,6 +54,8 @@ public class ControllerAdvisor {
             RetrofitException e
     ) {
         setDefaultHeaders(response, e.getHttpStatus() != null ? e.getHttpStatus() : HttpStatus.INTERNAL_SERVER_ERROR);
+
+        log(properties.getLogging().getRetrofitException(), e.getMessage(), e);
 
         return e.getErrorBody();
     }
@@ -64,6 +68,8 @@ public class ControllerAdvisor {
     ) {
         setDefaultHeaders(response, e.getCode());
 
+        log(properties.getLogging().getPersistenceException(), e.getMessage(), e);
+
         return new PersistenceErrorResponse(getResponseId(), e);
     }
 
@@ -72,7 +78,7 @@ public class ControllerAdvisor {
     public GenericErrorResponse handleMultipartException(MultipartException e, HttpServletResponse response) {
         setDefaultHeaders(response, HttpStatus.BAD_REQUEST);
 
-        log.warn(e.getMessage(), e);
+        log(properties.getLogging().getMultipartException(), e.getMessage(), e);
 
         return new GenericErrorResponse(
                 getResponseId(),
@@ -85,7 +91,7 @@ public class ControllerAdvisor {
     public GenericErrorResponse handleException(HttpMediaTypeNotSupportedException e, HttpServletResponse response) {
         setDefaultHeaders(response, HttpStatus.BAD_REQUEST);
 
-        log.warn(e.getMessage(), e);
+        log(properties.getLogging().getHttpMediaTypeNotSupportedException(), e.getMessage(), e);
 
         return new GenericErrorResponse(
                 getResponseId(),
@@ -96,8 +102,9 @@ public class ControllerAdvisor {
     @ResponseBody
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public GenericErrorResponse handleException(HttpMessageNotReadableException e, HttpServletResponse response) {
-        log.warn(e.getMessage());
         setDefaultHeaders(response, HttpStatus.BAD_REQUEST);
+
+        log(properties.getLogging().getHttpMessageNotReadableException(), e.getMessage(), e);
 
         InvalidFormatValidationException newException = null;
         if (e.getCause() instanceof InvalidFormatException) {
@@ -128,6 +135,8 @@ public class ControllerAdvisor {
     ) {
         setDefaultHeaders(response, HttpStatus.BAD_REQUEST);
 
+        log(properties.getLogging().getConstraintViolationException(), e.getMessage(), e);
+
         return logAndReturn(
                 new ValidationErrorResponse(getResponseId(), ExceptionConverter.convert(e))
         );
@@ -140,6 +149,8 @@ public class ControllerAdvisor {
             HttpServletResponse response
     ) {
         setDefaultHeaders(response, HttpStatus.BAD_REQUEST);
+
+        log(properties.getLogging().getBindException(), e.getMessage(), e);
 
         return logAndReturn(
                 new ValidationErrorResponse(
@@ -156,6 +167,8 @@ public class ControllerAdvisor {
             HttpServletResponse response
     ) {
         setDefaultHeaders(response, HttpStatus.BAD_REQUEST);
+
+        log(properties.getLogging().getMissingServletRequestParameterException(), e.getMessage(), e);
 
         return logAndReturn(new ValidationErrorResponse(
                 getResponseId(),
@@ -175,6 +188,8 @@ public class ControllerAdvisor {
     public ValidationErrorResponse handleException(MethodArgumentNotValidException e, HttpServletResponse response) {
         setDefaultHeaders(response, HttpStatus.BAD_REQUEST);
 
+        log(properties.getLogging().getMethodArgumentNotValidException(), e.getMessage(), e);
+
         return logAndReturn(new ValidationErrorResponse(
                 getResponseId(),
                 ExceptionConverter.translateBindingResult(e.getBindingResult())
@@ -185,6 +200,8 @@ public class ControllerAdvisor {
     @ResponseBody
     public ValidationErrorResponse handleException(MethodArgumentTypeMismatchException e, HttpServletResponse response) {
         setDefaultHeaders(response, HttpStatus.BAD_REQUEST);
+
+        log(properties.getLogging().getMethodArgumentTypeMismatchException(), e.getMessage(), e);
 
         return logAndReturn(new ValidationErrorResponse(
                 getResponseId(),
@@ -207,6 +224,8 @@ public class ControllerAdvisor {
     ) {
         setDefaultHeaders(response, HttpStatus.BAD_REQUEST);
 
+        log(properties.getLogging().getMissingServletRequestPartException(), e.getMessage(), e);
+
         return logAndReturn(new ValidationErrorResponse(
                 getResponseId(),
                 ErrorMessage.INVALID_ARGUMENT.toString(),
@@ -228,7 +247,7 @@ public class ControllerAdvisor {
     ) {
         setDefaultHeaders(response, HttpStatus.METHOD_NOT_ALLOWED);
 
-        log.warn(e.getMessage(), e);
+        log(properties.getLogging().getHttpRequestMethodNotSupportedException(), e.getMessage(), e);
 
         if (e.getSupportedMethods() != null) {
             response.setHeader(HttpHeaders.ALLOW, String.join(", ", e.getSupportedMethods()));
@@ -273,5 +292,27 @@ public class ControllerAdvisor {
     private void setDefaultHeaders(HttpServletResponse response, int status) {
         response.setContentType(DEFAULT_CONTENT_TYPE);
         response.setStatus(status);
+    }
+
+    private void log(ControllerAdvisorProperties.Level level, String message, Throwable e) {
+        switch (level) {
+            case ERROR:
+                log.error(message, e);
+                break;
+            case WARN:
+                log.warn(message, e);
+                break;
+            case INFO:
+                log.info(message);
+                break;
+            case DEBUG:
+                log.debug(message);
+                break;
+            case TRACE:
+                log.trace(message);
+                break;
+            case OFF:
+                break;
+        }
     }
 }

@@ -6,8 +6,6 @@ package ee.bitweb.core.trace;
  */
 public interface TraceIdFormConfig {
 
-    //String getHeaderName();
-
     String getPrefix();
 
     Character getDelimiter();
