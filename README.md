@@ -150,6 +150,11 @@ release notes section of this document. Documentation must be done before making
 
 ## Release notes
 
+### 2.4.0
+* Require Spring Boot 2.+ instead of 2.6.+
+* Bump various other dependencies
+* 
+
 ### 2.3.0
 * Introduces option to configure logging levels in `ControllerAdvisor`. All exceptions caught now have a configurable 
   logging level. In addition, logging can be turned off. Uncaught exceptions cannot be configured and are always logged

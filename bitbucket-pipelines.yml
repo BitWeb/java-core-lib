@@ -25,6 +25,16 @@ definitions:
         artifacts:
           - build/reports/tests/**
 
+    - step: &publishPreRelease
+        name: Publish PR result
+        caches:
+          - gradle
+        script:
+          - ./deploy/injectGradleCredentials.sh "$NEXUS_USERNAME" "$NEXUS_PASSWORD" "gradle.properties"
+          - ./deploy/setSnapshotVersion.sh "$BITBUCKET_BUILD_NUMBER"
+          - gradle build -x test
+          - gradle publish
+
     - step: &buildAndPublish
         name: Build and publish
         trigger: manual
@@ -38,6 +48,7 @@ pipelines:
   pull-requests:
     '**':
       - step: *testLint
+      - step: *publishPreRelease
   branches:
     master:
       - step: *testLint
