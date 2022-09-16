@@ -153,7 +153,7 @@ release notes section of this document. Documentation must be done before making
 ### 2.4.0
 * Require Spring Boot 2.+ instead of 2.6.+
 * Bump various other dependencies
-* 
+* Remove Spring Security from implementation classpath
 
 ### 2.3.0
 * Introduces option to configure logging levels in `ControllerAdvisor`. All exceptions caught now have a configurable 
