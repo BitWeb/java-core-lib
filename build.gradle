@@ -39,7 +39,7 @@ publishing {
             def snapshotsRepoUrl = "https://nexus.bitweb.ee/repository/maven-snapshot/"
 
             name 'nexus'
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            url = version.contains('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
             credentials {
                 username = project.repoUser
                 password = project.repoPassword
