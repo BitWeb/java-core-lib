@@ -31,7 +31,7 @@ definitions:
           - gradle
         script:
           - ./deploy/injectGradleCredentials.sh "$NEXUS_USERNAME" "$NEXUS_PASSWORD" "gradle.properties"
-          - ./deploy/setSnapshotVersion.sh "$BITBUCKET_BUILD_NUMBER"
+          - ./deploy/setSnapshotVersion.sh
           - gradle build -x test
           - gradle publish
 

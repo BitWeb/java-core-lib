@@ -6,10 +6,9 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   exit 1
 fi
 
-BUILD_NUMBER=$1
 CURRENT=$(./deploy/getVersion.sh)
 
-NEW_VERSION=$(./deploy/getVersion.sh)-SNAPSHOT-$BUILD_NUMBER
+NEW_VERSION=$(./deploy/getVersion.sh)-SNAPSHOT
 
 echo "Change version from $CURRENT to $NEW_VERSION"
 
