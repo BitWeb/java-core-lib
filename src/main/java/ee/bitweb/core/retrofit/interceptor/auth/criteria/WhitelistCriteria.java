@@ -19,10 +19,21 @@ public class WhitelistCriteria implements AuthTokenCriteria {
 
     @Override
     public boolean shouldApply(TokenProvider provider, Interceptor.Chain chain) {
+        log.trace("Checking if auth token should be added to request {}", chain.request());
+
+        if (whitelist.isEmpty()) {
+            log.debug("Rejected adding auth token to request because whitelist is empty");
+            return false;
+        }
+
         String url = chain.request().url().toString();
 
         for (Pattern entry : whitelist) {
+            log.trace("Checking pattern {} against url {}", entry, url);
+
             if (entry.matcher(url).matches()) {
+                log.debug("Matched url {} against pattern {}", url, entry);
+
                 return true;
             }
         }

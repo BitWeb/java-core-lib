@@ -20,14 +20,25 @@ public class BlacklistCriteria implements AuthTokenCriteria {
 
     @Override
     public boolean shouldApply(TokenProvider provider, Interceptor.Chain chain) {
+        log.trace("Checking if auth token should be added to request {}", chain.request());
+
         String url = chain.request().url().toString();
 
+        if (blacklist.isEmpty()) {
+            log.debug("Approved adding auth token to request for {} because blacklist is empty", url);
+            return true;
+        }
+
         for (Pattern entry : blacklist) {
+            log.trace("Checking pattern {} against url {}", entry, url);
+
             if (entry.matcher(url).matches()) {
                 log.debug("Rejected adding auth token to request for {}", url);
                 return false;
             }
         }
+
+        log.debug("Approved adding auth token to request for {}", url);
 
         return true;
     }
