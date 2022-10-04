@@ -33,7 +33,7 @@ public class SchedulerTraceIdFormConfigTests {
     @Test
     void accessingDelimiterShouldThrowException() {
         Exception e = assertThrows(IllegalStateException.class, () -> new SchedulerTraceIdFormConfig().getDelimiter());
-        assertEquals("Scheduler is a root invoker, thus prefix should never be used", e.getMessage());
+        assertEquals("Scheduler is a root invoker, thus delimiter should never be used", e.getMessage());
     }
 
     @Test
