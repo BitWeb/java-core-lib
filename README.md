@@ -109,12 +109,25 @@ Add dependency to your project
 
 ### Production release
 
-    // https://bitbucket.bitweb.ee/projects/BITWEB/repos/java-core-lib/browse
-    implementation group: 'ee.bitweb', name: 'core', version: '2.1.0'
+    // https://bitbucket.org/bitwebou/java-core-lib/src/master/
+    implementation group: 'ee.bitweb', name: 'core', version: '2.4.0'
 
 ### Current development version
 
-Development versions are not provided at this point.
+Add snapshot repository
+
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://nexus.bitweb.ee/repository/maven-snalshot/"
+        }
+    }
+
+Use desired version
+
+    // https://bitbucket.org/bitwebou/java-core-lib/src/master/
+    implementation group: 'ee.bitweb', name: 'core', version: '2.5.0-SNAPSHOT10'
+
 
 ## Development
 
@@ -149,6 +162,11 @@ release notes section of this document. Documentation must be done before making
 * **SNAPSHOT** - Indicates version in progress. DO NOT use snapshot versions for production or staging
 
 ## Release notes
+
+### 2.4.0
+* Require Spring Boot 2.+ instead of 2.6.+
+* Bump various other dependencies
+* Remove Spring Security from implementation classpath
 
 ### 2.3.0
 * Introduces option to configure logging levels in `ControllerAdvisor`. All exceptions caught now have a configurable 

@@ -1,9 +1,9 @@
 buildscript {
     ext {
-        springBootVersion = '2.6.+'
+        springBootVersion = '2.+'
         springVersion = '5.+'
         lombokVersion = '1.18.+'
-        mockitoVersion = '4.4.+'
+        mockitoVersion = '4.8.+'
         retrofitVersion = '2.9.0'
     }
     repositories {
@@ -23,8 +23,7 @@ plugins {
 }
 
 group 'ee.bitweb'
-version '2.3.0'
-
+version '2.4.0'
 
 sourceCompatibility = 11
 
@@ -36,8 +35,11 @@ publishing {
     }
     repositories {
         maven {
+            def releasesRepoUrl = "https://nexus.bitweb.ee/repository/maven-public/"
+            def snapshotsRepoUrl = "https://nexus.bitweb.ee/repository/maven-snapshot/"
+
             name 'nexus'
-            url "https://nexus.bitweb.ee/repository/maven-public/"
+            url = version.contains('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
             credentials {
                 username = project.repoUser
                 password = project.repoPassword
@@ -62,7 +64,7 @@ dependencies {
     implementation group: 'org.springframework', name: 'spring-webmvc', version: "${springVersion}"
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
-    api group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: "${springBootVersion}"
+    compileOnly group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: "${springBootVersion}"
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor
     annotationProcessor group: 'org.springframework.boot', name: 'spring-boot-configuration-processor', version: "${springBootVersion}"
@@ -83,13 +85,13 @@ dependencies {
     implementation group: 'io.springfox', name: 'springfox-spring-web', version: '2.10.+'
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.2.2'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.4'
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.2'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.4'
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.module/jackson-module-kotlin
-    implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.13.2'
+    implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.13.4'
 
     // https://mvnrepository.com/artifact/io.springfox/springfox-bean-validators
     implementation group: 'io.springfox', name: 'springfox-bean-validators', version: '2.10.+'
@@ -107,13 +109,10 @@ dependencies {
     implementation group: 'com.squareup.retrofit2', name: 'converter-jackson', version: "${retrofitVersion}"
 
     // https://mvnrepository.com/artifact/com.squareup.okhttp3/logging-interceptor
-    implementation group: 'com.squareup.okhttp3', name: 'logging-interceptor', version: '4.9.1'
+    implementation group: 'com.squareup.okhttp3', name: 'logging-interceptor', version: '4.10.0'
 
     // https://mvnrepository.com/artifact/org.projectlombok/lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
-
-    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter
-    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.8.2'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: "${springBootVersion}"
@@ -124,13 +123,17 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: "${springBootVersion}"
 
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: "${springBootVersion}"
+
     // https://mvnrepository.com/artifact/org.projectlombok/lombok
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
 
     // https://mvnrepository.com/artifact/org.json/json
     testImplementation group: 'org.json', name: 'json', version: '20220320'
 
-    testImplementation group: 'ee.bitweb', name: 'test-core-lib', version: '1.0.0'
+    // https://bitbucket.org/bitwebou/java-core-test-lib/src/master/
+    testImplementation group: 'ee.bitweb', name: 'test-core-lib', version: '1.+'
 
     // https://mvnrepository.com/artifact/org.mockito/mockito-inline
     testImplementation group: 'org.mockito', name: 'mockito-inline', version: "${mockitoVersion}"
@@ -139,7 +142,7 @@ dependencies {
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: "${mockitoVersion}"
 
     // https://mvnrepository.com/artifact/org.mock-server/mockserver-netty
-    testImplementation ("org.mock-server:mockserver-netty:5.13.2") {
+    testImplementation ("org.mock-server:mockserver-netty:5.14.0") {
         exclude group: 'junit', module: 'junit'
     }
 }
