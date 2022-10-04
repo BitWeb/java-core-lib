@@ -4,6 +4,10 @@ clone:
   depth: full # SonarCloud scanner needs the full history to assign issues properly
 
 definitions:
+
+  caches:
+    sonar: ~/.sonar/cache
+
   services:
     docker:
       memory: 2048
@@ -16,12 +20,14 @@ definitions:
         caches:
           - gradle
           - docker
+          - sonar
         script:
           - ./deploy/injectGradleCredentials.sh "$NEXUS_USERNAME" "$NEXUS_PASSWORD" "gradle.properties"
           - export TESTCONTAINERS_RYUK_DISABLED=true
           - gradle unitTest --fail-fast --no-daemon
           - gradle integrationTest --fail-fast --no-daemon
           - gradle jacocoUnitTestReport jacocoIntegrationTestReport --no-daemon
+          - gradle copyDependencies sonarqube -x test --no-watch-fs
         artifacts:
           - build/reports/tests/**
 
@@ -52,4 +58,5 @@ pipelines:
   branches:
     master:
       - step: *testLint
+      - step: *publishPreRelease
       - step: *buildAndPublish
