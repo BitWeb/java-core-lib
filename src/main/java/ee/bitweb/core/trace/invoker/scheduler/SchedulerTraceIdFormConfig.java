@@ -29,7 +29,7 @@ public class SchedulerTraceIdFormConfig implements TraceIdFormConfig {
 
     @Override
     public Character getDelimiter() {
-        throw new IllegalStateException("Scheduler is a root invoker, thus prefix should never be used");
+        throw new IllegalStateException("Scheduler is a root invoker, thus delimiter should never be used");
     }
 
     @AssertTrue(message = "prefix cannot be longer than entire length of trace id")
