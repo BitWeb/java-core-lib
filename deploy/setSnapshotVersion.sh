@@ -8,7 +8,7 @@ fi
 
 CURRENT=$(./deploy/getVersion.sh)
 
-NEW_VERSION=$(./deploy/getVersion.sh)-SNAPSHOT
+NEW_VERSION="$CURRENT"-SNAPSHOT
 
 echo "Change version from $CURRENT to $NEW_VERSION"
 

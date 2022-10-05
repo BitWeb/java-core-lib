@@ -32,7 +32,7 @@ definitions:
           - build/reports/tests/**
 
     - step: &publishPreRelease
-        name: Publish PR result
+        name: Publish SNAPSHOT version
         caches:
           - gradle
         script:
@@ -41,8 +41,8 @@ definitions:
           - gradle build -x test
           - gradle publish
 
-    - step: &buildAndPublish
-        name: Build and publish
+    - step: &publishRelease
+        name: Publish release version
         trigger: manual
         caches:
           - gradle
@@ -59,4 +59,4 @@ pipelines:
     master:
       - step: *testLint
       - step: *publishPreRelease
-      - step: *buildAndPublish
+      - step: *publishRelease

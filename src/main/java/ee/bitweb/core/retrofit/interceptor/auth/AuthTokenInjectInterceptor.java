@@ -5,7 +5,6 @@ import ee.bitweb.core.retrofit.interceptor.auth.criteria.AuthTokenCriteria;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
-import okhttp3.Request;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.util.StringUtils;

@@ -3,7 +3,6 @@ package ee.bitweb.core.retrofit.interceptor;
 import ee.bitweb.core.trace.context.TraceIdContext;
 import ee.bitweb.core.trace.invoker.http.TraceIdFilterConfig;
 import lombok.RequiredArgsConstructor;
-import okhttp3.Request;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
