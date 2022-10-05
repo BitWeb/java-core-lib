@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
-public class SchedulerTraceIdResolverTests {
+class SchedulerTraceIdResolverTests {
 
     @Mock
     private TraceIdContext contextMock;

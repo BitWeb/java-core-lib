@@ -19,7 +19,7 @@ import java.util.List;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
-public class TraceIdInterceptorTests {
+class TraceIdInterceptorTests {
 
     private static final String BASE_URL = "http://localhost:";
 

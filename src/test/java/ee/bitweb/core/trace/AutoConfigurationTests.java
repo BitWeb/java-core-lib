@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.*;
                 "ee.bitweb.core.trace.invoker.http.enabledFeatures=ADD_URL,ADD_METHOD,ADD_USER_AGENT"
         }
 )
-public class AutoConfigurationTests {
+class AutoConfigurationTests {
 
     @Autowired
     private TraceIdFilter filter;

@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
-public class ThreadTraceIdResolverTests {
+class ThreadTraceIdResolverTests {
 
     @Mock
     private TraceIdContext contextMock;

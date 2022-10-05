@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
-public class ThreadTraceIdFormConfigTests {
+class ThreadTraceIdFormConfigTests {
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 

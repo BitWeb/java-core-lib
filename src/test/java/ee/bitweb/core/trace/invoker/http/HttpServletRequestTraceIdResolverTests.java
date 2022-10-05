@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
-public class HttpServletRequestTraceIdResolverTests {
+class HttpServletRequestTraceIdResolverTests {
 
     @Mock
     TraceIdContext contextMock;

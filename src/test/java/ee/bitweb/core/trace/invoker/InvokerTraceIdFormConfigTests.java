@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
-public class InvokerTraceIdFormConfigTests {
+class InvokerTraceIdFormConfigTests {
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 

@@ -24,7 +24,7 @@ public class TraceIdInterceptor implements InterceptorBean {
     public Response intercept(@NotNull Chain chain) throws IOException {
         assertTraceIdPresent();
 
-        Request request = chain
+        var request = chain
                 .request()
                 .newBuilder()
                 .addHeader(config.getHeaderName(), context.get())

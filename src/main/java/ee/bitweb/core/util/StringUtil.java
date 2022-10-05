@@ -12,10 +12,10 @@ public final class StringUtil {
     private static final SecureRandom RANDOM = new SecureRandom();
 
     public static String random(int length) {
-        StringBuilder sb = new StringBuilder();
+        var sb = new StringBuilder();
 
         while (sb.length() < length) {
-            int index = RANDOM.nextInt(CHARS.length());
+            var index = RANDOM.nextInt(CHARS.length());
             sb.append(CHARS.charAt(index));
         }
 

@@ -69,7 +69,7 @@ public final class HttpForwardedHeaderParser {
             }
         }
 
-        ForwardedHeader result = new ForwardedHeader();
+        var result = new ForwardedHeader();
         result.setBy(by);
         result.setFor(aFor);
         result.setHost(host);
@@ -94,7 +94,7 @@ public final class HttpForwardedHeaderParser {
             extensions.addAll(header.getExtensions());
         }
 
-        ForwardedHeader result = new ForwardedHeader();
+        var result = new ForwardedHeader();
         result.setBy(List.copyOf(by));
         result.setFor(List.copyOf(aFor));
         result.setHost(List.copyOf(host));

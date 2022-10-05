@@ -28,7 +28,7 @@ public class AuthTokenInjectInterceptor implements InterceptorBean {
             return chain.proceed(chain.request());
         }
 
-        Request request = chain
+        var request = chain
                 .request()
                 .newBuilder()
                 .addHeader(header, provider.get())

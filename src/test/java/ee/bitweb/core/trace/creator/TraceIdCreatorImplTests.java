@@ -14,7 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
-public class TraceIdCreatorImplTests {
+class TraceIdCreatorImplTests {
 
     @Test
     @DisplayName("Default configuration, inbound trace id is present, must append new trace id")

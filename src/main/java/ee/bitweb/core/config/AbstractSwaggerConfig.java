@@ -50,10 +50,10 @@ public abstract class AbstractSwaggerConfig {
     protected abstract ApiInfo apiInfo();
 
     protected CorsFilter createCorsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        var source = new UrlBasedCorsConfigurationSource();
 
         // Allow anyone and anything access api documentation
-        CorsConfiguration config = new CorsConfiguration();
+        var config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.addAllowedOrigin("*");
         config.addAllowedHeader("*");

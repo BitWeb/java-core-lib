@@ -26,7 +26,7 @@ public class WhitelistCriteria implements AuthTokenCriteria {
             return false;
         }
 
-        String url = chain.request().url().toString();
+        var url = chain.request().url().toString();
 
         for (Pattern entry : whitelist) {
             log.trace("Checking pattern {} against url {}", entry, url);

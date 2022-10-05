@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
-public class MDCTraceIdContextTests {
+class MDCTraceIdContextTests {
 
     @Test
     @DisplayName("Test correct value is returned from MDC")

@@ -48,7 +48,7 @@ public class TraceIdFilter implements Filter {
             ServletRequest request, ServletResponse response, FilterChain chain
     ) throws IOException, ServletException {
         if (request instanceof HttpServletRequest) {
-            HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+            var httpServletRequest = (HttpServletRequest) request;
 
             resolver.resolve(httpServletRequest);
 
@@ -105,8 +105,8 @@ public class TraceIdFilter implements Filter {
     }
 
     String getUrl(HttpServletRequest request) {
-        String url = request.getRequestURL().toString();
-        String queryString = request.getQueryString();
+        var url = request.getRequestURL().toString();
+        var queryString = request.getQueryString();
         if (queryString == null) return url;
 
         return url + "?" + queryString;
@@ -177,7 +177,7 @@ public class TraceIdFilter implements Filter {
     }
 
     private String createHeaderValues(HttpServletRequest request, String key) {
-        StringBuilder builder = new StringBuilder();
+        var builder = new StringBuilder();
         Enumeration<String> headerValues = request.getHeaders(key);
         if (!headerValues.hasMoreElements()) return null;
 

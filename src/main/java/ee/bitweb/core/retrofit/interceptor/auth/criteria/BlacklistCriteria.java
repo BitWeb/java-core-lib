@@ -22,7 +22,7 @@ public class BlacklistCriteria implements AuthTokenCriteria {
     public boolean shouldApply(TokenProvider provider, Interceptor.Chain chain) {
         log.trace("Checking if auth token should be added to request {}", chain.request());
 
-        String url = chain.request().url().toString();
+        var url = chain.request().url().toString();
 
         if (blacklist.isEmpty()) {
             log.debug("Approved adding auth token to request for {} because blacklist is empty", url);

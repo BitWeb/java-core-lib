@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
-public class RetrofitExecutorTests {
+class RetrofitExecutorTests {
 
     private static final String BASE_URL = "http://localhost:";
 
