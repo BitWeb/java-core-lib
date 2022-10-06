@@ -96,6 +96,8 @@ logging, errors and trace id. Requires trace id functionality to be enabled.
 
 ## Usage
 
+### Production release
+
 Add BitWeb's public Maven repository to your build.gradle file
 
     repositories {
@@ -107,10 +109,8 @@ Add BitWeb's public Maven repository to your build.gradle file
 
 Add dependency to your project
 
-### Production release
-
     // https://bitbucket.org/bitwebou/java-core-lib/src/master/
-    implementation group: 'ee.bitweb', name: 'core', version: '2.4.0'
+    implementation group: 'ee.bitweb', name: 'core', version: '2.4.+'
 
 ### Current development version
 
@@ -119,14 +119,14 @@ Add snapshot repository
     repositories {
         mavenCentral()
         maven {
-            url "https://nexus.bitweb.ee/repository/maven-snalshot/"
+            url "https://nexus.bitweb.ee/repository/maven-snapshot/"
         }
     }
 
 Use desired version
 
     // https://bitbucket.org/bitwebou/java-core-lib/src/master/
-    implementation group: 'ee.bitweb', name: 'core', version: '2.5.0-SNAPSHOT10'
+    implementation group: 'ee.bitweb', name: 'core', version: '2.5.0-SNAPSHOT'
 
 
 ## Development
