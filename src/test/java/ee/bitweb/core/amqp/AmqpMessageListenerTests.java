@@ -37,6 +37,7 @@ class AmqpMessageListenerTests {
                 amqpTestHelper.clear(AmqpConfig.COMMAND_QUEUE_SIMPLE_NAME);
                 amqpTestHelper.clear(AmqpConfig.COMMAND_DEAD_LETTER_EXCHANGE_NAME);
                 amqpTestHelper.clear(AmqpConfig.RESPONSE_QUEUE_NAME);
+                MDC.clear();
         }
 
         @Test
