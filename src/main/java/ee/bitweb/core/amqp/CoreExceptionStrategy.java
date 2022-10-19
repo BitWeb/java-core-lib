@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DefaultExceptionStrategy extends ConditionalRejectingErrorHandler.DefaultExceptionStrategy {
+public class CoreExceptionStrategy extends ConditionalRejectingErrorHandler.DefaultExceptionStrategy {
 
     @Override
     public boolean isUserCauseFatal(Throwable t) {

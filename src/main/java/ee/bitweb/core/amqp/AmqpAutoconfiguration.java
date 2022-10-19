@@ -67,7 +67,7 @@ public class AmqpAutoconfiguration {
 
     private ErrorHandler createDefaultErrorHandler() {
         ConditionalRejectingErrorHandler errorHandler = new ConditionalRejectingErrorHandler(
-                new DefaultExceptionStrategy()
+                new CoreExceptionStrategy()
         );
         errorHandler.setDiscardFatalsWithXDeath(false);
 
