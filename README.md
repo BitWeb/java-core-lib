@@ -7,6 +7,15 @@ Given library contains only generic functionality that is not specific to any fi
 
 On order to enable component scanning, include package in component scanning eg. `scanBasePackages = {"ee.bitweb.core", ...}`
 
+### AMQP Support #### 
+###### Since 2.4.0
+AMQP features autoconfiguration is introduced. Autoconfiguration can be enabled with property `ee.bitweb.core.amqp.auto-configuration=true`. 
+This is configure json message converter for both serialization and deserialization.
+If trace propagation is enabled, trace id propagation will be also autoconfigured for amqp messages.
+By default error handling is configured to drop messages if listener throws an exception.
+Recommended way to avoid data loss is to configure Dead Letter Exchange.
+
+
 ### General HTTP web request error handling for Spring Boot applications. 
 ###### Since 2.0.0
 In order to enable standardised error handlers for HTTP web request hooks 
@@ -167,6 +176,9 @@ release notes section of this document. Documentation must be done before making
 * Require Spring Boot 2.+ instead of 2.6.+
 * Bump various other dependencies
 * Remove Spring Security from implementation classpath
+* Added base functionality to autoconfigure AMQP integration.
+* Added ObjectMapper autoconfiguration. To enable, add property `ee.bitweb.core.object-mapper.auto-configuration=true`
+  This will setup java.time module support and disable potentially harmful data casting operations which lead to data misinterpretation.
 
 ### 2.3.0
 * Introduces option to configure logging levels in `ControllerAdvisor`. All exceptions caught now have a configurable 

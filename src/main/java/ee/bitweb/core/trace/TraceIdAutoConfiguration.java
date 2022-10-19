@@ -5,6 +5,7 @@ import ee.bitweb.core.trace.context.TraceIdContext;
 import ee.bitweb.core.trace.creator.TraceIdCreator;
 import ee.bitweb.core.trace.creator.TraceIdCreatorImpl;
 import ee.bitweb.core.trace.invoker.InvokerTraceIdFormConfig;
+import ee.bitweb.core.trace.invoker.amqp.*;
 import ee.bitweb.core.trace.invoker.http.HttpServletRequestTraceIdResolver;
 import ee.bitweb.core.trace.invoker.http.TraceIdFilter;
 import ee.bitweb.core.trace.invoker.http.TraceIdFilterConfig;
@@ -29,7 +30,8 @@ import org.springframework.context.annotation.Configuration;
                 InvokerTraceIdFormConfig.class,
                 ThreadTraceIdFormConfig.class,
                 SchedulerTraceIdFormConfig.class,
-                TraceIdFilterConfig.class
+                TraceIdFilterConfig.class,
+                AmqpTraceProperties.class
         }
 )
 @ConditionalOnProperty(value = "ee.bitweb.core.trace.auto-configuration", havingValue = "true")
@@ -100,5 +102,46 @@ public class TraceIdAutoConfiguration {
     @ConditionalOnMissingBean
     public TraceIdFilter traceIdFilter(HttpServletRequestTraceIdResolver resolver, TraceIdContext context) {
         return new TraceIdFilter(traceIdFilterConfig, context, resolver);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public AmqpTraceIdResolver amqpTraceIdResolver(
+            @Qualifier("InvokerTraceIdCreator") TraceIdCreator traceIdCreator,
+            TraceIdContext context,
+            AmqpTraceProperties properties
+    ) {
+        log.info("Creating a default AmqpTraceIdResolver");
+
+        return new AmqpTraceIdResolver(properties, traceIdCreator, context);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public AmqpTraceBeforePublishMessageProcessor amqpTraceBeforePublishMessageProcessor(
+            TraceIdContext context,
+            AmqpTraceProperties properties
+    ) {
+        log.info("Creating a default AmqpTraceBeforePublishMessageProcessor");
+
+        return new AmqpTraceBeforePublishMessageProcessor(properties, context);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public AmqpTraceAfterReceiveMessageProcessor amqpTraceAfterReceiveMessageProcessor(
+            TraceIdContext context
+    ) {
+        log.info("Creating a default AmqpTraceAfterReceiveMessageProcessor");
+
+        return new AmqpTraceAfterReceiveMessageProcessor(context);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public AmqpTraceAdvisor amqpTraceAdvisor(AmqpTraceIdResolver resolver) {
+        log.info("Creating a default AmqpTraceAdvisor");
+
+        return new AmqpTraceAdvisor(resolver);
     }
 }
