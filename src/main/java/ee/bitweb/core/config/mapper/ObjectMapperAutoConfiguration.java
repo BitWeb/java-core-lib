@@ -1,4 +1,4 @@
-package ee.bitweb.core.config;
+package ee.bitweb.core.config.mapper;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
