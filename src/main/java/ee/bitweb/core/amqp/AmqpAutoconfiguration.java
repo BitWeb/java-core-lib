@@ -14,6 +14,7 @@ import org.springframework.amqp.rabbit.listener.ConditionalRejectingErrorHandler
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.boot.autoconfigure.amqp.SimpleRabbitListenerContainerFactoryConfigurer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -24,6 +25,7 @@ import java.util.Optional;
 
 @Slf4j
 @Configuration
+@ConditionalOnClass(ConnectionFactory.class)
 @ConditionalOnProperty(value = "ee.bitweb.core.amqp.auto-configuration", havingValue = "true")
 public class AmqpAutoconfiguration {
 

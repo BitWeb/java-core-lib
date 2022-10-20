@@ -103,45 +103,4 @@ public class TraceIdAutoConfiguration {
     public TraceIdFilter traceIdFilter(HttpServletRequestTraceIdResolver resolver, TraceIdContext context) {
         return new TraceIdFilter(traceIdFilterConfig, context, resolver);
     }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public AmqpTraceIdResolver amqpTraceIdResolver(
-            @Qualifier("InvokerTraceIdCreator") TraceIdCreator traceIdCreator,
-            TraceIdContext context,
-            AmqpTraceProperties properties
-    ) {
-        log.info("Creating a default AmqpTraceIdResolver");
-
-        return new AmqpTraceIdResolver(properties, traceIdCreator, context);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public AmqpTraceBeforePublishMessageProcessor amqpTraceBeforePublishMessageProcessor(
-            TraceIdContext context,
-            AmqpTraceProperties properties
-    ) {
-        log.info("Creating a default AmqpTraceBeforePublishMessageProcessor");
-
-        return new AmqpTraceBeforePublishMessageProcessor(properties, context);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public AmqpTraceAfterReceiveMessageProcessor amqpTraceAfterReceiveMessageProcessor(
-            TraceIdContext context
-    ) {
-        log.info("Creating a default AmqpTraceAfterReceiveMessageProcessor");
-
-        return new AmqpTraceAfterReceiveMessageProcessor(context);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public AmqpTraceAdvisor amqpTraceAdvisor(AmqpTraceIdResolver resolver) {
-        log.info("Creating a default AmqpTraceAdvisor");
-
-        return new AmqpTraceAdvisor(resolver);
-    }
 }
