@@ -6,21 +6,21 @@ import ee.bitweb.core.amqp.AmqpService;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
-
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 @Component
-@ConditionalOnProperty(value = "test.listener.enabled", havingValue = "true")
+//@ConditionalOnProperty(value = "test.listener.enabled", havingValue = "true")
+@Profile("AmqpTest")
 public class AmqpTestHelper {
 
     @Autowired
@@ -32,27 +32,23 @@ public class AmqpTestHelper {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    private final ObjectMapper mapper = new ObjectMapper();
-
-    @PostConstruct
-    void init() {
-        mapper.registerModule(new JavaTimeModule());
-    }
+    @Autowired
+    private ObjectMapper mapper;
 
     public Queue createQueue() {
         return admin.declareQueue();
     }
 
-    public void waitForResponse(String responseQueue, int size ){
+    public void waitForResponse(String responseQueue, int size){
         Awaitility.await().atMost(10, TimeUnit.SECONDS).until(() -> {
-            Integer count = (Integer) admin.getQueueProperties(responseQueue).get("QUEUE_MESSAGE_COUNT");
+            Integer count = getMessageCount(responseQueue);
             return count >= size;
         });
     }
 
     public void waitForEmptyQueue(String queueName) {
         Awaitility.await().atMost(10, TimeUnit.SECONDS).until(() -> {
-            Integer count = (Integer) admin.getQueueProperties(queueName).get("QUEUE_MESSAGE_COUNT");
+            Integer count = getMessageCount(queueName);
             return count == 0;
         });
     }
@@ -111,7 +107,7 @@ public class AmqpTestHelper {
         return response;
     }
 
-    public Properties getQueueProperties(String queueName) {
-        return admin.getQueueProperties(queueName);
+    public Integer getMessageCount(String queueName) {
+        return (Integer) admin.getQueueProperties(queueName).get(RabbitAdmin.QUEUE_MESSAGE_COUNT);
     }
  }

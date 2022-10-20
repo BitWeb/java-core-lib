@@ -95,6 +95,6 @@ public class AmqpService {
 
     @FunctionalInterface
     public interface MessageInterceptor {
-        String process(Message message);
+        Message process(Message message);
     }
 }
