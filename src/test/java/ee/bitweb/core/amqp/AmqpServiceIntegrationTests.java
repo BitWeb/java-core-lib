@@ -2,12 +2,14 @@ package ee.bitweb.core.amqp;
 
 import ee.bitweb.core.app.amqp.util.AmqpParsedMessage;
 import ee.bitweb.core.app.amqp.util.AmqpTestHelper;
+import ee.bitweb.core.exception.CoreException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.support.converter.MessageConversionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -36,6 +38,21 @@ class AmqpServiceIntegrationTests {
         helper.waitForEmptyQueue(queue.getName());
 
         assertEquals("some-data", message.getBody().getData());
+    }
+
+    @Test
+    void onErrorCoreExceptionIsThrown() {
+        SelfReferencingClass message = new SelfReferencingClass();
+
+        CoreException exception = assertThrows(
+                CoreException.class,
+                () -> service.sendMessage("whatever", message)
+        );
+
+        assertAll(
+                () -> assertEquals("Sending message to MQ failed", exception.getMessage()),
+                () -> assertTrue(exception.getCause() instanceof MessageConversionException)
+        );
     }
 
     @Test
@@ -151,5 +168,20 @@ class AmqpServiceIntegrationTests {
     @AllArgsConstructor
     private static class Payload {
         private String data;
+    }
+
+
+    /**
+     *  This class is used to spaz the ObjectMapper out and generate an exception.
+     */
+    @Getter
+    @Setter
+    private static class SelfReferencingClass {
+
+        private SelfReferencingClass selfReference;
+
+        public SelfReferencingClass() {
+            selfReference = this;
+        }
     }
 }
