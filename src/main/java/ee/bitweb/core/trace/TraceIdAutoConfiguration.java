@@ -5,6 +5,7 @@ import ee.bitweb.core.trace.context.TraceIdContext;
 import ee.bitweb.core.trace.creator.TraceIdCreator;
 import ee.bitweb.core.trace.creator.TraceIdCreatorImpl;
 import ee.bitweb.core.trace.invoker.InvokerTraceIdFormConfig;
+import ee.bitweb.core.trace.invoker.amqp.*;
 import ee.bitweb.core.trace.invoker.http.HttpServletRequestTraceIdResolver;
 import ee.bitweb.core.trace.invoker.http.TraceIdFilter;
 import ee.bitweb.core.trace.invoker.http.TraceIdFilterConfig;
@@ -29,7 +30,8 @@ import org.springframework.context.annotation.Configuration;
                 InvokerTraceIdFormConfig.class,
                 ThreadTraceIdFormConfig.class,
                 SchedulerTraceIdFormConfig.class,
-                TraceIdFilterConfig.class
+                TraceIdFilterConfig.class,
+                AmqpTraceProperties.class
         }
 )
 @ConditionalOnProperty(value = "ee.bitweb.core.trace.auto-configuration", havingValue = "true")

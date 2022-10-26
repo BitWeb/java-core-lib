@@ -67,6 +67,9 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
     compileOnly group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: "${springBootVersion}"
 
+    // https://mvnrepository.com/artifact/org.springframework.amqp/spring-amqp
+    compileOnly group: 'org.springframework.boot', name: 'spring-boot-starter-amqp', version: "${springBootVersion}"
+
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor
     annotationProcessor group: 'org.springframework.boot', name: 'spring-boot-configuration-processor', version: "${springBootVersion}"
 
@@ -127,6 +130,9 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: "${springBootVersion}"
 
+    // https://mvnrepository.com/artifact/org.springframework.amqp/spring-amqp
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-amqp', version: "${springBootVersion}"
+
     // https://mvnrepository.com/artifact/org.projectlombok/lombok
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
 
@@ -146,6 +152,8 @@ dependencies {
     testImplementation ("org.mock-server:mockserver-netty:5.14.0") {
         exclude group: 'junit', module: 'junit'
     }
+
+    testImplementation group : 'org.testcontainers', name: 'testcontainers',  version: "1.+"
 }
 
 task copyDependencies(type: Copy) {
