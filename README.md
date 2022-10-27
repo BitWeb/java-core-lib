@@ -172,6 +172,9 @@ release notes section of this document. Documentation must be done before making
 
 ## Release notes
 
+### 2.5.0
+* ...
+
 ### 2.4.0
 * Require Spring Boot 2.+ instead of 2.6.+
 * Bump various other dependencies
