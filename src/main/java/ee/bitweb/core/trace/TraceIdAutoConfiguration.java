@@ -45,18 +45,24 @@ public class TraceIdAutoConfiguration {
     @Bean("InvokerTraceIdCreator")
     @ConditionalOnMissingBean(name="InvokerTraceIdCreator")
     public TraceIdCreatorImpl defaultInvokerTraceIdCreator() {
+        log.info("Creating default TraceIdCreatorImpl bean");
+
         return new TraceIdCreatorImpl(invokerTraceIdFormConfig);
     }
 
     @Bean("ThreadTraceIdCreator")
     @ConditionalOnMissingBean(name="ThreadTraceIdCreator")
     public TraceIdCreator defaultThreadTraceIdCreator() {
+        log.info("Creating default ThreadTraceIdCreator bean");
+
         return new TraceIdCreatorImpl(threadTraceIdFormConfig);
     }
 
     @Bean("SchedulerTraceIdCreator")
     @ConditionalOnMissingBean(name="SchedulerTraceIdCreator")
     public TraceIdCreatorImpl defaultSchedulerTraceIdCreator() {
+        log.info("Creating default SchedulerTraceIdCreator bean");
+
         return new TraceIdCreatorImpl(schedulerTraceIdFormConfig);
     }
 
@@ -66,6 +72,8 @@ public class TraceIdAutoConfiguration {
             @Qualifier("InvokerTraceIdCreator") TraceIdCreator creator,
             TraceIdContext context
     ) {
+        log.info("Creating default HttpServletRequestTraceIdResolver bean");
+
         return new HttpServletRequestTraceIdResolver(
                 traceIdFilterConfig.getHeaderName(),
                 context,
@@ -80,6 +88,8 @@ public class TraceIdAutoConfiguration {
             TraceIdContext context,
             @Qualifier("ThreadTraceIdCreator") TraceIdCreator creator
     ) {
+        log.info("Creating default ThreadTraceIdResolver bean");
+
         return new ThreadTraceIdResolver(context, creator);
     }
 
@@ -89,18 +99,24 @@ public class TraceIdAutoConfiguration {
             TraceIdContext context,
             @Qualifier("SchedulerTraceIdCreator") TraceIdCreator creator
     ) {
+        log.info("Creating default SchedulerTraceIdCreator bean");
+
         return new SchedulerTraceIdResolver(context, creator);
     }
 
     @Bean
     @ConditionalOnMissingBean
     public TraceIdContext traceIdContext() {
+        log.info("Creating default MDCTraceIdContext bean");
+
         return MDCTraceIdContext.standard();
     }
 
     @Bean
     @ConditionalOnMissingBean
     public TraceIdFilter traceIdFilter(HttpServletRequestTraceIdResolver resolver, TraceIdContext context) {
+        log.info("Creating default TraceIdFilter bean");
+
         return new TraceIdFilter(traceIdFilterConfig, context, resolver);
     }
 }

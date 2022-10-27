@@ -29,7 +29,7 @@ public class TraceIdAmqpAutoConfiguration {
             TraceIdContext context,
             AmqpTraceProperties properties
     ) {
-        log.info("Creating a default AmqpTraceIdResolver");
+        log.info("Creating default AmqpTraceIdResolver");
 
         return new AmqpTraceIdResolver(properties, traceIdCreator, context);
     }
@@ -40,7 +40,7 @@ public class TraceIdAmqpAutoConfiguration {
             TraceIdContext context,
             AmqpTraceProperties properties
     ) {
-        log.info("Creating a default AmqpTraceBeforePublishMessageProcessor");
+        log.info("Creating default AmqpTraceBeforePublishMessageProcessor");
 
         return new AmqpTraceBeforePublishMessageProcessor(properties, context);
     }
@@ -50,7 +50,7 @@ public class TraceIdAmqpAutoConfiguration {
     public AmqpTraceAfterReceiveMessageProcessor amqpTraceAfterReceiveMessageProcessor(
             TraceIdContext context
     ) {
-        log.info("Creating a default AmqpTraceAfterReceiveMessageProcessor");
+        log.info("Creating default AmqpTraceAfterReceiveMessageProcessor");
 
         return new AmqpTraceAfterReceiveMessageProcessor(context);
     }
@@ -58,7 +58,7 @@ public class TraceIdAmqpAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public AmqpTraceAdvisor amqpTraceAdvisor(AmqpTraceIdResolver resolver) {
-        log.info("Creating a default AmqpTraceAdvisor");
+        log.info("Creating default AmqpTraceAdvisor");
 
         return new AmqpTraceAdvisor(resolver);
     }
