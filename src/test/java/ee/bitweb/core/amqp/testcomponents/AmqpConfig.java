@@ -1,4 +1,4 @@
-package ee.bitweb.core.app.amqp;
+package ee.bitweb.core.amqp.testcomponents;
 
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;

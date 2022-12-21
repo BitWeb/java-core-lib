@@ -50,6 +50,10 @@ public class RetrofitAutoConfiguration {
         for (String entry : properties.getAuthTokenInjector().getWhitelistUrls()) {
             patterns.add(Pattern.compile(entry));
         }
-        return new WhitelistCriteria(patterns);
+
+        WhitelistCriteria criteria = new WhitelistCriteria(patterns);
+        criteria.validate();
+
+        return criteria;
     }
 }

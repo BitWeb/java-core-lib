@@ -1,7 +1,6 @@
-package ee.bitweb.core.app.amqp.util;
+package ee.bitweb.core.amqp.testcomponents.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import ee.bitweb.core.amqp.AmqpService;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.Message;
@@ -9,7 +8,6 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
@@ -19,7 +17,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Component
-//@ConditionalOnProperty(value = "test.listener.enabled", havingValue = "true")
 @Profile("AmqpTest")
 public class AmqpTestHelper {
 

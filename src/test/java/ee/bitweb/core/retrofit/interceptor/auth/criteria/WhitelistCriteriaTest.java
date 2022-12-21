@@ -1,15 +1,23 @@
 package ee.bitweb.core.retrofit.interceptor.auth.criteria;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
 import ee.bitweb.core.retrofit.interceptor.auth.TokenProvider;
+import ee.bitweb.core.utils.MemoryAppender;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.Request;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -32,6 +40,19 @@ class WhitelistCriteriaTest {
 
     @Mock
     private HttpUrl url;
+
+    Logger logger;
+    MemoryAppender memoryAppender;
+
+    @BeforeEach
+    void beforeEach() {
+        logger = (Logger) LoggerFactory.getLogger(WhitelistCriteria.class);
+        memoryAppender = new MemoryAppender();
+        memoryAppender.setContext((LoggerContext) LoggerFactory.getILoggerFactory());
+        logger.setLevel(Level.DEBUG);
+        logger.addAppender(memoryAppender);
+        memoryAppender.start();
+    }
 
     @Test
     @DisplayName("Whitelist empty, must return false")
@@ -108,5 +129,19 @@ class WhitelistCriteriaTest {
 
         verifyNoMoreInteractions(chain, request, url);
         verifyNoInteractions(tokenProvider);
+    }
+
+    @ParameterizedTest
+    @ValueSource(
+            strings = {
+                    "^https://.*",
+                    ".*api.application.com.*",
+                    "^https://.*/some-api",
+                    "^https://localhost.*",
+            }
+    )
+    void testInvalidPatternResultsInErrorMessage(String pattern) {
+        new WhitelistCriteria(List.of(Pattern.compile(pattern)));
+        assertEquals(1, memoryAppender.getSize());
     }
 }

@@ -7,6 +7,17 @@ Given library contains only generic functionality that is not specific to any fi
 
 On order to enable component scanning, include package in component scanning eg. `scanBasePackages = {"ee.bitweb.core", ...}`
 
+#### Audit logging ####
+
+###### Since 2.5.0
+
+Introducing Audit logging support. Audit logging allows to create a singular log entry about a request.
+In order to enable that feature `ee.bitweb.core.audit.auto-configuration=true` should be added to application.properties file.
+Audit logging is flexible. Please refer to AuditLogProperties class to see which configuration properties are available. 
+Should you wish to implement own data mapper, simply define a bean that extends `ee.bitweb.core.audit.mappers.AbstractAuditLogDataMapper` class.
+By default logs are written to logger (which should be sent to Graylog). Should you wish to store logs to separate storage solution, you 
+can override behaviour by defining a bean that implements `ee.bitweb.core.audit.writers.AuditLogWriteAdapter` interface.
+
 ### AMQP Support #### 
 ###### Since 2.4.0
 AMQP features autoconfiguration is introduced. Autoconfiguration can be enabled with property `ee.bitweb.core.amqp.auto-configuration=true`. 
@@ -56,6 +67,15 @@ Full configuration options:
 * `ee.bitweb.core.actuator.security.user.roles` - list of roles to assign to the user, default `ACTUATOR`
 
 ### Retrofit features
+###### Since 2.5.0
+
+Whitelist Criteria which is used for Auth token injection to requests now implements validation rules to incoming patterns. 
+* Invalid pattern endings: ["//.*"]
+* Invalid containments in pattern: [".*/", "^https://localhost.*"]
+* Valid pattern prefixes: ["^http://", "^https://"]
+
+If any rule is not followed an error is logged. In future releases an exception will be thrown.  
+
 ###### Since 2.1.0
 Introduces a more convenient builder for retrofit api creation. `ee.bitweb.core.retrofit.builder.RetrofitApiBuilder`
 builder has no requirements to use, it has logging interceptor set up out of the box. In addition it uses

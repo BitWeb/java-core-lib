@@ -164,7 +164,7 @@ public class TraceIdFilter implements Filter {
             String key = headerNames.nextElement();
             String value;
 
-            if (configuration.getSensitiveHeaders().contains(key)) {
+            if (configuration.getSensitiveHeaders().stream().anyMatch(a -> a.equalsIgnoreCase(key))) {
                 value = "***";
             } else {
                 value = createHeaderValues(request, key);

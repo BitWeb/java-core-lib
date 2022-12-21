@@ -1,4 +1,4 @@
-package ee.bitweb.core.app;
+package ee.bitweb.core.api.testcomponents;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

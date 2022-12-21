@@ -4,7 +4,7 @@ import java.util.List;
 
 import ee.bitweb.core.TestSpringApplication;
 import ee.bitweb.core.api.InvalidFormatExceptionConverter;
-import ee.bitweb.core.app.TestPingController;
+import ee.bitweb.core.api.testcomponents.TestPingController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.bitweb.http.api.response.Criteria;

@@ -1,15 +1,15 @@
-package ee.bitweb.core.app.amqp;
+package ee.bitweb.core.amqp.testcomponents;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
 @Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Response {
+public class Command {
 
-    private String traceId;
+    private Boolean throwError = false;
 }
