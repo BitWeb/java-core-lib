@@ -18,6 +18,12 @@ Should you wish to implement own data mapper, simply define a bean that extends 
 By default logs are written to logger (which should be sent to Graylog). Should you wish to store logs to separate storage solution, you 
 can override behaviour by defining a bean that implements `ee.bitweb.core.audit.writers.AuditLogWriteAdapter` interface.
 
+#### CAUTION 
+Given feature can produce alot of data in logs, please be considerate.
+Consider separating these logs to separate log storage with low retention.
+Enable this feature for environments that really need it. 
+
+
 ### AMQP Support #### 
 ###### Since 2.4.0
 AMQP features autoconfiguration is introduced. Autoconfiguration can be enabled with property `ee.bitweb.core.amqp.auto-configuration=true`. 

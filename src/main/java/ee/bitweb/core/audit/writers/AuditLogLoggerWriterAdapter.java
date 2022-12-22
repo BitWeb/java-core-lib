@@ -15,12 +15,12 @@ import java.util.Map;
 )
 public class AuditLogLoggerWriterAdapter implements AuditLogWriteAdapter {
 
-    public static final String AUDIT = "audit_log";
+    public static final String AUDIT = "audit";
 
     @Override
     public void write(Map<String, String> container) {
         Map<String, String> currentContext = MDC.getCopyOfContextMap();
-        container.put(AUDIT, "true");
+        container.put(AUDIT, "1");
         MDC.setContextMap(container);
         log.info(
                 "Status({}) Url({}) in {} ms",
