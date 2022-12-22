@@ -6,16 +6,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @RequiredArgsConstructor
-public class RequestMethodMapper extends AbstractAuditLogDataMapper {
+public class RequestMethodMapper implements AuditLogDataMapper {
 
     public static final String KEY = "method";
 
-    @Override
     public String getValue(HttpServletRequest request, HttpServletResponse response) {
         return request.getMethod();
     }
 
-    @Override
     public String getKey() {
         return KEY;
     }

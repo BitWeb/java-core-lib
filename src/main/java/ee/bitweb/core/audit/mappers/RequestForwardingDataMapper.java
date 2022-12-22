@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
-public class RequestForwardingDataMapper extends AbstractAuditLogDataMapper {
+public class RequestForwardingDataMapper implements AuditLogDataMapper {
 
     public static final String KEY = "forwarded";
 

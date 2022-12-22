@@ -14,7 +14,7 @@ On order to enable component scanning, include package in component scanning eg.
 Introducing Audit logging support. Audit logging allows to create a singular log entry about a request.
 In order to enable that feature `ee.bitweb.core.audit.auto-configuration=true` should be added to application.properties file.
 Audit logging is flexible. Please refer to AuditLogProperties class to see which configuration properties are available. 
-Should you wish to implement own data mapper, simply define a bean that extends `ee.bitweb.core.audit.mappers.AbstractAuditLogDataMapper` class.
+Should you wish to implement own data mapper, simply define a bean that extends `ee.bitweb.core.audit.mappers.AuditLogDataMapper` class.
 By default logs are written to logger (which should be sent to Graylog). Should you wish to store logs to separate storage solution, you 
 can override behaviour by defining a bean that implements `ee.bitweb.core.audit.writers.AuditLogWriteAdapter` interface.
 

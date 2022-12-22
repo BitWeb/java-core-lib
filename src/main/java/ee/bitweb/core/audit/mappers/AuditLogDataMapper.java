@@ -8,12 +8,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
-public abstract class AbstractAuditLogDataMapper {
+public interface AuditLogDataMapper {
 
-    public abstract String getValue(HttpServletRequest request, HttpServletResponse response);
-    public abstract String getKey();
+    String getValue(HttpServletRequest request, HttpServletResponse response);
+    String getKey();
 
-    public void map (ContentCachingRequestWrapper request, ContentCachingResponseWrapper response, Map<String, String> container) {
+    default void map(ContentCachingRequestWrapper request, ContentCachingResponseWrapper response, Map<String, String> container) {
         if (container.containsKey(getKey())) {
             throw new CoreException(String.format("Audit log container already contains value for key %s", getKey()));
         }

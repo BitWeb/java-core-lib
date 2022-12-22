@@ -14,14 +14,13 @@ import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
-public class RequestHeadersMapper extends AbstractAuditLogDataMapper {
+public class RequestHeadersMapper implements AuditLogDataMapper {
 
     private final AuditLogProperties properties;
     private final ObjectMapper mapper;
 
     public static final String KEY = "request_headers";
 
-    @Override
     public String getValue(HttpServletRequest request, HttpServletResponse response) {
         Map<String, String> result = new HashMap<>();
 
@@ -42,7 +41,6 @@ public class RequestHeadersMapper extends AbstractAuditLogDataMapper {
         return null;
     }
 
-    @Override
     public String getKey() {
         return KEY;
     }

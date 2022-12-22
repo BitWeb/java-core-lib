@@ -24,10 +24,10 @@ public class AuditLogProperties {
     public static final String PREFIX = "ee.bitweb.core.audit";
 
     @Positive
-    private long maxLoggableResponseSize= 1024 * 3;
+    private long maxLoggableResponseSize = 1024 * 3L;
 
     @Positive
-    private long maxLoggableRequestSize = 1024 * 3;
+    private long maxLoggableRequestSize = 1024 * 3L;
 
     @NotNull
     private List<@NotBlank String> requestHeaders = new ArrayList<>(Arrays.asList("User-Agent", "Origin"));

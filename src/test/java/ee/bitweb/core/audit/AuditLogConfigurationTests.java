@@ -61,7 +61,7 @@ class AuditLogConfigurationTests {
 
         Map<String, String> container = writer.getResult();
         assertAll(
-                () -> assertEquals(container.size(), 3),
+                () -> assertEquals(3, container.size()),
                 () -> assertTrue(container.containsKey(CustomAuditLogMapper.KEY)),
                 () -> assertTrue(container.containsKey(RequestMethodMapper.KEY)),
                 () -> assertTrue(container.containsKey(ResponseStatusMapper.KEY))

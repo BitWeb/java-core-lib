@@ -1,6 +1,6 @@
 package ee.bitweb.core.audit;
 
-import ee.bitweb.core.audit.mappers.AbstractAuditLogDataMapper;
+import ee.bitweb.core.audit.mappers.AuditLogDataMapper;
 import ee.bitweb.core.audit.writers.AuditLogWriteAdapter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ public class AuditLogFilter implements Filter {
     public static final String DURATION_KEY = "duration";
 
     private final AuditLogProperties properties;
-    private final List<AbstractAuditLogDataMapper> mappers;
+    private final List<AuditLogDataMapper> mappers;
     private final AuditLogWriteAdapter writer;
 
     @Override
@@ -62,7 +62,7 @@ public class AuditLogFilter implements Filter {
 
         Map<String, String> dataContainer = new HashMap<>();
 
-        for (AbstractAuditLogDataMapper mapper: mappers) {
+        for (AuditLogDataMapper mapper: mappers) {
             mapper.map(requestWrapper, responseWrapper, dataContainer);
         }
         responseWrapper.copyBodyToResponse();

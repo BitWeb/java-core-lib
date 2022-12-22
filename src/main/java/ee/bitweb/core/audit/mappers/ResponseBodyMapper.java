@@ -12,13 +12,12 @@ import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @RequiredArgsConstructor
-public class ResponseBodyMapper extends AbstractAuditLogDataMapper {
+public class ResponseBodyMapper implements AuditLogDataMapper {
 
     public static final String KEY = "response_body";
 
     private final AuditLogProperties properties;
 
-    @Override
     public String getValue(HttpServletRequest request, HttpServletResponse response) {
         String responseBody = "";
 
@@ -40,7 +39,6 @@ public class ResponseBodyMapper extends AbstractAuditLogDataMapper {
         return responseBody;
     }
 
-    @Override
     public String getKey() {
         return KEY;
     }

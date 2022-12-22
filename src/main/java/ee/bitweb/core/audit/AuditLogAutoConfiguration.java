@@ -1,6 +1,6 @@
 package ee.bitweb.core.audit;
 
-import ee.bitweb.core.audit.mappers.AbstractAuditLogDataMapper;
+import ee.bitweb.core.audit.mappers.AuditLogDataMapper;
 import ee.bitweb.core.audit.writers.AuditLogLoggerWriterAdapter;
 import ee.bitweb.core.audit.writers.AuditLogWriteAdapter;
 import lombok.extern.slf4j.Slf4j;
@@ -22,12 +22,12 @@ public class AuditLogAutoConfiguration {
     @ConditionalOnMissingBean
     public AuditLogFilter auditLogFilter(
             AuditLogProperties properties,
-            List<AbstractAuditLogDataMapper> mappers,
+            List<AuditLogDataMapper> mappers,
             AuditLogWriteAdapter writer
     ) {
         log.info("Registering Audit Log Filter with writer {}", writer.getClass());
 
-        for (AbstractAuditLogDataMapper mapper : mappers) {
+        for (AuditLogDataMapper mapper : mappers) {
             log.info("Applying Audit Log Data Mapper: {}", mapper.getClass());
         }
 

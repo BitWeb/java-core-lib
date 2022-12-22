@@ -34,7 +34,11 @@ public class AuditLogDefaultMapperLoader {
             Map<String, Object> attributes= metadata.getAnnotationAttributes(
                     ConditionalOnEnabledMapper.class.getName()
             );
-            String mapperKey = (String) attributes.get("mapper");
+            Object mapperKeyOb = attributes.get("mapper");
+
+            if (mapperKeyOb == null) return false;
+
+            String mapperKey = (String) mapperKeyOb;
 
             AuditLogProperties config = Binder.get(context.getEnvironment())
                     .bind(AuditLogProperties.PREFIX, AuditLogProperties.class).orElse(null);
