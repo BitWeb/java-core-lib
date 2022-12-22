@@ -2,6 +2,7 @@ package ee.bitweb.core.audit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.bitweb.core.audit.mappers.*;
+import ee.bitweb.core.exception.CoreException;
 import ee.bitweb.core.trace.context.TraceIdContext;
 import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -34,14 +35,21 @@ public class AuditLogDefaultMapperLoader {
             Map<String, Object> attributes= metadata.getAnnotationAttributes(
                     ConditionalOnEnabledMapper.class.getName()
             );
+            if (attributes == null) return false;
+
             Object mapperKeyOb = attributes.get("mapper");
 
             if (mapperKeyOb == null) return false;
 
             String mapperKey = (String) mapperKeyOb;
 
-            AuditLogProperties config = Binder.get(context.getEnvironment())
-                    .bind(AuditLogProperties.PREFIX, AuditLogProperties.class).orElse(null);
+            AuditLogProperties config = Binder.get(
+                    context.getEnvironment()
+            ).bind(
+                    AuditLogProperties.PREFIX, AuditLogProperties.class
+            ).orElseThrow(
+                    () -> new CoreException("Error occured while trying to bind environment to AuditLogProperties")
+            );
 
             return config.getMappers().contains(mapperKey);
         }
