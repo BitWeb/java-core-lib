@@ -25,6 +25,10 @@ public class SpringAwareRetrofitBuilder {
                 .addAll(new ArrayList<>(defaultInterceptors))
                 .loggingLevel(properties.getLogging().getLevel())
                 .suppressedHeaders(properties.getLogging().getSuppressedHeaders())
+                .callTimeout(properties.getTimeout().getCall())
+                .connectTimeout(properties.getTimeout().getConnect())
+                .readTimeout(properties.getTimeout().getRead())
+                .writeTimeout(properties.getTimeout().getWrite())
                 .converter(defaultConverterFactory);
     }
 }

@@ -34,6 +34,9 @@ public class RetrofitProperties {
     @Valid
     private AuthTokenInjector authTokenInjector = new AuthTokenInjector();
 
+    @Valid
+    private Timeout timeout = new Timeout();
+
     @Getter
     @Setter
     @Validated
@@ -59,5 +62,19 @@ public class RetrofitProperties {
         public boolean assertHeaderNameValid() {
             return !enabled || StringUtils.hasText(headerName);
         }
+    }
+
+    @Getter
+    @Setter
+    @Validated
+    public static class Timeout {
+
+        private Long call = 0L;
+
+        private Long connect = 10_000L;
+
+        private Long read = 10_000L;
+
+        private Long write = 10_000L;
     }
 }
