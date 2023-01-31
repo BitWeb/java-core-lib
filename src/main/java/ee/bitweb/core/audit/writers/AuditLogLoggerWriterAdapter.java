@@ -3,6 +3,7 @@ package ee.bitweb.core.audit.writers;
 import ee.bitweb.core.audit.AuditLogFilter;
 import ee.bitweb.core.audit.mappers.RequestMethodMapper;
 import ee.bitweb.core.audit.mappers.RequestUrlDataMapper;
+import ee.bitweb.core.audit.mappers.ResponseStatusMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -23,9 +24,10 @@ public class AuditLogLoggerWriterAdapter implements AuditLogWriteAdapter {
         container.put(AUDIT, "1");
         MDC.setContextMap(container);
         log.info(
-                "Status({}) Url({}) in {} ms",
+                "{} {} {} in {} ms",
                 get(container, RequestMethodMapper.KEY),
                 get(container, RequestUrlDataMapper.KEY),
+                get(container, ResponseStatusMapper.KEY),
                 get(container, AuditLogFilter.DURATION_KEY));
         MDC.setContextMap(currentContext);
     }
