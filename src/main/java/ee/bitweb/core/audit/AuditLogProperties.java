@@ -23,6 +23,8 @@ public class AuditLogProperties {
 
     public static final String PREFIX = "ee.bitweb.core.audit";
 
+    private boolean autoConfiguration = false;
+
     @Positive
     private long maxLoggableResponseSize = 1024 * 3L;
 

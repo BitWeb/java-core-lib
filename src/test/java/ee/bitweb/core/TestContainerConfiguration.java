@@ -9,7 +9,7 @@ import org.testcontainers.utility.DockerImageName;
 @Configuration
 public class TestContainerConfiguration {
 
-    public static final DockerImageName RABBIT_MQ_IMAGE = DockerImageName.parse("rabbitmq:3.9.21-management-alpine");
+    private static final DockerImageName RABBIT_MQ_IMAGE = DockerImageName.parse("rabbitmq:3.11-management-alpine");
 
     public static GenericContainer<?> rabbit;
 
