@@ -1,11 +1,11 @@
 package ee.bitweb.core.amqp;
 
-import ee.bitweb.core.app.amqp.AmqpConfig;
-import ee.bitweb.core.app.amqp.Command;
-import ee.bitweb.core.app.amqp.Response;
+import ee.bitweb.core.amqp.testcomponents.AmqpConfig;
+import ee.bitweb.core.amqp.testcomponents.Command;
+import ee.bitweb.core.amqp.testcomponents.Response;
 import ee.bitweb.core.trace.context.MDCTraceIdContext;
-import ee.bitweb.core.app.amqp.util.AmqpParsedMessage;
-import ee.bitweb.core.app.amqp.util.AmqpTestHelper;
+import ee.bitweb.core.amqp.testcomponents.util.AmqpParsedMessage;
+import ee.bitweb.core.amqp.testcomponents.util.AmqpTestHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
@@ -59,7 +59,7 @@ class AmqpMessageListenerTests {
         }
 
         @Test
-        void onMessageExceptionMessageLandsToDeadLetterExchange() throws Exception {
+        void onMessageExceptionMessageLandsToDeadLetterExchange() {
                 MDC.put(MDCTraceIdContext.DEFAULT_KEY, "some-value");
                 amqpTestHelper.sendMessage(AmqpConfig.COMMAND_QUEUE_NAME, new Command(true));
 
@@ -74,13 +74,13 @@ class AmqpMessageListenerTests {
         }
 
         @Test
-        void onMessageExceptionInQueueWithoutDLXMessageIsDiscarded() throws Exception {
+        void onMessageExceptionInQueueWithoutDLXMessageIsDiscarded() {
                 amqpTestHelper.sendMessage(AmqpConfig.COMMAND_QUEUE_SIMPLE_NAME, new Command(true));
                 amqpTestHelper.waitForEmptyQueue(AmqpConfig.COMMAND_QUEUE_SIMPLE_NAME);
         }
 
         @Test
-        void onMessageRequeueFromDLXOnErrorShouldReturnToDLXWithCorrectHeader() throws Exception {
+        void onMessageRequeueFromDLXOnErrorShouldReturnToDLXWithCorrectHeader() {
                 MDC.put(MDCTraceIdContext.DEFAULT_KEY, "some-value");
                 amqpTestHelper.sendMessage(AmqpConfig.COMMAND_QUEUE_NAME, new Command(true));
 

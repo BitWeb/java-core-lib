@@ -1,4 +1,4 @@
-package ee.bitweb.core.app.amqp.util;
+package ee.bitweb.core.amqp.testcomponents.util;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

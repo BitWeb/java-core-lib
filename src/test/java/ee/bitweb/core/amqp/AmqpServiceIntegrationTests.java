@@ -1,7 +1,7 @@
 package ee.bitweb.core.amqp;
 
-import ee.bitweb.core.app.amqp.util.AmqpParsedMessage;
-import ee.bitweb.core.app.amqp.util.AmqpTestHelper;
+import ee.bitweb.core.amqp.testcomponents.util.AmqpParsedMessage;
+import ee.bitweb.core.amqp.testcomponents.util.AmqpTestHelper;
 import ee.bitweb.core.exception.CoreException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

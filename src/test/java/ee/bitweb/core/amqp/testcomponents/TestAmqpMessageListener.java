@@ -1,4 +1,4 @@
-package ee.bitweb.core.app.amqp;
+package ee.bitweb.core.amqp.testcomponents;
 
 import ee.bitweb.core.amqp.AmqpService;
 import ee.bitweb.core.exception.CoreException;
