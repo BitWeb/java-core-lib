@@ -24,7 +24,7 @@ public class AuditLogLoggerWriterAdapter implements AuditLogWriteAdapter {
         container.put(AUDIT, "1");
         MDC.setContextMap(container);
         log.info(
-                "{} {} {} in {} ms",
+                "{} {} {} {} ms",
                 get(container, RequestMethodMapper.KEY),
                 get(container, RequestUrlDataMapper.KEY),
                 get(container, ResponseStatusMapper.KEY),
