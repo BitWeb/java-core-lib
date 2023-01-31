@@ -80,7 +80,14 @@ Whitelist Criteria which is used for Auth token injection to requests now implem
 * Invalid containments in pattern: [".*/", "^https://localhost.*"]
 * Valid pattern prefixes: ["^http://", "^https://"]
 
-If any rule is not followed an error is logged. In future releases an exception will be thrown.  
+If any rule is not followed an error is logged. In future releases an exception will be thrown.
+
+Introduced retrofit timeout configuration properties. Timeout properties must be provided in milliseconds. 
+0 value means no timeout. Full configuration options:
+* `ee.bitweb.core.retrofit.timeout.call` - time limit for a complete HTTP call, default `0`
+* `ee.bitweb.core.retrofit.timeout.connect` - time period in which our client should establish a connection with a target host, default `10000`
+* `ee.bitweb.core.retrofit.timeout.read` - maximum time of inactivity between two data packets when waiting for the server's response, default `10000`
+* `ee.bitweb.core.retrofit.timeout.write` - maximum time of inactivity between two data packets when sending the request to the server, default `10000`
 
 ###### Since 2.1.0
 Introduces a more convenient builder for retrofit api creation. `ee.bitweb.core.retrofit.builder.RetrofitApiBuilder`

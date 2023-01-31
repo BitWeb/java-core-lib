@@ -11,11 +11,13 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import retrofit2.Converter;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Tag("unit")
 @ExtendWith(MockitoExtension.class)
@@ -154,6 +156,86 @@ class RetrofitApiBuilderTests {
                 () -> Assertions.assertEquals(1, customInterceptor1.getCount()),
                 () -> Assertions.assertEquals(0, customInterceptor2.getCount())
         );
+    }
+
+    @Test
+    void callTimeoutIsApplied() {
+        OkHttpClient.Builder clientBuilder = Mockito.spy(OkHttpClient.Builder.class);
+        AtomicReference<OkHttpClient> clientRef = new AtomicReference<>();
+
+        Mockito.doAnswer((answer) -> {
+            OkHttpClient client = (OkHttpClient) answer.callRealMethod();
+            clientRef.set(client);
+            return client;
+        }).when(clientBuilder).build();
+
+        ExternalServiceApi api = RetrofitApiBuilder
+                .create(BASE_URL  + server.getPort(), ExternalServiceApi.class)
+                .clientBuilder(clientBuilder)
+                .callTimeout(999)
+                .build();
+
+        Assertions.assertEquals(999, clientRef.get().callTimeoutMillis());
+    }
+
+    @Test
+    void connectTimeoutIsApplied() {
+        OkHttpClient.Builder clientBuilder = Mockito.spy(OkHttpClient.Builder.class);
+        AtomicReference<OkHttpClient> clientRef = new AtomicReference<>();
+
+        Mockito.doAnswer((answer) -> {
+            OkHttpClient client = (OkHttpClient) answer.callRealMethod();
+            clientRef.set(client);
+            return client;
+        }).when(clientBuilder).build();
+
+        ExternalServiceApi api = RetrofitApiBuilder
+                .create(BASE_URL + server.getPort(), ExternalServiceApi.class)
+                .clientBuilder(clientBuilder)
+                .connectTimeout(999)
+                .build();
+
+        Assertions.assertEquals(999, clientRef.get().connectTimeoutMillis());
+    }
+
+    @Test
+    void readTimeoutIsApplied() {
+        OkHttpClient.Builder clientBuilder = Mockito.spy(OkHttpClient.Builder.class);
+        AtomicReference<OkHttpClient> clientRef = new AtomicReference<>();
+
+        Mockito.doAnswer((answer) -> {
+            OkHttpClient client = (OkHttpClient) answer.callRealMethod();
+            clientRef.set(client);
+            return client;
+        }).when(clientBuilder).build();
+
+        ExternalServiceApi api = RetrofitApiBuilder
+                .create(BASE_URL  + server.getPort(), ExternalServiceApi.class)
+                .clientBuilder(clientBuilder)
+                .readTimeout(999)
+                .build();
+
+        Assertions.assertEquals(999, clientRef.get().readTimeoutMillis());
+    }
+
+    @Test
+    void writeTimeoutIsApplied() {
+        OkHttpClient.Builder clientBuilder = Mockito.spy(OkHttpClient.Builder.class);
+        AtomicReference<OkHttpClient> clientRef = new AtomicReference<>();
+
+        Mockito.doAnswer((answer) -> {
+            OkHttpClient client = (OkHttpClient) answer.callRealMethod();
+            clientRef.set(client);
+            return client;
+        }).when(clientBuilder).build();
+
+        ExternalServiceApi api = RetrofitApiBuilder
+                .create(BASE_URL  + server.getPort(), ExternalServiceApi.class)
+                .clientBuilder(clientBuilder)
+                .writeTimeout(999)
+                .build();
+
+        Assertions.assertEquals(999, clientRef.get().writeTimeoutMillis());
     }
 
     @Test

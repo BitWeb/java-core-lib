@@ -14,6 +14,7 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class RetrofitApiBuilder<T> {
@@ -121,6 +122,30 @@ public class RetrofitApiBuilder<T> {
 
     public RetrofitApiBuilder<T> clientBuilder(OkHttpClient.Builder clientBuilder) {
         this.clientBuilder = clientBuilder;
+
+        return this;
+    }
+
+    public RetrofitApiBuilder<T> callTimeout(long timeout) {
+        clientBuilder.callTimeout(timeout, TimeUnit.MILLISECONDS);
+
+        return this;
+    }
+
+    public RetrofitApiBuilder<T> connectTimeout(long timeout) {
+        clientBuilder.connectTimeout(timeout, TimeUnit.MILLISECONDS);
+
+        return this;
+    }
+
+    public RetrofitApiBuilder<T> readTimeout(long timeout) {
+        clientBuilder.readTimeout(timeout, TimeUnit.MILLISECONDS);
+
+        return this;
+    }
+
+    public RetrofitApiBuilder<T> writeTimeout(long timeout) {
+        clientBuilder.writeTimeout(timeout, TimeUnit.MILLISECONDS);
 
         return this;
     }
