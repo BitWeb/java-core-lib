@@ -9,6 +9,7 @@ On order to enable component scanning, include package in component scanning eg.
 
 #### Audit logging ####
 
+
 ###### Since 2.5.0
 
 Introducing Audit logging support. Audit logging allows to create a singular log entry about a request.
@@ -205,8 +206,12 @@ release notes section of this document. Documentation must be done before making
 
 ## Release notes
 
+### 2.5.1
+
+* Added null check inside `ee.bitweb.core.audit.writers.AuditLogLoggerWriterAdapter`
+
 ### 2.5.0
-* ...
+* Introduced Audit Log feature.
 
 ### 2.4.0
 * Require Spring Boot 2.+ instead of 2.6.+
