@@ -29,7 +29,9 @@ public class AuditLogLoggerWriterAdapter implements AuditLogWriteAdapter {
                 get(container, RequestUrlDataMapper.KEY),
                 get(container, ResponseStatusMapper.KEY),
                 get(container, AuditLogFilter.DURATION_KEY));
-        MDC.setContextMap(currentContext);
+        if (currentContext != null) {
+            MDC.setContextMap(currentContext);
+        }
     }
 
     private String get(Map<String, String> container, String key) {
