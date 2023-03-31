@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.bitweb.http.api.response.Criteria;
 import ee.bitweb.http.api.response.ResponseAssertions;
 import ee.bitweb.http.api.response.Error;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -341,6 +342,32 @@ class ControllerAdvisorIntegrationTests {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$", aMapWithSize(1)))
                 .andExpect(jsonPath("$.error", is("message")));
+    }
+
+    @Test
+    @DisplayName("On broken pipe should return empty 503")
+    void onBrokenPipe() throws Exception {
+        MockHttpServletRequestBuilder mockMvcBuilder = get(TestPingController.BASE_URL + "/broken-pipe")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(mockMvcBuilder)
+                .andDo(print())
+                .andExpect(status().isServiceUnavailable())
+                .andExpect(jsonPath("$").doesNotExist());
+    }
+
+    @Test
+    @DisplayName("On generic ClientAbortException should return 500")
+    void onGenericClientAbortException() throws Exception {
+        MockHttpServletRequestBuilder mockMvcBuilder = get(TestPingController.BASE_URL + "/generic-client-abort-exception")
+                .header(TRACE_ID_HEADER_NAME, "1234567890")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON);
+
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        ResponseAssertions.assertInternalServerError(result);
+        assertIdField(result);
     }
 
     private void testFieldPost(String field, String value, String expectedReason, String expectedMessage) throws Exception {

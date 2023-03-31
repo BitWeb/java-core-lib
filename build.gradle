@@ -1,8 +1,10 @@
 buildscript {
     ext {
-        springBootVersion = '2.+'
-        springVersion = '5.+'
-        lombokVersion = '1.18.+'
+        springBootVersion = '2.7.10'
+        springVersion = '5.3.26'
+        lombokVersion = '1.18.26'
+        springFoxVersion = '2.10.5'
+        jacksonVersion = '2.13.5'
         mockitoVersion = '4.8.+'
         retrofitVersion = '2.9.0'
     }
@@ -24,7 +26,7 @@ plugins {
 }
 
 group 'ee.bitweb'
-version '2.5.1'
+version '2.6.0'
 
 sourceCompatibility = 11
 
@@ -61,6 +63,9 @@ repositories {
 }
 
 dependencies {
+    // https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-catalina
+    compileOnly group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '9.0.73'
+
     // https://mvnrepository.com/artifact/org.springframework/spring-webmvc
     implementation group: 'org.springframework', name: 'spring-webmvc', version: "${springVersion}"
 
@@ -83,22 +88,22 @@ dependencies {
     implementation group: 'org.springframework', name: 'spring-tx', version: "${springVersion}"
 
     // https://mvnrepository.com/artifact/io.swagger/swagger-annotations
-    implementation group: 'io.swagger', name: 'swagger-annotations', version: '1.6.6'
+    implementation group: 'io.swagger', name: 'swagger-annotations', version: '1.6.10'
 
     // https://mvnrepository.com/artifact/io.springfox/springfox-spring-web
-    implementation group: 'io.springfox', name: 'springfox-spring-web', version: '2.10.+'
-
-    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.4'
-
-    // https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.4'
-
-    // https://mvnrepository.com/artifact/com.fasterxml.jackson.module/jackson-module-kotlin
-    implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: '2.13.4'
+    implementation group: 'io.springfox', name: 'springfox-spring-web', version: "${springFoxVersion}"
 
     // https://mvnrepository.com/artifact/io.springfox/springfox-bean-validators
-    implementation group: 'io.springfox', name: 'springfox-bean-validators', version: '2.10.+'
+    implementation group: 'io.springfox', name: 'springfox-bean-validators', version: "${springFoxVersion}"
+
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "${jacksonVersion}"
+
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: "${jacksonVersion}"
+
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.module/jackson-module-kotlin
+    implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: "${jacksonVersion}"
 
     // https://mvnrepository.com/artifact/javax.validation/validation-api
     implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
@@ -137,7 +142,7 @@ dependencies {
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
 
     // https://mvnrepository.com/artifact/org.json/json
-    testImplementation group: 'org.json', name: 'json', version: '20220320'
+    testImplementation group: 'org.json', name: 'json', version: '20230227'
 
     // https://bitbucket.org/bitwebou/java-core-test-lib/src/master/
     testImplementation group: 'ee.bitweb', name: 'test-core-lib', version: '1.+'

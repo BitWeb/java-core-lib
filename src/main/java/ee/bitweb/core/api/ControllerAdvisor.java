@@ -1,5 +1,6 @@
 package ee.bitweb.core.api;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
@@ -18,7 +19,9 @@ import ee.bitweb.core.retrofit.RetrofitException;
 import ee.bitweb.core.trace.context.TraceIdContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.NestedExceptionUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -257,6 +260,22 @@ public class ControllerAdvisor {
                 getResponseId(),
                 ErrorMessage.METHOD_NOT_ALLOWED.toString()
         );
+    }
+
+    @ExceptionHandler(ClientAbortException.class)
+    @ResponseBody
+    public GenericErrorResponse clientAbortExceptionHandler(ClientAbortException e, HttpServletResponse response) {
+        Throwable cause = NestedExceptionUtils.getRootCause(e);
+
+        if (cause instanceof IOException && cause.getMessage().toLowerCase().contains("broken pipe")) {
+            setDefaultHeaders(response, HttpStatus.SERVICE_UNAVAILABLE);
+
+            log(properties.getLogging().getClientAbortException(), e.getMessage(), e);
+
+            return null;
+        } else {
+            return handleGeneralException(response, e);
+        }
     }
 
     @ExceptionHandler(Throwable.class)

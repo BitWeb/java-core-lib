@@ -1,5 +1,6 @@
 package ee.bitweb.core.api.testcomponents;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import ee.bitweb.core.retrofit.RetrofitException;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -85,6 +87,16 @@ public class TestPingController {
     @GetMapping("/constraint-violation")
     public void throwsConstraintViolationException() {
         throw new ConstraintViolationException("Validation failed", validator.validate(new SimpleValidatedObject()));
+    }
+
+    @GetMapping("/broken-pipe")
+    public void throwBrokenPipeException() throws ClientAbortException {
+        throw new ClientAbortException(new IOException("Broken pipe"));
+    }
+
+    @GetMapping("/generic-client-abort-exception")
+    public void throwGenericClientAbortException() throws ClientAbortException {
+        throw new ClientAbortException("something wrong");
     }
 
     @Getter

@@ -63,6 +63,9 @@ public class ControllerAdvisorProperties {
 
         @NotNull
         private Level retrofitException = Level.INFO;
+
+        @NotNull
+        private Level clientAbortException = Level.WARN;
     }
 
     public enum Level {

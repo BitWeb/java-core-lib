@@ -7,7 +7,7 @@ Given library contains only generic functionality that is not specific to any fi
 
 On order to enable component scanning, include package in component scanning eg. `scanBasePackages = {"ee.bitweb.core", ...}`
 
-#### Audit logging ####
+#### Audit logging
 
 
 ###### Since 2.5.0
@@ -25,10 +25,10 @@ Consider separating these logs to separate log storage with low retention.
 Enable this feature for environments that really need it. 
 
 
-### AMQP Support #### 
+### AMQP Support
 ###### Since 2.4.0
 AMQP features autoconfiguration is introduced. Autoconfiguration can be enabled with property `ee.bitweb.core.amqp.auto-configuration=true`. 
-This is configure json message converter for both serialization and deserialization.
+This will configure json message converter for both serialization and deserialization.
 If trace propagation is enabled, trace id propagation will be also autoconfigured for amqp messages.
 By default error handling is configured to drop messages if listener throws an exception.
 Recommended way to avoid data loss is to configure Dead Letter Exchange.
@@ -153,7 +153,7 @@ Add BitWeb's public Maven repository to your build.gradle file
 Add dependency to your project
 
     // https://bitbucket.org/bitwebou/java-core-lib/src/master/
-    implementation group: 'ee.bitweb', name: 'core', version: '2.4.+'
+    implementation group: 'ee.bitweb', name: 'core', version: '2.6.+'
 
 ### Current development version
 
@@ -169,7 +169,7 @@ Add snapshot repository
 Use desired version
 
     // https://bitbucket.org/bitwebou/java-core-lib/src/master/
-    implementation group: 'ee.bitweb', name: 'core', version: '2.5.0-SNAPSHOT'
+    implementation group: 'ee.bitweb', name: 'core', version: '2.7.0-SNAPSHOT'
 
 
 ## Development
@@ -205,6 +205,13 @@ release notes section of this document. Documentation must be done before making
 * **SNAPSHOT** - Indicates version in progress. DO NOT use snapshot versions for production or staging
 
 ## Release notes
+
+### 2.6.0
+
+* Add handler in `ControllerAdvisor` for `ClientAbortException`. In case of Broken Pipe, no response is sent and the
+  exception is logged at desired level. The level is set by `ee.bitweb.core.controller-advice.logging.client-abort-exception`
+  and default is `WARN`.
+* Fix and bump dependency versions
 
 ### 2.5.1
 
