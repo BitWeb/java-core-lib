@@ -206,6 +206,10 @@ release notes section of this document. Documentation must be done before making
 
 ## Release notes
 
+### 2.6.1
+* Fixed MDC clearing once AMQP message has been processed. Before AmqpTraceAfterReceiveMessageProcessor had been used.
+  It turned out to not work as intended, thus clearing had been moved to `ee.bitweb.core.trace.invoker.amqp.AmqpTraceAdvisor`
+
 ### 2.6.0
 
 * Add handler in `ControllerAdvisor` for `ClientAbortException`. In case of Broken Pipe, no response is sent and the

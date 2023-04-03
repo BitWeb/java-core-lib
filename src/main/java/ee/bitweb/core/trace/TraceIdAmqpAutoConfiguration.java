@@ -47,19 +47,9 @@ public class TraceIdAmqpAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public AmqpTraceAfterReceiveMessageProcessor amqpTraceAfterReceiveMessageProcessor(
-            TraceIdContext context
-    ) {
-        log.info("Creating default AmqpTraceAfterReceiveMessageProcessor");
-
-        return new AmqpTraceAfterReceiveMessageProcessor(context);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public AmqpTraceAdvisor amqpTraceAdvisor(AmqpTraceIdResolver resolver) {
+    public AmqpTraceAdvisor amqpTraceAdvisor(AmqpTraceIdResolver resolver, TraceIdContext context) {
         log.info("Creating default AmqpTraceAdvisor");
 
-        return new AmqpTraceAdvisor(resolver);
+        return new AmqpTraceAdvisor(resolver, context);
     }
 }
