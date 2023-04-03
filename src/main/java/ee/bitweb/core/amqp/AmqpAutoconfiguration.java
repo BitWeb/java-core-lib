@@ -38,7 +38,7 @@ public class AmqpAutoconfiguration {
             ConnectionFactory connectionFactory,
             MessageConverter converter,
             SimpleRabbitListenerContainerFactoryConfigurer configurer,
-            Optional<AmqpTraceAdvisor> traceIdResolver
+            Optional<AmqpTraceAdvisor> traceAdvisor
     ) {
         log.info("Creating a default SimpleRabbitListenerContainerFactory");
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
@@ -46,10 +46,10 @@ public class AmqpAutoconfiguration {
         factory.setMessageConverter(converter);
 
         factory.setErrorHandler(createDefaultErrorHandler());
-        traceIdResolver.ifPresent(
-                resolver -> {
+        traceAdvisor.ifPresent(
+                advisor -> {
                     log.info("Adding AMQP Trace Advisor to SimpleRabbitListenerContainerFactory");
-                    factory.setAdviceChain(resolver);
+                    factory.setAdviceChain(advisor);
                 }
         );
 
