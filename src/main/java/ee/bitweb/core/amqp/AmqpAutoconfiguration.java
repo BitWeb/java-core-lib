@@ -2,9 +2,7 @@ package ee.bitweb.core.amqp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.bitweb.core.trace.invoker.amqp.AmqpTraceAdvisor;
-import ee.bitweb.core.trace.invoker.amqp.AmqpTraceAfterReceiveMessageProcessor;
 import ee.bitweb.core.trace.invoker.amqp.AmqpTraceBeforePublishMessageProcessor;
-import ee.bitweb.core.trace.invoker.amqp.AmqpTraceIdResolver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListenerAnnotationBeanPostProcessor;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
@@ -40,27 +38,18 @@ public class AmqpAutoconfiguration {
             ConnectionFactory connectionFactory,
             MessageConverter converter,
             SimpleRabbitListenerContainerFactoryConfigurer configurer,
-            Optional<AmqpTraceAfterReceiveMessageProcessor> afterReceiveProcessor,
-            Optional<AmqpTraceIdResolver> traceIdResolver
+            Optional<AmqpTraceAdvisor> traceIdResolver
     ) {
         log.info("Creating a default SimpleRabbitListenerContainerFactory");
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         configurer.configure(factory, connectionFactory);
         factory.setMessageConverter(converter);
 
-        afterReceiveProcessor.ifPresent(afterRecieveProcess -> {
-            log.info("Adding after receive post processor to SimpleRabbitListenerContainerFactory");
-
-            factory.setAfterReceivePostProcessors(afterRecieveProcess);
-        });
-
         factory.setErrorHandler(createDefaultErrorHandler());
-
         traceIdResolver.ifPresent(
-                amqpTraceIdResolver -> {
+                resolver -> {
                     log.info("Adding AMQP Trace Advisor to SimpleRabbitListenerContainerFactory");
-
-                    factory.setAdviceChain(new AmqpTraceAdvisor(amqpTraceIdResolver));
+                    factory.setAdviceChain(resolver);
                 }
         );
 
