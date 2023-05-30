@@ -13,7 +13,7 @@ public class AmqpTraceIdResolver {
     private final TraceIdContext context;
 
     public String resolve(Message message) {
-        context.clear();
+        context.clearTraceId();
         String traceId = creator.generate(message.getMessageProperties().getHeader(properties.getHeaderName()));
         context.set(traceId);
 

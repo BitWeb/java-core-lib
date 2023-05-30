@@ -55,7 +55,7 @@ class SpringAwareRetrofitBuilderTests {
 
     @BeforeEach
     void reset() {
-        context.clear();
+        context.clearAll();
         interceptor1.reset();
         interceptor2.reset();
     }

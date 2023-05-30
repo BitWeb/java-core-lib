@@ -3,9 +3,9 @@ package ee.bitweb.core.amqp;
 import ee.bitweb.core.amqp.testcomponents.AmqpConfig;
 import ee.bitweb.core.amqp.testcomponents.Command;
 import ee.bitweb.core.amqp.testcomponents.Response;
-import ee.bitweb.core.trace.context.MDCTraceIdContext;
 import ee.bitweb.core.amqp.testcomponents.util.AmqpParsedMessage;
 import ee.bitweb.core.amqp.testcomponents.util.AmqpTestHelper;
+import ee.bitweb.core.trace.context.MDCTraceIdContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
@@ -17,7 +17,8 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(
         properties = {
@@ -43,7 +44,7 @@ class AmqpMessageListenerTests {
         }
 
         @Test
-        void traceIdPropagates() throws Exception {
+        void onMessagePostSendProcessorsAndListenerInterceptorsPropagateData() throws Exception {
                 MDC.put(MDCTraceIdContext.DEFAULT_KEY, "some-value");
                 amqpTestHelper.sendMessage(AmqpConfig.COMMAND_QUEUE_NAME, new Command(false));
 
@@ -52,10 +53,13 @@ class AmqpMessageListenerTests {
                 Message message = response.get(0);
 
                 String traceId = message.getMessageProperties().getHeader("custom-header-name");
+                String postProcessMessageParameter = message.getMessageProperties().getHeader("post-process-message-parameter");
                 AmqpParsedMessage<Response> parsedMessage = amqpTestHelper.convert(message, Response.class);
 
                 assertTrue(traceId.startsWith("some-value"));
+                assertEquals("some-parameter-value", postProcessMessageParameter);
                 assertEquals(traceId, parsedMessage.getBody().getTraceId());
+                assertEquals("some-parameter-value", parsedMessage.getBody().getPostProcessMessageParameter());
         }
 
         @Test

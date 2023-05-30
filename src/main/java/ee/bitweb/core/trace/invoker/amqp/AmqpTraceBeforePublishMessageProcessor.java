@@ -1,15 +1,15 @@
 package ee.bitweb.core.trace.invoker.amqp;
 
+import ee.bitweb.core.amqp.AmqpBeforePublishMessageProcessor;
 import ee.bitweb.core.trace.context.TraceIdContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessagePostProcessor;
 
 @Slf4j
 @RequiredArgsConstructor
-public class AmqpTraceBeforePublishMessageProcessor implements MessagePostProcessor {
+public class AmqpTraceBeforePublishMessageProcessor implements AmqpBeforePublishMessageProcessor {
 
     private final AmqpTraceProperties properties;
     private final TraceIdContext context;

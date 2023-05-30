@@ -70,7 +70,7 @@ public class TraceIdFilter implements Filter {
         try {
             chain.doFilter(request, response);
         } finally {
-            context.clear();
+            context.clearAll();
         }
     }
 

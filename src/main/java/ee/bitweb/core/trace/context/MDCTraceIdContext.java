@@ -5,13 +5,15 @@ import org.slf4j.MDC;
 import org.springframework.util.StringUtils;
 
 @RequiredArgsConstructor
-public final class MDCTraceIdContext implements TraceIdContext{
+public final class MDCTraceIdContext implements TraceIdContext {
 
     public static final String DEFAULT_KEY = "trace_id";
 
     private final String key;
 
-    public static MDCTraceIdContext standard() {return new MDCTraceIdContext(DEFAULT_KEY);}
+    public static MDCTraceIdContext standard() {
+        return new MDCTraceIdContext(DEFAULT_KEY);
+    }
 
     public void set(String traceId) {
         String existing = get();
@@ -28,7 +30,13 @@ public final class MDCTraceIdContext implements TraceIdContext{
     }
 
     @Override
-    public void clear() {
+    public void clearTraceId() {
+        MDC.remove(DEFAULT_KEY);
+        MDC.remove(key);
+    }
+
+    @Override
+    public void clearAll() {
         MDC.clear();
     }
 

@@ -39,7 +39,12 @@ class TraceIdMapperUnitTests {
         }
 
         @Override
-        public void clear() {
+        public void clearTraceId() {
+            throw new IllegalCallerException("Should not be called");
+        }
+
+        @Override
+        public void clearAll() {
             throw new IllegalCallerException("Should not be called");
         }
     }

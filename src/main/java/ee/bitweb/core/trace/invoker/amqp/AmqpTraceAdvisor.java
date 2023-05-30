@@ -1,15 +1,15 @@
 package ee.bitweb.core.trace.invoker.amqp;
 
+import ee.bitweb.core.amqp.AmqpListenerInterceptor;
 import ee.bitweb.core.trace.context.TraceIdContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.amqp.core.Message;
 
 @Slf4j
 @RequiredArgsConstructor
-public class AmqpTraceAdvisor implements MethodInterceptor {
+public class AmqpTraceAdvisor implements AmqpListenerInterceptor {
 
     private final AmqpTraceIdResolver resolver;
     private final TraceIdContext context;
@@ -28,7 +28,7 @@ public class AmqpTraceAdvisor implements MethodInterceptor {
             return invocation.proceed();
         } finally {
             log.debug("Message has been processed, clearing trace id context.");
-            context.clear();
+            context.clearTraceId();
         }
     }
 
