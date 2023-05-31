@@ -26,6 +26,7 @@ import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -288,7 +289,7 @@ class TraceIdFilterTest {
             mdcMock.verify(() -> MDC.put("user_agent", "some-user-agent"));
             mdcMock.verify(() -> MDC.get("trace_id"), times(2));
 
-            mdcMock.verify(MDC::clear);
+            mdcMock.verify(() -> MDC.remove(any()), times(2));
             mdcMock.verifyNoMoreInteractions();
 
             verify(chain).doFilter(request, response);
@@ -323,7 +324,7 @@ class TraceIdFilterTest {
             mdcMock.verify(() -> MDC.put("user_agent", "some-user-agent"), times(0));
             mdcMock.verify(() -> MDC.get("trace_id"), times(2));
 
-            mdcMock.verify(MDC::clear);
+            mdcMock.verify(() -> MDC.remove(any()), times(2));
             mdcMock.verifyNoMoreInteractions();
 
             verify(chain).doFilter(request, response);

@@ -24,6 +24,6 @@ public abstract class ScheduledJob<T extends ScheduledRunnable> {
 
         log.info("Finished {}", getClass().getName());
 
-        traceIdResolver.getContext().clearAll();
+        traceIdResolver.getContext().clear();
     }
 }

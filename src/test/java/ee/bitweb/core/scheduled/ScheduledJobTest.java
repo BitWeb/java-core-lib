@@ -68,7 +68,7 @@ class ScheduledJobTest {
                 () -> assertEquals(2, memoryAppender.getSize()),
                 () -> assertEquals(1, memoryAppender.search("Started ee.bitweb.core.scheduled.ScheduledJobTest$TestJob", Level.INFO).size()),
                 () -> assertEquals(1, memoryAppender.search("Finished ee.bitweb.core.scheduled.ScheduledJobTest$TestJob", Level.INFO).size()),
-                () -> assertNull(MDC.getCopyOfContextMap())
+                () -> assertEquals(0, MDC.getCopyOfContextMap().size())
         );
     }
 
@@ -92,7 +92,7 @@ class ScheduledJobTest {
                 () -> assertEquals(1, errorMessages.size()),
                 () -> assertEquals("java.lang.RuntimeException", errorMessages.get(0).getThrowableProxy().getClassName()), // validates that cause has been added to log message
                 () -> assertEquals(1, memoryAppender.search("Finished ee.bitweb.core.scheduled.ScheduledJobTest$TestJob", Level.INFO).size()),
-                () -> assertNull(MDC.getCopyOfContextMap())
+                () -> assertEquals(0, MDC.getCopyOfContextMap().size())
         );
     }
 

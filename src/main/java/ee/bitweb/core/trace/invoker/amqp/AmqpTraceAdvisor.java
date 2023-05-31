@@ -28,7 +28,7 @@ public class AmqpTraceAdvisor implements AmqpListenerInterceptor {
             return invocation.proceed();
         } finally {
             log.debug("Message has been processed, clearing trace id context.");
-            context.clearTraceId();
+            context.clear();
         }
     }
 
