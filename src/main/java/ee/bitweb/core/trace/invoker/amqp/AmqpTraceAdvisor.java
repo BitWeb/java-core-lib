@@ -6,8 +6,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.amqp.core.Message;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
 @Slf4j
+//@Order(Ordered.HIGHEST_PRECEDENCE)
 @RequiredArgsConstructor
 public class AmqpTraceAdvisor implements AmqpListenerInterceptor {
 
@@ -31,5 +34,4 @@ public class AmqpTraceAdvisor implements AmqpListenerInterceptor {
             context.clear();
         }
     }
-
 }

@@ -31,8 +31,7 @@ public final class MDCTraceIdContext implements TraceIdContext {
 
     @Override
     public void clear() {
-        MDC.remove(DEFAULT_KEY);
-        MDC.remove(key);
+        MDC.clear();
     }
 
     @Override

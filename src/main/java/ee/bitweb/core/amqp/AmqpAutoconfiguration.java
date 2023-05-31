@@ -1,6 +1,7 @@
 package ee.bitweb.core.amqp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ee.bitweb.core.trace.invoker.amqp.AmqpTraceAdvisor;
 import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.springframework.amqp.rabbit.annotation.RabbitListenerAnnotationBeanPostProcessor;
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.ErrorHandler;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -46,12 +48,30 @@ public class AmqpAutoconfiguration {
 
         factory.setErrorHandler(createDefaultErrorHandler());
 
-        interceptors.forEach(interceptor ->
-                log.info("Adding {} to SimpleRabbitListenerContainerFactory", interceptor.getClass().getSimpleName())
-        );
-        factory.setAdviceChain(interceptors.toArray(new MethodInterceptor[0]));
+        var sortedInterceptors = sortTraceIdInterceptorToFirst(interceptors);
+        for (AmqpListenerInterceptor interceptor : sortedInterceptors) {
+            log.info("Adding {} to SimpleRabbitListenerContainerFactory", interceptor.getClass().getSimpleName());
+        }
+        factory.setAdviceChain(sortedInterceptors.toArray(new MethodInterceptor[0]));
 
         return factory;
+    }
+
+    private List<AmqpListenerInterceptor> sortTraceIdInterceptorToFirst(List<AmqpListenerInterceptor> interceptors) {
+        List<AmqpListenerInterceptor> sorted = new ArrayList<>();
+
+        var traceIdInterceptor = interceptors.stream().filter(interceptor -> interceptor instanceof AmqpTraceAdvisor)
+                .findFirst()
+                .orElse(null);
+
+        if (traceIdInterceptor != null) {
+            sorted.add(traceIdInterceptor);
+            interceptors.remove(traceIdInterceptor);
+        }
+
+        sorted.addAll(interceptors);
+
+        return sorted;
     }
 
     private ErrorHandler createDefaultErrorHandler() {
@@ -74,9 +94,9 @@ public class AmqpAutoconfiguration {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setMessageConverter(converter);
 
-        processors.forEach(processor ->
-                log.info("Adding {} to RabbitTemplate", processor.getClass().getSimpleName())
-        );
+        for (AmqpBeforePublishMessageProcessor processor : processors) {
+            log.info("Adding {} to RabbitTemplate", processor.getClass().getSimpleName());
+        }
         template.setBeforePublishPostProcessors(processors.toArray(new AmqpBeforePublishMessageProcessor[0]));
 
         return template;

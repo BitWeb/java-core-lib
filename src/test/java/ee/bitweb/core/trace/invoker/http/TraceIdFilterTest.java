@@ -289,7 +289,7 @@ class TraceIdFilterTest {
             mdcMock.verify(() -> MDC.put("user_agent", "some-user-agent"));
             mdcMock.verify(() -> MDC.get("trace_id"), times(2));
 
-            mdcMock.verify(() -> MDC.remove(any()), times(2));
+            mdcMock.verify(MDC::clear);
             mdcMock.verifyNoMoreInteractions();
 
             verify(chain).doFilter(request, response);
@@ -324,7 +324,7 @@ class TraceIdFilterTest {
             mdcMock.verify(() -> MDC.put("user_agent", "some-user-agent"), times(0));
             mdcMock.verify(() -> MDC.get("trace_id"), times(2));
 
-            mdcMock.verify(() -> MDC.remove(any()), times(2));
+            mdcMock.verify(MDC::clear);
             mdcMock.verifyNoMoreInteractions();
 
             verify(chain).doFilter(request, response);

@@ -7,6 +7,7 @@ import ee.bitweb.core.amqp.testcomponents.util.AmqpParsedMessage;
 import ee.bitweb.core.amqp.testcomponents.util.AmqpTestHelper;
 import ee.bitweb.core.trace.context.MDCTraceIdContext;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 import org.springframework.amqp.core.Message;
@@ -20,6 +21,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Tag("integration")
 @SpringBootTest(
         properties = {
                 "ee.bitweb.core.trace.auto-configuration=true",

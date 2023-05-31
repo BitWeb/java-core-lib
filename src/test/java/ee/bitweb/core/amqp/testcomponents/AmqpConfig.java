@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.intercept.MethodInvocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.junit.jupiter.api.Order;
 import org.slf4j.MDC;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
@@ -78,6 +79,7 @@ public class AmqpConfig {
         }
     }
 
+    @Order(1)
     public static class TestAmqpListenerInterceptor implements AmqpListenerInterceptor {
 
         @Nullable

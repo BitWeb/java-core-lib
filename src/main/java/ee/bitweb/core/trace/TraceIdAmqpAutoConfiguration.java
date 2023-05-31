@@ -2,7 +2,10 @@ package ee.bitweb.core.trace;
 
 import ee.bitweb.core.trace.context.TraceIdContext;
 import ee.bitweb.core.trace.creator.TraceIdCreator;
-import ee.bitweb.core.trace.invoker.amqp.*;
+import ee.bitweb.core.trace.invoker.amqp.AmqpTraceAdvisor;
+import ee.bitweb.core.trace.invoker.amqp.AmqpTraceBeforePublishMessageProcessor;
+import ee.bitweb.core.trace.invoker.amqp.AmqpTraceIdResolver;
+import ee.bitweb.core.trace.invoker.amqp.AmqpTraceProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.MessagePostProcessor;
