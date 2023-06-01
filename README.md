@@ -207,8 +207,8 @@ release notes section of this document. Documentation must be done before making
 ## Release notes
 
 ### 2.7.0
-* Added `ee.bitweb.core.amqp.AmqpBeforePublishMessageProcessor` and `ee.bitweb.core.amqp.AmqpListenerInterceptor`.
-  `MDCTraceIdContxt` clear method now only removes trace id from context.
+* Added `ee.bitweb.core.amqp.AmqpBeforePublishMessageProcessor` and `ee.bitweb.core.amqp.AmqpListenerInterceptor`
+  interfaces to extend amqp message processing and interception flow.
 
 ### 2.6.1
 * Fixed MDC clearing once AMQP message has been processed. Before AmqpTraceAfterReceiveMessageProcessor had been used.
