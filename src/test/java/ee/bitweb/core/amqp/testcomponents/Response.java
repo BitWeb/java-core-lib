@@ -12,4 +12,5 @@ import lombok.Setter;
 public class Response {
 
     private String traceId;
+    private String postProcessMessageParameter;
 }

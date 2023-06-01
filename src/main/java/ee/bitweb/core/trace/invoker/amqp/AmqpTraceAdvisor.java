@@ -1,15 +1,18 @@
 package ee.bitweb.core.trace.invoker.amqp;
 
+import ee.bitweb.core.amqp.AmqpListenerInterceptor;
 import ee.bitweb.core.trace.context.TraceIdContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.amqp.core.Message;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
 @Slf4j
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @RequiredArgsConstructor
-public class AmqpTraceAdvisor implements MethodInterceptor {
+public class AmqpTraceAdvisor implements AmqpListenerInterceptor {
 
     private final AmqpTraceIdResolver resolver;
     private final TraceIdContext context;
@@ -31,5 +34,4 @@ public class AmqpTraceAdvisor implements MethodInterceptor {
             context.clear();
         }
     }
-
 }

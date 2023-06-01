@@ -2,8 +2,8 @@ package ee.bitweb.core.amqp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.bitweb.core.trace.invoker.amqp.AmqpTraceAdvisor;
-import ee.bitweb.core.trace.invoker.amqp.AmqpTraceBeforePublishMessageProcessor;
 import lombok.extern.slf4j.Slf4j;
+import org.aopalliance.intercept.MethodInterceptor;
 import org.springframework.amqp.rabbit.annotation.RabbitListenerAnnotationBeanPostProcessor;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -19,7 +19,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.ErrorHandler;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Configuration
@@ -38,7 +39,7 @@ public class AmqpAutoconfiguration {
             ConnectionFactory connectionFactory,
             MessageConverter converter,
             SimpleRabbitListenerContainerFactoryConfigurer configurer,
-            Optional<AmqpTraceAdvisor> traceAdvisor
+            List<AmqpListenerInterceptor> interceptors
     ) {
         log.info("Creating a default SimpleRabbitListenerContainerFactory");
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
@@ -46,14 +47,31 @@ public class AmqpAutoconfiguration {
         factory.setMessageConverter(converter);
 
         factory.setErrorHandler(createDefaultErrorHandler());
-        traceAdvisor.ifPresent(
-                advisor -> {
-                    log.info("Adding AMQP Trace Advisor to SimpleRabbitListenerContainerFactory");
-                    factory.setAdviceChain(advisor);
-                }
-        );
+
+        var sortedInterceptors = sortTraceIdInterceptorToFirst(interceptors);
+        for (AmqpListenerInterceptor interceptor : sortedInterceptors) {
+            log.info("Adding {} to SimpleRabbitListenerContainerFactory", interceptor.getClass().getSimpleName());
+        }
+        factory.setAdviceChain(sortedInterceptors.toArray(new MethodInterceptor[0]));
 
         return factory;
+    }
+
+    private List<AmqpListenerInterceptor> sortTraceIdInterceptorToFirst(List<AmqpListenerInterceptor> interceptors) {
+        List<AmqpListenerInterceptor> sorted = new ArrayList<>();
+
+        var traceIdInterceptor = interceptors.stream().filter(interceptor -> interceptor instanceof AmqpTraceAdvisor)
+                .findFirst()
+                .orElse(null);
+
+        if (traceIdInterceptor != null) {
+            sorted.add(traceIdInterceptor);
+            interceptors.remove(traceIdInterceptor);
+        }
+
+        sorted.addAll(interceptors);
+
+        return sorted;
     }
 
     private ErrorHandler createDefaultErrorHandler() {
@@ -70,12 +88,16 @@ public class AmqpAutoconfiguration {
     public RabbitTemplate rabbitTemplate(
             ConnectionFactory connectionFactory,
             MessageConverter converter,
-            Optional<AmqpTraceBeforePublishMessageProcessor> processor
+            List<AmqpBeforePublishMessageProcessor> processors
     ) {
         log.info("Creating a default RabbitTemplate");
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setMessageConverter(converter);
-        processor.ifPresent(template::setBeforePublishPostProcessors);
+
+        for (AmqpBeforePublishMessageProcessor processor : processors) {
+            log.info("Adding {} to RabbitTemplate", processor.getClass().getSimpleName());
+        }
+        template.setBeforePublishPostProcessors(processors.toArray(new AmqpBeforePublishMessageProcessor[0]));
 
         return template;
     }
