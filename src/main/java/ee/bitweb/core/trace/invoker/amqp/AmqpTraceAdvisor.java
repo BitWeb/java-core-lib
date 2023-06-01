@@ -10,7 +10,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
 @Slf4j
-//@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @RequiredArgsConstructor
 public class AmqpTraceAdvisor implements AmqpListenerInterceptor {
 
