@@ -3,8 +3,8 @@ package ee.bitweb.core.api;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.ConstraintViolationException;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.ConstraintViolationException;
 
 import ee.bitweb.core.api.model.exception.FieldErrorResponse;
 import ee.bitweb.core.api.model.exception.GenericErrorResponse;
@@ -94,7 +94,7 @@ public class ControllerAdvisor {
     public GenericErrorResponse handleException(HttpMediaTypeNotSupportedException e, HttpServletResponse response) {
         setDefaultHeaders(response, HttpStatus.BAD_REQUEST);
 
-        log(properties.getLogging().getHttpMediaTypeNotSupportedException(), e.getMessage(), e);
+        log(properties.getLogging().getHttpMediaTypeNotSupportedException(), e.getDetailMessageCode(), e);
 
         return new GenericErrorResponse(
                 getResponseId(),
@@ -227,7 +227,7 @@ public class ControllerAdvisor {
     ) {
         setDefaultHeaders(response, HttpStatus.BAD_REQUEST);
 
-        log(properties.getLogging().getMissingServletRequestPartException(), e.getMessage(), e);
+        log(properties.getLogging().getMissingServletRequestPartException(), e.getRequestPartName(), e);
 
         return logAndReturn(new ValidationErrorResponse(
                 getResponseId(),
@@ -236,7 +236,7 @@ public class ControllerAdvisor {
                         new FieldErrorResponse(
                                 e.getRequestPartName(),
                                 "RequestPartPresent",
-                                e.getMessage()
+                                String.format("Required request part '%s' is not present", e.getRequestPartName())
                         )
                 )
         ));
@@ -250,7 +250,7 @@ public class ControllerAdvisor {
     ) {
         setDefaultHeaders(response, HttpStatus.METHOD_NOT_ALLOWED);
 
-        log(properties.getLogging().getHttpRequestMethodNotSupportedException(), e.getMessage(), e);
+        log(properties.getLogging().getHttpRequestMethodNotSupportedException(), e.getDetailMessageCode(), e);
 
         if (e.getSupportedMethods() != null) {
             response.setHeader(HttpHeaders.ALLOW, String.join(", ", e.getSupportedMethods()));

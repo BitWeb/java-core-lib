@@ -1,9 +1,8 @@
 package ee.bitweb.core.audit.mappers;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @RequiredArgsConstructor
 public class RequestMethodMapper implements AuditLogDataMapper {

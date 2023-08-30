@@ -3,13 +3,14 @@ package ee.bitweb.core.actuator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.autoconfigure.health.HealthEndpointProperties;
-import org.springframework.boot.actuate.autoconfigure.health.HealthProperties;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
+import org.springframework.boot.actuate.endpoint.Show;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 
 import java.util.List;
 
@@ -18,24 +19,23 @@ import java.util.List;
 @Configuration
 @ConditionalOnProperty(value = "ee.bitweb.core.actuator.security.enabled", havingValue = "true")
 @RequiredArgsConstructor
-public class ActuatorHealthSecurity extends WebSecurityConfigurerAdapter {
+public class ActuatorHealthSecurity {
 
     private final ActuatorSecurityProperties actuatorSecurityProperties;
 
     private final HealthEndpointProperties healthEndpointProperties;
 
-    @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         List<String> allowedRoles = actuatorSecurityProperties.getHealthEndpointRoles();
 
         logUnsafeHealthEndpointWarning();
 
         httpSecurity
-                .requestMatcher(EndpointRequest.to("health"))
-                .csrf().disable()
+                .securityMatcher(EndpointRequest.to("health"))
+                .csrf(AbstractHttpConfigurer::disable)
                 .authenticationProvider(new ActuatorAuthenticationProvider(actuatorSecurityProperties))
-                .authorizeRequests(requests -> requests.anyRequest().hasAnyRole(allowedRoles.toArray(new String[0])))
-                .httpBasic();
+                .authorizeHttpRequests(requests -> requests.anyRequest().hasAnyRole(allowedRoles.toArray(new String[0])))
+                .httpBasic(Customizer.withDefaults());
 
         log.info("Configured actuator security for health endpoint, allowing roles {}", allowedRoles);
     }
@@ -45,7 +45,7 @@ public class ActuatorHealthSecurity extends WebSecurityConfigurerAdapter {
             return;
         }
 
-        if (!healthEndpointProperties.getShowDetails().equals(HealthProperties.Show.ALWAYS)) {
+        if (!healthEndpointProperties.getShowDetails().equals(Show.ALWAYS)) {
             return;
         }
 

@@ -1,0 +1,19 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.2.0"
+    }
+}
+apply plugin: org.sonarqube.gradle.SonarQubePlugin
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", "java-core-lib"
+        property "sonar.projectName", "java-core-lib"
+        property "sonar.host.url", "https://sonarqube.bitweb.ee"
+        property "sonar.exclusions", "build/generated/**"
+        property "sonar.junit.reportPaths", "build/test-results/unitTest/,build/test-results/integrationTest/"
+    }
+}

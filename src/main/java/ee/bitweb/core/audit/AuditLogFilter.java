@@ -2,15 +2,15 @@ package ee.bitweb.core.audit;
 
 import ee.bitweb.core.audit.mappers.AuditLogDataMapper;
 import ee.bitweb.core.audit.writers.AuditLogWriteAdapter;
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -75,7 +75,6 @@ public class AuditLogFilter implements Filter {
         } catch (Exception e) {
             log.error("Error occured while writing to audit log", e);
         }
-
     }
 
     private boolean isBlacklisted(HttpServletRequest request) {

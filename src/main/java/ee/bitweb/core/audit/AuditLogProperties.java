@@ -6,9 +6,9 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,13 +32,13 @@ public class AuditLogProperties {
     private long maxLoggableRequestSize = 1024 * 3L;
 
     @NotNull
-    private List<@NotBlank String> requestHeaders = new ArrayList<>(Arrays.asList("User-Agent", "Origin"));
+    private List<@NotBlank String> requestHeaders = new ArrayList<>(List.of("User-Agent", "Origin"));
 
     @NotNull
     private List<@NotBlank String> responseHeaders = new ArrayList<>();
 
     @NotNull
-    private List<@NotBlank String> sensitiveHeaders = new ArrayList<>(Arrays.asList("authorization"));
+    private List<@NotBlank String> sensitiveHeaders = new ArrayList<>(List.of("authorization"));
 
     @NotNull
     private List<@NotBlank String> mappers = new ArrayList<>(
@@ -47,6 +47,7 @@ public class AuditLogProperties {
                     RequestHeadersMapper.KEY,
                     RequestMethodMapper.KEY,
                     RequestUrlDataMapper.KEY,
+                    RequestBodyMapper.KEY,
                     ResponseBodyMapper.KEY,
                     ResponseStatusMapper.KEY,
                     TraceIdMapper.KEY
@@ -54,7 +55,7 @@ public class AuditLogProperties {
     );
 
     @NotNull
-    private List<String> blacklist = new ArrayList<>(Arrays.asList("/actuator/"));
+    private List<String> blacklist = new ArrayList<>(List.of("/actuator/"));
 
     private boolean includeDuration = true;
     private boolean includeDefaultMappers = true;

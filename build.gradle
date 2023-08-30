@@ -1,15 +1,10 @@
 buildscript {
     ext {
-        springBootVersion = '2.7.10'
+        springBootVersion = '3.1.1'
         springVersion = '5.3.26'
-        lombokVersion = '1.18.26'
-        springFoxVersion = '2.10.5'
-        jacksonVersion = '2.13.5'
+        jacksonVersion = '2.15.2'
         mockitoVersion = '4.8.+'
         retrofitVersion = '2.9.0'
-    }
-    repositories {
-        mavenCentral()
     }
     dependencies {
         classpath 'org.owasp:dependency-check-gradle:6.5.3'
@@ -18,42 +13,18 @@ buildscript {
 
 plugins {
     id 'java'
-    id 'jacoco'
-    id 'java-library'
-    id 'maven-publish'
     id "org.owasp.dependencycheck" version "6.5.3"
-    id 'org.sonarqube' version '3.2.0'
+    id "io.freefair.lombok" version "8.3"
 }
+
+apply from: "test.gradle"
+apply from: "library.gradle"
+apply from: "sonarqube.gradle"
 
 group 'ee.bitweb'
-version '2.7.0'
+version '3.0.0'
 
-sourceCompatibility = 11
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
-    repositories {
-        maven {
-            def releasesRepoUrl = "https://nexus.bitweb.ee/repository/maven-public/"
-            def snapshotsRepoUrl = "https://nexus.bitweb.ee/repository/maven-snapshot/"
-
-            name 'nexus'
-            url = version.contains('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-            credentials {
-                username = project.repoUser
-                password = project.repoPassword
-            }
-        }
-    }
-}
-
-jar {
-    from sourceSets.main.allSource
-}
+sourceCompatibility = 17
 
 repositories {
     mavenCentral()
@@ -64,7 +35,7 @@ repositories {
 
 dependencies {
     // https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-catalina
-    compileOnly group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '9.0.73'
+    compileOnly group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '10.1.10'
 
     // https://mvnrepository.com/artifact/org.springframework/spring-webmvc
     implementation group: 'org.springframework', name: 'spring-webmvc', version: "${springVersion}"
@@ -81,20 +52,11 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-actuator
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: "${springBootVersion}"
 
-    // https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api
-    implementation group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
-
     // https://mvnrepository.com/artifact/org.springframework/spring-tx
     implementation group: 'org.springframework', name: 'spring-tx', version: "${springVersion}"
 
     // https://mvnrepository.com/artifact/io.swagger/swagger-annotations
     implementation group: 'io.swagger', name: 'swagger-annotations', version: '1.6.10'
-
-    // https://mvnrepository.com/artifact/io.springfox/springfox-spring-web
-    implementation group: 'io.springfox', name: 'springfox-spring-web', version: "${springFoxVersion}"
-
-    // https://mvnrepository.com/artifact/io.springfox/springfox-bean-validators
-    implementation group: 'io.springfox', name: 'springfox-bean-validators', version: "${springFoxVersion}"
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "${jacksonVersion}"
@@ -105,8 +67,8 @@ dependencies {
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.module/jackson-module-kotlin
     implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-kotlin', version: "${jacksonVersion}"
 
-    // https://mvnrepository.com/artifact/javax.validation/validation-api
-    implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+    // https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api
+    implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: '3.0.2'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-autoconfigure
     implementation group: 'org.springframework.boot', name: 'spring-boot-autoconfigure', version: "${springBootVersion}"
@@ -123,9 +85,6 @@ dependencies {
     // https://mvnrepository.com/artifact/com.squareup.okhttp3/logging-interceptor
     implementation group: 'com.squareup.okhttp3', name: 'logging-interceptor', version: '4.10.0'
 
-    // https://mvnrepository.com/artifact/org.projectlombok/lombok
-    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
-
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: "${springBootVersion}"
 
@@ -137,9 +96,6 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.springframework.amqp/spring-amqp
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-amqp', version: "${springBootVersion}"
-
-    // https://mvnrepository.com/artifact/org.projectlombok/lombok
-    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
 
     // https://mvnrepository.com/artifact/org.json/json
     testImplementation group: 'org.json', name: 'json', version: '20230227'
@@ -159,73 +115,4 @@ dependencies {
     }
 
     testImplementation group : 'org.testcontainers', name: 'testcontainers',  version: "1.+"
-}
-
-task copyDependencies(type: Copy) {
-    from configurations.annotationProcessor
-    into './build/dependencies'
-}
-
-jacocoTestReport {
-    reports {
-        xml.enabled true
-    }
-}
-
-test {
-    useJUnitPlatform()
-}
-
-task unitTest(type: Test) {
-    group("verification")
-
-    useJUnitPlatform {
-        excludeTags "integration"
-    }
-}
-
-task integrationTest(type: Test) {
-    group("verification")
-
-    useJUnitPlatform {
-        includeTags 'integration'
-    }
-}
-
-task jacocoUnitTestReport(type: JacocoReport) {
-    sourceSets sourceSets.main
-    executionData unitTest
-
-    reports {
-        xml.enabled true
-    }
-}
-
-task jacocoIntegrationTestReport(type: JacocoReport) {
-    sourceSets sourceSets.main
-    executionData integrationTest
-
-    reports {
-        xml.enabled true
-    }
-}
-
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-    testCompileOnly {
-        extendsFrom testAnnotationProcessor
-    }
-    deployerJars
-}
-
-sonarqube {
-    properties {
-        property "sonar.projectKey", "java-core-lib"
-        property "sonar.projectName", "java-core-lib"
-        property "sonar.host.url", "https://sonarqube.bitweb.ee"
-        property "sonar.exclusions", "build/generated/**"
-        property "sonar.junit.reportPaths", "build/test-results/unitTest/,build/test-results/integrationTest/"
-    }
 }

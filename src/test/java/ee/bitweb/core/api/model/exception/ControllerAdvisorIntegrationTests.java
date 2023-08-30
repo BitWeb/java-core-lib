@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.bitweb.http.api.response.Criteria;
 import ee.bitweb.http.api.response.ResponseAssertions;
 import ee.bitweb.http.api.response.Error;
+import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.*;
 import org.springframework.test.web.servlet.request.*;
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.util.JSONPObject;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -367,6 +369,24 @@ class ControllerAdvisorIntegrationTests {
 
         ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
         ResponseAssertions.assertInternalServerError(result);
+        assertIdField(result);
+    }
+
+    @Test
+    void testDateFieldBindException() throws Exception {
+        MockHttpServletRequestBuilder mockMvcBuilder = get(TestPingController.BASE_URL + "/complex-data")
+                .header(TRACE_ID_HEADER_NAME, "1234567890")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("localDateField", "whatever")
+                .accept(MediaType.APPLICATION_JSON);
+
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        ResponseAssertions.assertValidationErrorResponse(
+                result,
+                List.of(
+                        new Error("localDateField", "typeMismatch", "Unable to interpret value: whatever")
+                )
+        );
         assertIdField(result);
     }
 

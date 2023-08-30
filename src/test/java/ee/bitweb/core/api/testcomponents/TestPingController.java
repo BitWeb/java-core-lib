@@ -7,12 +7,12 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Valid;
-import javax.validation.Validator;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Valid;
+import jakarta.validation.Validator;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 import ee.bitweb.core.exception.CoreException;
 import ee.bitweb.core.exception.persistence.ConflictException;
@@ -53,6 +53,9 @@ public class TestPingController {
 
     @GetMapping("/validated")
     public void getValidated(@Valid SimpleValidatedObject data) {}
+
+    @GetMapping("/complex-data")
+    public void dateFieldParam(ComplexData data) {}
 
     @GetMapping("/with-request-param")
     public void get(@RequestParam("id") Long id) {}

@@ -6,12 +6,14 @@ import ee.bitweb.core.audit.mappers.*;
 import ee.bitweb.core.audit.testcomponent.AuditLogController;
 import ee.bitweb.core.audit.testcomponent.CustomAuditLogWriter;
 import ee.bitweb.core.trace.invoker.http.TraceIdFilterConfig;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -20,6 +22,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -52,18 +55,22 @@ class AuditLogAutoconfigurationEnabledTests {
 
         @Test
         void defaultMappersIncludedAndFilterAdded() throws Exception {
-                MockHttpServletRequestBuilder mockMvcBuilder = get(
-                        AuditLogController.BASE_URL + "/validated?simpleProperty=simpleValue"
+                JSONObject payload = new JSONObject();
+                payload.put("simpleProperty", "simpleValue");
+                MockHttpServletRequestBuilder mockMvcBuilder = post(
+                        AuditLogController.BASE_URL + "/validated"
                 ).header(TraceIdFilterConfig.DEFAULT_HEADER_NAME, "1234567890")
                         .header(HttpHeaders.FORWARDED, "1.2.3.4")
-                        .header("Custom-Header", "SomeValue");
+                        .header("Custom-Header", "SomeValue")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload.toString());
 
                 mockMvc.perform(mockMvcBuilder).andDo(print())
                         .andExpect(status().isOk());
 
                 Map<String, String> container = writer.getResult();
                 assertAll(
-                        () -> assertEquals(8, container.size()),
+                        () -> assertEquals(9, container.size()),
                         () -> assertTrue(container.containsKey(TraceIdMapper.KEY)),
                         () -> assertTrue(container.containsKey(AuditLogFilter.DURATION_KEY)),
                         () -> assertTrue(container.containsKey(RequestUrlDataMapper.KEY)),
@@ -71,7 +78,8 @@ class AuditLogAutoconfigurationEnabledTests {
                         () -> assertTrue(container.containsKey(RequestUrlDataMapper.KEY)),
                         () -> assertTrue(container.containsKey(RequestMethodMapper.KEY)),
                         () -> assertTrue(container.containsKey(ResponseBodyMapper.KEY)),
-                        () -> assertTrue(container.containsKey(ResponseStatusMapper.KEY))
+                        () -> assertTrue(container.containsKey(ResponseStatusMapper.KEY)),
+                        () -> assertTrue(container.containsKey(RequestBodyMapper.KEY))
                 );
         }
 

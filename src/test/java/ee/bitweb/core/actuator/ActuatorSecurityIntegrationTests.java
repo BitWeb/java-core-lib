@@ -114,9 +114,8 @@ class ActuatorSecurityIntegrationTests {
         mockMvc.perform(request)
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", aMapWithSize(3)))
+                .andExpect(jsonPath("$", aMapWithSize(2)))
                 .andExpect(jsonPath("$.status", is("UP")))
-                .andExpect(jsonPath("$.components", aMapWithSize(greaterThan(1))))
                 .andExpect(jsonPath("$.groups", hasSize(2)))
                 .andExpect(jsonPath("$.groups[0]", is("liveness")))
                 .andExpect(jsonPath("$.groups[1]", is("readiness")));
