@@ -1,4 +1,4 @@
-package ee.bitweb.core.config.mapper;
+package ee.bitweb.core.object_mapper;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-@ConditionalOnProperty(value = "ee.bitweb.core.object-mapper.auto-configuration", havingValue = "true")
+@ConditionalOnProperty(value = ObjectMapperProperties.PREFIX + ".auto-configuration", havingValue = "true")
 public class ObjectMapperAutoConfiguration {
 
     private final ObjectMapper mapper;

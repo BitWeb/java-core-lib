@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 @Configuration
 @RequiredArgsConstructor
-@ConditionalOnProperty(value = "ee.bitweb.core.retrofit.auto-configuration", havingValue = "true")
+@ConditionalOnProperty(value = RetrofitProperties.PREFIX + ".auto-configuration", havingValue = "true")
 public class RetrofitAutoConfiguration {
 
     @Bean
@@ -29,7 +29,7 @@ public class RetrofitAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(value = "ee.bitweb.core.retrofit.auth-token-injector.enabled", havingValue = "true")
+    @ConditionalOnProperty(value = RetrofitProperties.PREFIX + ".auth-token-injector.auto-configuration", havingValue = "true")
     public AuthTokenInjectInterceptor defaultAuthTokenInjectInterceptor(
             RetrofitProperties properties,
             TokenProvider provider,
@@ -43,7 +43,7 @@ public class RetrofitAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(value = "ee.bitweb.core.retrofit.auth-token-injector.enabled", havingValue = "true")
+    @ConditionalOnProperty(value = RetrofitProperties.PREFIX + ".auth-token-injector.auto-configuration", havingValue = "true")
     public AuthTokenCriteria defaultCriteria(RetrofitProperties properties) {
         List<Pattern> patterns = new ArrayList<>();
 

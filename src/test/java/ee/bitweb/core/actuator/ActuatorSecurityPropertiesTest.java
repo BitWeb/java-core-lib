@@ -15,12 +15,12 @@ class ActuatorSecurityPropertiesTest {
         ActuatorSecurityProperties properties = new ActuatorSecurityProperties();
 
         assertAll(
-                () -> assertFalse(properties.getEnabled()),
+                () -> assertFalse(properties.isAutoConfiguration()),
                 () -> assertEquals("ACTUATOR", properties.getRole()),
                 () -> assertEquals(2, properties.getHealthEndpointRoles().size()),
                 () -> assertEquals("ACTUATOR", properties.getHealthEndpointRoles().get(0)),
                 () -> assertEquals("ANONYMOUS", properties.getHealthEndpointRoles().get(1)),
-                () -> assertFalse(properties.getDisableUnsafeHealthEndpointWarning()),
+                () -> assertFalse(properties.isDisableUnsafeHealthEndpointWarning()),
                 () -> assertEquals("actuator-user", properties.getUser().getName()),
                 () -> assertNotNull(properties.getUser().getPassword()),
                 () -> assertEquals(1, properties.getUser().getRoles().size()),

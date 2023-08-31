@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @RequiredArgsConstructor
 @EnableConfigurationProperties({AmqpTraceProperties.class})
-@ConditionalOnProperty(value = "ee.bitweb.core.trace.auto-configuration", havingValue = "true")
+@ConditionalOnProperty(value = TraceIdProperties.PREFIX + ".auto-configuration", havingValue = "true")
 @ConditionalOnClass(MessagePostProcessor.class)
 public class TraceIdAmqpAutoConfiguration {
 

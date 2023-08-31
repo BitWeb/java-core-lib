@@ -3,6 +3,7 @@ package ee.bitweb.core.audit;
 import ee.bitweb.core.audit.mappers.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
@@ -19,9 +20,10 @@ import static ee.bitweb.core.audit.AuditLogProperties.PREFIX;
 @Setter
 @Validated
 @ConfigurationProperties(PREFIX)
+@ConditionalOnProperty(value = PREFIX + ".auto-configuration", havingValue = "true")
 public class AuditLogProperties {
 
-    public static final String PREFIX = "ee.bitweb.core.audit";
+    static final String PREFIX = "ee.bitweb.core.audit";
 
     private boolean autoConfiguration = false;
 

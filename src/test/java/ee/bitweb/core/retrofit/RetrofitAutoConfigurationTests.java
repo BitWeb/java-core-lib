@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
         properties = {
                 "ee.bitweb.core.trace.auto-configuration=true",
                 "ee.bitweb.core.retrofit.auto-configuration=true",
-                "ee.bitweb.core.retrofit.auth-token-injector.enabled=true",
+                "ee.bitweb.core.retrofit.auth-token-injector.auto-configuration=true",
                 "ee.bitweb.core.retrofit.auth-token-injector.headerName=some-header-name",
                 "ee.bitweb.core.retrofit.auth-token-injector.whitelist-urls[0]=^http?:\\\\/\\\\/localhost:\\\\d{3,5}\\\\/.*"
         }

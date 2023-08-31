@@ -25,8 +25,8 @@ import java.util.List;
 @Slf4j
 @Configuration
 @ConditionalOnClass(ConnectionFactory.class)
-@ConditionalOnProperty(value = "ee.bitweb.core.amqp.auto-configuration", havingValue = "true")
-public class AmqpAutoconfiguration {
+@ConditionalOnProperty(value = AmqpProperties.PREFIX + ".auto-configuration", havingValue = "true")
+public class AmqpAutoConfiguration {
 
     @Bean
     public AmqpService amqpService(RabbitTemplate template) {
@@ -60,7 +60,7 @@ public class AmqpAutoconfiguration {
     private List<AmqpListenerInterceptor> sortTraceIdInterceptorToFirst(List<AmqpListenerInterceptor> interceptors) {
         List<AmqpListenerInterceptor> sorted = new ArrayList<>();
 
-        var traceIdInterceptor = interceptors.stream().filter(interceptor -> interceptor instanceof AmqpTraceAdvisor)
+        var traceIdInterceptor = interceptors.stream().filter(AmqpTraceAdvisor.class::isInstance)
                 .findFirst()
                 .orElse(null);
 

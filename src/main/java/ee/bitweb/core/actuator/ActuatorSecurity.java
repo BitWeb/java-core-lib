@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
@@ -14,7 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Slf4j(topic = "ee.bitweb.core.actuator")
 @Order(110)
 @Configuration
-@ConditionalOnProperty(value = "ee.bitweb.core.actuator.security.enabled", havingValue = "true")
+@ConditionalOnProperty(value = ActuatorSecurityProperties.PREFIX + ".auto-configuration", havingValue = "true")
 @RequiredArgsConstructor
 public class ActuatorSecurity {
 
@@ -28,7 +29,7 @@ public class ActuatorSecurity {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authenticationProvider(new ActuatorAuthenticationProvider(actuatorSecurityProperties))
                 .authorizeHttpRequests(requests -> requests.anyRequest().hasRole(allowedRole))
-                .httpBasic();
+                .httpBasic(Customizer.withDefaults());
 
         log.info("Configured security for actuator endpoints excluding health, allowing roles {}", allowedRole);
 

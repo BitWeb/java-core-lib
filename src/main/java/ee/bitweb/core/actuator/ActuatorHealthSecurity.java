@@ -17,7 +17,7 @@ import java.util.List;
 @Slf4j(topic = "ee.bitweb.core.actuator")
 @Order(111)
 @Configuration
-@ConditionalOnProperty(value = "ee.bitweb.core.actuator.security.enabled", havingValue = "true")
+@ConditionalOnProperty(value = ActuatorSecurityProperties.PREFIX + ".auto-configuration", havingValue = "true")
 @RequiredArgsConstructor
 public class ActuatorHealthSecurity {
 
@@ -41,7 +41,7 @@ public class ActuatorHealthSecurity {
     }
 
     private void logUnsafeHealthEndpointWarning() {
-        if (actuatorSecurityProperties.getDisableUnsafeHealthEndpointWarning()) {
+        if (actuatorSecurityProperties.isDisableUnsafeHealthEndpointWarning()) {
             return;
         }
 

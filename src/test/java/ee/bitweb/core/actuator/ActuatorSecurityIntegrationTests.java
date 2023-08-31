@@ -13,9 +13,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.util.Base64Utils;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(
         classes= TestSpringApplication.class,
         properties = {
-                "ee.bitweb.core.actuator.security.enabled=true",
+                "ee.bitweb.core.actuator.security.auto-configuration=true",
                 "ee.bitweb.core.actuator.security.user.roles=ACTUATOR",
                 "management.endpoints.web.exposure.include=*",
                 "management.endpoint.health.probes.enabled=true",
@@ -141,6 +141,6 @@ class ActuatorSecurityIntegrationTests {
     }
 
     private String getBasicAuthHeader(String user, String password) {
-        return "Basic " + Base64Utils.encodeToString((user + ":" + password).getBytes(StandardCharsets.UTF_8));
+        return "Basic " + Base64.getEncoder().encodeToString((user + ":" + password).getBytes(StandardCharsets.UTF_8));
     }
 }

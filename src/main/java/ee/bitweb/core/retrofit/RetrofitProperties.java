@@ -17,16 +17,19 @@ import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import static ee.bitweb.core.retrofit.RetrofitProperties.PREFIX;
 
 @Component
 @Setter
 @Getter
 @Validated
-@ConfigurationProperties(prefix = "ee.bitweb.core.retrofit")
-@ConditionalOnProperty(value = "ee.bitweb.core.retrofit.auto-configuration", havingValue = "true")
+@ConfigurationProperties(PREFIX)
+@ConditionalOnProperty(value = PREFIX + ".auto-configuration", havingValue = "true")
 public class RetrofitProperties {
 
-    private boolean autoConfiguration;
+    static final String PREFIX = "ee.bitweb.core.retrofit";
+
+    private boolean autoConfiguration = false;
 
     @Valid
     private Logging logging = new Logging();
@@ -52,7 +55,7 @@ public class RetrofitProperties {
     @Validated
     public static class AuthTokenInjector {
 
-        private boolean enabled;
+        private boolean autoConfiguration;
 
         private String headerName = HttpHeaders.AUTHORIZATION;
 
@@ -60,7 +63,7 @@ public class RetrofitProperties {
 
         @AssertTrue(message = "header name must be non blank value")
         public boolean assertHeaderNameValid() {
-            return !enabled || StringUtils.hasText(headerName);
+            return !autoConfiguration || StringUtils.hasText(headerName);
         }
     }
 
