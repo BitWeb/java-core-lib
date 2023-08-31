@@ -17,8 +17,3 @@ sonarqube {
         property "sonar.junit.reportPaths", "build/test-results/unitTest/,build/test-results/integrationTest/"
     }
 }
-
-task copyDependencies(type: Copy) {
-    from configurations.annotationProcessor
-    into './build/dependencies'
-}
