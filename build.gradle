@@ -18,7 +18,7 @@ plugins {
 }
 
 group 'ee.bitweb'
-version '3.0.0-SNAPSHOT'
+version '3.0.0'
 sourceCompatibility = JavaVersion.VERSION_17
 
 apply from: "test.gradle"
