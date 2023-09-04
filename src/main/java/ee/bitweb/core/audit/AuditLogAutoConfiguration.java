@@ -90,6 +90,12 @@ public class AuditLogAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnEnabledMapper(mapper = RequestBodyMapper.KEY)
+    public RequestBodyMapper requestBodyMapper() {
+        return new RequestBodyMapper();
+    }
+
+    @Bean
     @Conditional(TraceIdMapperEligible.class)
     public TraceIdMapper traceIdMapper(TraceIdContext context) {
         return new TraceIdMapper(context);
