@@ -23,7 +23,7 @@ import java.util.List;
 @Configuration
 @ConfigurationProperties(prefix = "ee.bitweb.cors")
 @ConditionalOnProperty(value = "ee.bitweb.core.cors.auto-configuration.enabled", havingValue = "true")
-public class CorsConfig {
+public class CorsAutoconfiguration {
 
     @NotBlank
     private String path = "/**";
@@ -41,8 +41,7 @@ public class CorsConfig {
             HttpMethod.OPTIONS.name(),
             HttpMethod.PATCH.name()
     );
-
-
+    
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         log.info("Creating CorsConfigurationSource");
@@ -57,5 +56,4 @@ public class CorsConfig {
 
         return source;
     }
-
 }
