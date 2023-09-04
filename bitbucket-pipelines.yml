@@ -27,7 +27,7 @@ definitions:
           - gradle unitTest --fail-fast --no-daemon
           - gradle integrationTest --fail-fast --no-daemon
           - gradle jacocoUnitTestReport jacocoIntegrationTestReport --no-daemon
-          - gradle copyDependencies sonarqube -x test --no-watch-fs
+          - gradle sonarqube -x test --no-watch-fs
         artifacts:
           - build/reports/tests/**
 
