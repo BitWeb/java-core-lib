@@ -34,7 +34,7 @@ import org.springframework.context.annotation.Configuration;
                 AmqpTraceProperties.class
         }
 )
-@ConditionalOnProperty(value = "ee.bitweb.core.trace.auto-configuration", havingValue = "true")
+@ConditionalOnProperty(value = TraceIdProperties.PREFIX + ".auto-configuration", havingValue = "true")
 public class TraceIdAutoConfiguration {
 
     private final InvokerTraceIdFormConfig invokerTraceIdFormConfig;

@@ -41,7 +41,7 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 @Slf4j
 @ControllerAdvice
 @RequiredArgsConstructor
-@ConditionalOnProperty(value = "ee.bitweb.core.controller-advice.enabled", havingValue = "true")
+@ConditionalOnProperty(value = ControllerAdvisorProperties.PREFIX + ".auto-configuration", havingValue = "true")
 public class ControllerAdvisor {
 
     private static final String DEFAULT_CONTENT_TYPE = MediaType.APPLICATION_JSON_VALUE;
@@ -109,16 +109,7 @@ public class ControllerAdvisor {
 
         log(properties.getLogging().getHttpMessageNotReadableException(), e.getMessage(), e);
 
-        InvalidFormatValidationException newException = null;
-        if (e.getCause() instanceof InvalidFormatException) {
-            newException = new InvalidFormatValidationException(
-                    (InvalidFormatException) e.getCause()
-            );
-        } else if (e.getCause() instanceof MismatchedInputException) {
-            newException = new InvalidFormatValidationException(
-                    (MismatchedInputException) e.getCause()
-            );
-        }
+        InvalidFormatValidationException newException = getFormatValidationException(e);
 
         if (newException != null && InvalidFormatExceptionConverter.canConvert(newException)) {
             return new ValidationErrorResponse(
@@ -128,6 +119,22 @@ public class ControllerAdvisor {
         }
 
         return new GenericErrorResponse(getResponseId(), ErrorMessage.MESSAGE_NOT_READABLE.toString());
+    }
+
+    private InvalidFormatValidationException getFormatValidationException(HttpMessageNotReadableException e) {
+        InvalidFormatValidationException newException = null;
+
+        if (e.getCause() instanceof InvalidFormatException invalidFormatException) {
+            newException = new InvalidFormatValidationException(
+                    invalidFormatException
+            );
+        } else if (e.getCause() instanceof MismatchedInputException mismatchedInputException) {
+            newException = new InvalidFormatValidationException(
+                    mismatchedInputException
+            );
+        }
+
+        return newException;
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -315,23 +322,13 @@ public class ControllerAdvisor {
 
     private void log(ControllerAdvisorProperties.Level level, String message, Throwable e) {
         switch (level) {
-            case ERROR:
-                log.error(message, e);
-                break;
-            case WARN:
-                log.warn(message, e);
-                break;
-            case INFO:
-                log.info(message);
-                break;
-            case DEBUG:
-                log.debug(message);
-                break;
-            case TRACE:
-                log.trace(message);
-                break;
-            case OFF:
-                break;
+            case ERROR -> log.error(message, e);
+            case WARN -> log.warn(message, e);
+            case INFO -> log.info(message);
+            case DEBUG -> log.debug(message);
+            case TRACE -> log.trace(message);
+            case OFF -> {
+            }
         }
     }
 }

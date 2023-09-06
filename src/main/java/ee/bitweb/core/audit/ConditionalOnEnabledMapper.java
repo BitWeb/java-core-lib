@@ -1,6 +1,5 @@
-package ee.bitweb.core.audit.mappers;
+package ee.bitweb.core.audit;
 
-import ee.bitweb.core.audit.AuditLogProperties;
 import ee.bitweb.core.exception.CoreException;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.context.annotation.Condition;
@@ -41,7 +40,7 @@ public @interface ConditionalOnEnabledMapper {
             ).bind(
                     AuditLogProperties.PREFIX, AuditLogProperties.class
             ).orElseThrow(
-                    () -> new CoreException("Error occured while trying to bind environment to AuditLogProperties")
+                    () -> new CoreException("Error occurred while trying to bind environment to AuditLogProperties")
             );
 
             return config.getMappers().contains(mapperKey);

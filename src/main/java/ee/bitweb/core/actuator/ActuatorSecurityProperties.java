@@ -13,18 +13,22 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
 
+import static ee.bitweb.core.actuator.ActuatorSecurityProperties.PREFIX;
+
 @Getter
 @Setter
 @Component
 @Validated
-@ConfigurationProperties(prefix = "ee.bitweb.core.actuator.security")
-@ConditionalOnProperty(value = "ee.bitweb.core.actuator.security.enabled", havingValue = "true")
+@ConfigurationProperties(prefix = PREFIX)
+@ConditionalOnProperty(value = PREFIX + ".auto-configuration", havingValue = "true")
 public class ActuatorSecurityProperties {
+
+    static final String PREFIX = "ee.bitweb.core.actuator.security";
 
     private static final String DEFAULT_ROLE = "ACTUATOR";
 
     @NotNull
-    private Boolean enabled = false;
+    private boolean autoConfiguration = false;
 
     @NotBlank
     private String role = DEFAULT_ROLE;
@@ -33,7 +37,7 @@ public class ActuatorSecurityProperties {
     private List<String> healthEndpointRoles = List.of(DEFAULT_ROLE, "ANONYMOUS");
 
     @NotNull
-    private Boolean disableUnsafeHealthEndpointWarning = false;
+    private boolean disableUnsafeHealthEndpointWarning = false;
 
     @NotNull
     private User user = new User();

@@ -51,12 +51,18 @@ definitions:
           - gradle publish --no-daemon
 
 pipelines:
+
   pull-requests:
     '**':
       - step: *testLint
       - step: *publishPreRelease
+
   branches:
     master:
       - step: *testLint
       - step: *publishPreRelease
       - step: *publishRelease
+
+    3_0_0:
+      - step: *testLint
+      - step: *publishPreRelease

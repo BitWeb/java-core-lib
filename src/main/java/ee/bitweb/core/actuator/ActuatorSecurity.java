@@ -15,7 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Slf4j(topic = "ee.bitweb.core.actuator")
 @Order(110)
 @Configuration
-@ConditionalOnProperty(value = "ee.bitweb.core.actuator.security.enabled", havingValue = "true")
+@ConditionalOnProperty(value = ActuatorSecurityProperties.PREFIX + ".auto-configuration", havingValue = "true")
 @RequiredArgsConstructor
 public class ActuatorSecurity {
 

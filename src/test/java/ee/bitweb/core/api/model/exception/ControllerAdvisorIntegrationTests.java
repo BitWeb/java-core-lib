@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.bitweb.http.api.response.Criteria;
 import ee.bitweb.http.api.response.ResponseAssertions;
 import ee.bitweb.http.api.response.Error;
-import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -21,7 +20,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.*;
 import org.springframework.test.web.servlet.request.*;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.util.JSONPObject;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -35,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         classes= TestSpringApplication.class,
         properties = {
                 "ee.bitweb.core.trace.auto-configuration=true",
-                "ee.bitweb.core.controller-advice.enabled=true"
+                "ee.bitweb.core.controller-advice.auto-configuration=true"
         }
 )
 class ControllerAdvisorIntegrationTests {
