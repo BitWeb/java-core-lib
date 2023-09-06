@@ -17,14 +17,13 @@ plugins {
     id "io.freefair.lombok" version "8.3"
 }
 
+group 'ee.bitweb'
+version '3.0.0'
+sourceCompatibility = JavaVersion.VERSION_17
+
 apply from: "test.gradle"
 apply from: "library.gradle"
 apply from: "sonarqube.gradle"
-
-group 'ee.bitweb'
-version '3.0.0'
-
-sourceCompatibility = 17
 
 repositories {
     mavenCentral()
@@ -116,3 +115,4 @@ dependencies {
 
     testImplementation group : 'org.testcontainers', name: 'testcontainers',  version: "1.+"
 }
+

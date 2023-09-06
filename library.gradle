@@ -1,7 +1,6 @@
 apply plugin: 'java-library'
 apply plugin: 'maven-publish'
 
-
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -14,7 +13,7 @@ publishing {
             def snapshotsRepoUrl = "https://nexus.bitweb.ee/repository/maven-snapshot/"
 
             name 'nexus'
-            url = version.contains('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            url = project.version.contains('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
             credentials {
                 username = project.repoUser
                 password = project.repoPassword

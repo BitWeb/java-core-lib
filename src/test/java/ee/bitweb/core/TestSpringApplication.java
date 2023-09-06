@@ -13,7 +13,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.util.StringUtils;
@@ -62,10 +64,10 @@ public class TestSpringApplication {
             // Configure security to allow any request other than actuator requests
 
             return httpSecurity
-                    .csrf().disable()
+                    .csrf(AbstractHttpConfigurer::disable)
                     .securityMatcher(new NegatedRequestMatcher(EndpointRequest.toAnyEndpoint()))
-                    .authorizeRequests(requests -> requests.anyRequest().hasAnyRole("ANONYMOUS"))
-                    .httpBasic().and().build();
+                    .authorizeHttpRequests(requests -> requests.anyRequest().hasAnyRole("ANONYMOUS"))
+                    .httpBasic(Customizer.withDefaults()).build();
         }
     }
 }
