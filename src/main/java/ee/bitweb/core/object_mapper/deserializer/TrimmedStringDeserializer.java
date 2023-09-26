@@ -1,4 +1,4 @@
-package ee.bitweb.core.util.deserializer;
+package ee.bitweb.core.object_mapper.deserializer;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
