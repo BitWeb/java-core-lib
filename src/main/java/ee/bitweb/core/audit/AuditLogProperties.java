@@ -28,10 +28,10 @@ public class AuditLogProperties {
     private boolean autoConfiguration = false;
 
     @Positive
-    private long maxLoggableResponseSize = 1024 * 3L;
+    private long maxLoggableResponseSize = 1024 * 10L;
 
     @Positive
-    private long maxLoggableRequestSize = 1024 * 3L;
+    private long maxLoggableRequestSize = 1024 * 10L;
 
     @NotNull
     private List<@NotBlank String> requestHeaders = new ArrayList<>(List.of("User-Agent", "Origin"));
@@ -60,5 +60,4 @@ public class AuditLogProperties {
     private List<String> blacklist = new ArrayList<>(List.of("/actuator/"));
 
     private boolean includeDuration = true;
-    private boolean includeDefaultMappers = true;
 }

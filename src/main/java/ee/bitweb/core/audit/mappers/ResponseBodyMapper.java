@@ -33,7 +33,7 @@ public class ResponseBodyMapper implements AuditLogDataMapper {
         }
 
         if (responseBody.length() > properties.getMaxLoggableResponseSize()) {
-            responseBody = String.format("Content size: %s characters", responseBody.length());
+            responseBody = String.format("%s ... Content size: %s characters", responseBody.substring(0, (int) properties.getMaxLoggableResponseSize()),  responseBody.length());
         }
 
         return responseBody;

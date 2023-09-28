@@ -91,8 +91,8 @@ public class AuditLogAutoConfiguration {
 
     @Bean
     @ConditionalOnEnabledMapper(mapper = RequestBodyMapper.KEY)
-    public RequestBodyMapper requestBodyMapper() {
-        return new RequestBodyMapper();
+    public RequestBodyMapper requestBodyMapper(AuditLogProperties properties) {
+        return new RequestBodyMapper(properties);
     }
 
     @Bean

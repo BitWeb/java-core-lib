@@ -36,7 +36,7 @@ class ResponseBodyMapperUnitTests {
 
     @Test
     void onContentLargerThanMaxLoggableSizeShouldLogOnlyLength() throws IOException {
-        long size = 100;
+        long size = 10;
         HttpServletResponse response = new MockHttpServletResponse();
         ContentCachingResponseWrapper wrapper = new ContentCachingResponseWrapper(response);
         wrapper.getWriter().write("a".repeat((int) size));
@@ -50,7 +50,7 @@ class ResponseBodyMapperUnitTests {
                 new MockHttpServletRequest(),
                 wrapper
         );
-        assertEquals("Content size: 100 characters", value);
+        assertEquals("aaaaaaaaa ... Content size: 10 characters", value);
     }
 
 }
