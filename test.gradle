@@ -2,9 +2,7 @@ apply plugin: 'jacoco'
 
 jacocoTestReport {
     reports {
-        xml {
-            enabled true
-        }
+        xml.required = true
     }
 }
 
@@ -33,9 +31,7 @@ task jacocoUnitTestReport(type: JacocoReport) {
     executionData unitTest
 
     reports {
-        xml {
-            enabled true
-        }
+        xml.required = true
     }
 }
 
@@ -44,8 +40,6 @@ task jacocoIntegrationTestReport(type: JacocoReport) {
     executionData integrationTest
 
     reports {
-        xml {
-            enabled true
-        }
+        xml.required = true
     }
 }

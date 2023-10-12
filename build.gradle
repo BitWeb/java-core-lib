@@ -36,9 +36,6 @@ dependencies {
     // https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-catalina
     compileOnly group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '10.1.13'
 
-    // https://mvnrepository.com/artifact/io.swagger/swagger-annotations
-    //compileOnly group: 'io.swagger', name: 'swagger-annotations', version: '1.6.10'
-
     // https://mvnrepository.com/artifact/org.springframework/spring-webmvc
     compileOnly group: 'org.springframework', name: 'spring-webmvc', version: "${springVersion}"
 

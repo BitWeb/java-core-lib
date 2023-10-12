@@ -1,4 +1,4 @@
-image: gradle:8.2-jdk17
+image: gradle:8.4-jdk17
 
 clone:
   depth: full # SonarCloud scanner needs the full history to assign issues properly
@@ -62,7 +62,3 @@ pipelines:
       - step: *testLint
       - step: *publishPreRelease
       - step: *publishRelease
-
-    3_0_0:
-      - step: *testLint
-      - step: *publishPreRelease
