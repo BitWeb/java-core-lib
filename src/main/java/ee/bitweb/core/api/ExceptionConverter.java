@@ -8,6 +8,8 @@ import org.springframework.validation.BindingResult;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -63,9 +65,15 @@ public class ExceptionConverter {
     }
 
     private static String parseMessage(org.springframework.validation.FieldError error) {
-        if (error.getRejectedValue() != null) {
-            return String.format("Unable to interpret value: %s", error.getRejectedValue().toString());
+
+        if (error.isBindingFailure()) {
+            if (error.getRejectedValue() != null) {
+                return String.format("Unable to interpret value: %s", error.getRejectedValue().toString());
+            } else {
+                return "Unable to interpret value";
+            }
         }
+
         return error.getDefaultMessage();
     }
 }

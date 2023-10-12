@@ -8,11 +8,13 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
+@EnableConfigurationProperties({ObjectMapperProperties.class})
 @ConditionalOnProperty(value = ObjectMapperProperties.PREFIX + ".auto-configuration", havingValue = "true")
 public class ObjectMapperAutoConfiguration {
 

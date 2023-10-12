@@ -12,7 +12,6 @@ import static ee.bitweb.core.object_mapper.ObjectMapperProperties.PREFIX;
 @Getter
 @Component
 @ConfigurationProperties(PREFIX)
-@ConditionalOnProperty(value = PREFIX + ".auto-configuration", havingValue = "true")
 public class ObjectMapperProperties {
 
     static final String PREFIX = "ee.bitweb.core.object-mapper";
