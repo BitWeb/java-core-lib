@@ -2,8 +2,8 @@ package ee.bitweb.core.trace.invoker.http;
 
 import ee.bitweb.core.trace.creator.TraceIdCreator;
 import ee.bitweb.core.trace.context.TraceIdContext;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import javax.servlet.http.HttpServletRequest;
 
 @RequiredArgsConstructor
 public final class HttpServletRequestTraceIdResolver {

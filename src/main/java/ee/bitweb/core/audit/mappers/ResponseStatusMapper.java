@@ -1,11 +1,8 @@
 package ee.bitweb.core.audit.mappers;
 
-import lombok.RequiredArgsConstructor;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-@RequiredArgsConstructor
 public class ResponseStatusMapper implements AuditLogDataMapper {
 
     public static final String KEY = "response_status";

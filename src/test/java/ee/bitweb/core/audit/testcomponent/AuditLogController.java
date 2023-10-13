@@ -6,13 +6,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Slf4j
 @Validated
@@ -23,8 +21,8 @@ public class AuditLogController {
 
     public static final String BASE_URL = "/audit";
 
-    @GetMapping("/validated")
-    public SimpleValidatedObject getValidated(@Valid SimpleValidatedObject data) {
+    @PostMapping("/validated")
+    public SimpleValidatedObject getValidated(@RequestBody @Valid SimpleValidatedObject data) {
 
         return data;
     }

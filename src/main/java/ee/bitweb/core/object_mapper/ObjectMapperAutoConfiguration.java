@@ -1,20 +1,21 @@
-package ee.bitweb.core.config.mapper;
+package ee.bitweb.core.object_mapper;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import ee.bitweb.core.util.deserializer.TrimmedStringDeserializer;
+import ee.bitweb.core.object_mapper.deserializer.TrimmedStringDeserializer;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-
-import javax.annotation.PostConstruct;
 
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-@ConditionalOnProperty(value = "ee.bitweb.core.object-mapper.auto-configuration", havingValue = "true")
+@EnableConfigurationProperties({ObjectMapperProperties.class})
+@ConditionalOnProperty(value = ObjectMapperProperties.PREFIX + ".auto-configuration", havingValue = "true")
 public class ObjectMapperAutoConfiguration {
 
     private final ObjectMapper mapper;

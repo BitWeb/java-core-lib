@@ -2,12 +2,12 @@ package ee.bitweb.core.audit.mappers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.bitweb.core.audit.AuditLogProperties;
-import io.micrometer.core.instrument.util.StringUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +27,7 @@ public class RequestHeadersMapper implements AuditLogDataMapper {
         for (String additionalHeader : properties.getRequestHeaders()) {
             String headerValue = request.getHeader(additionalHeader);
 
-            if (StringUtils.isEmpty(headerValue)) continue;
+            if (!StringUtils.hasText(headerValue)) continue;
 
             result.put(additionalHeader, createHeaderValues(request, additionalHeader));
         }

@@ -6,8 +6,10 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.validation.BindingResult;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,7 +26,7 @@ public class ExceptionConverter {
                 .map(error -> new FieldError(
                         getFieldName(error),
                         getValidatorName(error),
-                        parseMessage(error.getMessage())
+                        error.getMessage()
                 ))
                 .collect(Collectors.toSet());
 
@@ -37,13 +39,13 @@ public class ExceptionConverter {
         fieldErrors.addAll(bindingResult.getFieldErrors().stream().map(error -> new FieldError(
                 error.getField(),
                 error.getCodes() != null ? error.getCodes()[0].split("\\.")[0] : null,
-                parseMessage(error.getDefaultMessage())
+                parseMessage(error)
         )).collect(Collectors.toList()));
 
         fieldErrors.addAll(bindingResult.getGlobalErrors().stream().map(error -> new FieldError(
                 error.getObjectName(),
                 error.getCodes() != null ? error.getCodes()[0].split("\\.")[0] : null,
-                parseMessage(error.getDefaultMessage())
+                error.getDefaultMessage()
         )).collect(Collectors.toList()));
 
         return new ValidationException(ErrorMessage.INVALID_ARGUMENT.toString(), fieldErrors);
@@ -62,13 +64,16 @@ public class ExceptionConverter {
         return parts[parts.length - 1];
     }
 
-    private static String parseMessage(String message) {
-        if (message != null
-                && (message.contains("java.util.Date") || message.contains("java.time.LocalDate"))
-                && message.contains("java.lang.IllegalArgumentException")) {
-            return message.substring(message.indexOf("java.lang.IllegalArgumentException") + 36);
+    private static String parseMessage(org.springframework.validation.FieldError error) {
+
+        if (error.isBindingFailure()) {
+            if (error.getRejectedValue() != null) {
+                return String.format("Unable to interpret value: %s", error.getRejectedValue().toString());
+            } else {
+                return "Unable to interpret value";
+            }
         }
 
-        return message;
+        return error.getDefaultMessage();
     }
 }

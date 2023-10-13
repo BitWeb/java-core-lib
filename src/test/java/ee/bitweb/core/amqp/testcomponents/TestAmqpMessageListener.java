@@ -3,6 +3,7 @@ package ee.bitweb.core.amqp.testcomponents;
 import ee.bitweb.core.amqp.AmqpService;
 import ee.bitweb.core.exception.CoreException;
 import ee.bitweb.core.trace.context.TraceIdContext;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -10,7 +11,6 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 
 @Slf4j
 @Component

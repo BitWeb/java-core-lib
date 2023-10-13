@@ -3,8 +3,8 @@ package ee.bitweb.core.api;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.ConstraintViolationException;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.ConstraintViolationException;
 
 import ee.bitweb.core.api.model.exception.FieldErrorResponse;
 import ee.bitweb.core.api.model.exception.GenericErrorResponse;
@@ -41,7 +41,7 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 @Slf4j
 @ControllerAdvice
 @RequiredArgsConstructor
-@ConditionalOnProperty(value = "ee.bitweb.core.controller-advice.enabled", havingValue = "true")
+@ConditionalOnProperty(value = ControllerAdvisorProperties.PREFIX + ".auto-configuration", havingValue = "true")
 public class ControllerAdvisor {
 
     private static final String DEFAULT_CONTENT_TYPE = MediaType.APPLICATION_JSON_VALUE;
@@ -94,7 +94,7 @@ public class ControllerAdvisor {
     public GenericErrorResponse handleException(HttpMediaTypeNotSupportedException e, HttpServletResponse response) {
         setDefaultHeaders(response, HttpStatus.BAD_REQUEST);
 
-        log(properties.getLogging().getHttpMediaTypeNotSupportedException(), e.getMessage(), e);
+        log(properties.getLogging().getHttpMediaTypeNotSupportedException(), e.getDetailMessageCode(), e);
 
         return new GenericErrorResponse(
                 getResponseId(),
@@ -109,16 +109,7 @@ public class ControllerAdvisor {
 
         log(properties.getLogging().getHttpMessageNotReadableException(), e.getMessage(), e);
 
-        InvalidFormatValidationException newException = null;
-        if (e.getCause() instanceof InvalidFormatException) {
-            newException = new InvalidFormatValidationException(
-                    (InvalidFormatException) e.getCause()
-            );
-        } else if (e.getCause() instanceof MismatchedInputException) {
-            newException = new InvalidFormatValidationException(
-                    (MismatchedInputException) e.getCause()
-            );
-        }
+        InvalidFormatValidationException newException = getFormatValidationException(e);
 
         if (newException != null && InvalidFormatExceptionConverter.canConvert(newException)) {
             return new ValidationErrorResponse(
@@ -128,6 +119,22 @@ public class ControllerAdvisor {
         }
 
         return new GenericErrorResponse(getResponseId(), ErrorMessage.MESSAGE_NOT_READABLE.toString());
+    }
+
+    private InvalidFormatValidationException getFormatValidationException(HttpMessageNotReadableException e) {
+        InvalidFormatValidationException newException = null;
+
+        if (e.getCause() instanceof InvalidFormatException invalidFormatException) {
+            newException = new InvalidFormatValidationException(
+                    invalidFormatException
+            );
+        } else if (e.getCause() instanceof MismatchedInputException mismatchedInputException) {
+            newException = new InvalidFormatValidationException(
+                    mismatchedInputException
+            );
+        }
+
+        return newException;
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -227,7 +234,7 @@ public class ControllerAdvisor {
     ) {
         setDefaultHeaders(response, HttpStatus.BAD_REQUEST);
 
-        log(properties.getLogging().getMissingServletRequestPartException(), e.getMessage(), e);
+        log(properties.getLogging().getMissingServletRequestPartException(), e.getRequestPartName(), e);
 
         return logAndReturn(new ValidationErrorResponse(
                 getResponseId(),
@@ -236,7 +243,7 @@ public class ControllerAdvisor {
                         new FieldErrorResponse(
                                 e.getRequestPartName(),
                                 "RequestPartPresent",
-                                e.getMessage()
+                                String.format("Required request part '%s' is not present", e.getRequestPartName())
                         )
                 )
         ));
@@ -250,7 +257,7 @@ public class ControllerAdvisor {
     ) {
         setDefaultHeaders(response, HttpStatus.METHOD_NOT_ALLOWED);
 
-        log(properties.getLogging().getHttpRequestMethodNotSupportedException(), e.getMessage(), e);
+        log(properties.getLogging().getHttpRequestMethodNotSupportedException(), e.getDetailMessageCode(), e);
 
         if (e.getSupportedMethods() != null) {
             response.setHeader(HttpHeaders.ALLOW, String.join(", ", e.getSupportedMethods()));
@@ -315,23 +322,13 @@ public class ControllerAdvisor {
 
     private void log(ControllerAdvisorProperties.Level level, String message, Throwable e) {
         switch (level) {
-            case ERROR:
-                log.error(message, e);
-                break;
-            case WARN:
-                log.warn(message, e);
-                break;
-            case INFO:
-                log.info(message);
-                break;
-            case DEBUG:
-                log.debug(message);
-                break;
-            case TRACE:
-                log.trace(message);
-                break;
-            case OFF:
-                break;
+            case ERROR -> log.error(message, e);
+            case WARN -> log.warn(message, e);
+            case INFO -> log.info(message);
+            case DEBUG -> log.debug(message);
+            case TRACE -> log.trace(message);
+            case OFF -> {
+            }
         }
     }
 }

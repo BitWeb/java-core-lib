@@ -4,8 +4,8 @@ package ee.bitweb.core.validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 @RequiredArgsConstructor
 public class FileTypeValidator implements ConstraintValidator<FileType, MultipartFile> {

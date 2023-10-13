@@ -7,18 +7,22 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+
+import static ee.bitweb.core.api.ControllerAdvisorProperties.PREFIX;
 
 @Setter
 @Getter
 @Validated
 @Component
-@ConfigurationProperties("ee.bitweb.core.controller-advice")
-@ConditionalOnProperty(value = "ee.bitweb.core.controller-advice.enabled", havingValue = "true")
+@ConfigurationProperties(PREFIX)
+@ConditionalOnProperty(value = PREFIX + ".auto-configuration", havingValue = "true")
 public class ControllerAdvisorProperties {
 
-    private boolean enabled;
+    static final String PREFIX = "ee.bitweb.core.controller-advice";
+
+    private boolean autoConfiguration = false;
 
     @Valid
     private Logging logging = new Logging();

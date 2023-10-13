@@ -19,7 +19,7 @@ import java.util.List;
 
 @Slf4j
 @Configuration
-@ConditionalOnProperty(name = "ee.bitweb.core.audit.auto-configuration", havingValue="true")
+@ConditionalOnProperty(name = AuditLogProperties.PREFIX + ".auto-configuration", havingValue="true")
 @EnableConfigurationProperties({AuditLogProperties.class})
 public class AuditLogAutoConfiguration {
 
@@ -87,6 +87,12 @@ public class AuditLogAutoConfiguration {
     @ConditionalOnEnabledMapper(mapper = ResponseStatusMapper.KEY)
     public ResponseStatusMapper responseStatusMapper() {
         return new ResponseStatusMapper();
+    }
+
+    @Bean
+    @ConditionalOnEnabledMapper(mapper = RequestBodyMapper.KEY)
+    public RequestBodyMapper requestBodyMapper(AuditLogProperties properties) {
+        return new RequestBodyMapper(properties);
     }
 
     @Bean

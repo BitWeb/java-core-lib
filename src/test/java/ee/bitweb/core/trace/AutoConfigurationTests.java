@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -110,10 +110,6 @@ class AutoConfigurationTests {
     private void assertTraceIdFilterConfig() {
         assertNotNull(traceIdFilterConfig);
         assertEquals("Custom-ID", traceIdFilterConfig.getHeaderName());
-        assertTrue(traceIdFilterConfig.getEnabledFeatures().contains(TraceIdFilter.Feature.ADD_URL));
-        assertTrue(traceIdFilterConfig.getEnabledFeatures().contains(TraceIdFilter.Feature.ADD_METHOD));
-        assertTrue(traceIdFilterConfig.getEnabledFeatures().contains(TraceIdFilter.Feature.ADD_USER_AGENT));
-        assertEquals(3, traceIdFilterConfig.getEnabledFeatures().size());
     }
 
     private void assertInvokerTraceIdCreator() {

@@ -4,31 +4,35 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Slf4j(topic = "ee.bitweb.core.actuator")
 @Order(110)
 @Configuration
-@ConditionalOnProperty(value = "ee.bitweb.core.actuator.security.enabled", havingValue = "true")
+@ConditionalOnProperty(value = ActuatorSecurityProperties.PREFIX + ".auto-configuration", havingValue = "true")
 @RequiredArgsConstructor
-public class ActuatorSecurity extends WebSecurityConfigurerAdapter {
+public class ActuatorSecurity {
 
     private final ActuatorSecurityProperties actuatorSecurityProperties;
 
-    @Override
-    protected void configure(HttpSecurity httpSecurity) throws Exception {
+    @Bean
+    public SecurityFilterChain actuatorChain(HttpSecurity http) throws Exception {
         String allowedRole = actuatorSecurityProperties.getRole();
-
-        httpSecurity
-                .requestMatcher(EndpointRequest.toAnyEndpoint().excluding("health"))
-                .csrf().disable()
+        http
+                .securityMatcher(EndpointRequest.toAnyEndpoint().excluding("health"))
+                .csrf(AbstractHttpConfigurer::disable)
                 .authenticationProvider(new ActuatorAuthenticationProvider(actuatorSecurityProperties))
-                .authorizeRequests(requests -> requests.anyRequest().hasRole(allowedRole))
-                .httpBasic();
+                .authorizeHttpRequests(requests -> requests.anyRequest().hasRole(allowedRole))
+                .httpBasic(Customizer.withDefaults());
 
         log.info("Configured security for actuator endpoints excluding health, allowing roles {}", allowedRole);
+
+        return http.build();
     }
 }

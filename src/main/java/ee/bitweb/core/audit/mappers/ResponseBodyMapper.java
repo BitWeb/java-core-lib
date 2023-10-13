@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
@@ -33,7 +33,7 @@ public class ResponseBodyMapper implements AuditLogDataMapper {
         }
 
         if (responseBody.length() > properties.getMaxLoggableResponseSize()) {
-            responseBody = String.format("Content size: %s characters", responseBody.length());
+            responseBody = String.format("%s ... Content size: %s characters", responseBody.substring(0, (int) properties.getMaxLoggableResponseSize()),  responseBody.length());
         }
 
         return responseBody;

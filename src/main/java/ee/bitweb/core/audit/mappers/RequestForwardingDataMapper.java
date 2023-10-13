@@ -3,11 +3,11 @@ package ee.bitweb.core.audit.mappers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.bitweb.core.audit.AuditLogProperties;
 import ee.bitweb.core.util.HttpForwardedHeaderParser;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;

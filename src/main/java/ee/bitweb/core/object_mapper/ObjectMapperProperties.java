@@ -1,4 +1,4 @@
-package ee.bitweb.core.amqp;
+package ee.bitweb.core.object_mapper;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -6,16 +6,15 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import static ee.bitweb.core.amqp.AmqpProperties.PREFIX;
+import static ee.bitweb.core.object_mapper.ObjectMapperProperties.PREFIX;
 
 @Setter
 @Getter
 @Component
-@ConfigurationProperties(prefix = PREFIX)
-@ConditionalOnProperty(value = AmqpProperties.PREFIX + ".auto-configuration", havingValue = "true")
-public class AmqpProperties {
+@ConfigurationProperties(PREFIX)
+public class ObjectMapperProperties {
 
-    static final String PREFIX = "ee.bitweb.core.amqp";
+    static final String PREFIX = "ee.bitweb.core.object-mapper";
 
     private Boolean autoConfiguration = false;
 }
