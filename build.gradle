@@ -23,7 +23,7 @@ sourceCompatibility = JavaVersion.VERSION_17
 
 apply from: "test.gradle"
 apply from: "library.gradle"
-apply from: "sonarqube.gradle"
+apply from: "sonarcloud.gradle"
 
 repositories {
     mavenCentral()
