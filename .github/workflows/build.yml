@@ -22,12 +22,10 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
-      - name: Setup Gradle
-        run: ls -la
       - name: Inject nexus credentials
         env:
           NEXUS_USER: ${{secrets.NEXUS_USER}}
           NEXUS_PASSWORD: ${{secrets.NEXUS_PASSWORD}}
-        run: ./deploy/injectGradleCredentials.sh $NEXUS_USER $NEXUS_PASSWORD
+        run: ./deploy/injectGradleCredentials.sh $NEXUS_USER $NEXUS_PASSWORD "gradle.properties"
       - name: Run build with Gradle Wrapper
         run: ./gradlew build
