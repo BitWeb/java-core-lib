@@ -1,0 +1,45 @@
+apply plugin: 'jacoco'
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+task unitTest(type: Test) {
+    group("verification")
+
+    useJUnitPlatform {
+        excludeTags "integration"
+    }
+}
+
+task integrationTest(type: Test) {
+    group("verification")
+
+    useJUnitPlatform {
+        includeTags 'integration'
+    }
+}
+
+task jacocoUnitTestReport(type: JacocoReport) {
+    sourceSets sourceSets.main
+    executionData unitTest
+
+    reports {
+        xml.required = true
+    }
+}
+
+task jacocoIntegrationTestReport(type: JacocoReport) {
+    sourceSets sourceSets.main
+    executionData integrationTest
+
+    reports {
+        xml.required = true
+    }
+}
