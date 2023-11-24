@@ -1,24 +1,63 @@
 apply plugin: 'java-library'
 apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            artifactId = 'spring-core'
             from components.java
+            pom {
+                name = 'Bitweb Java Core Library'
+                description = 'Bitweb Spring Boot Java Core Library'
+                url = 'https://github.com/BitWeb/java-core-lib'
+                //properties = []
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'https://github.com/BitWeb/java-core-lib/blob/main/LICENSE'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'erichjag'
+                        name = 'Erich Jagomägis'
+                        email = 'erich@bitweb.ee'
+                    }
+                }
+                scm {
+                    connection = 'scm:https://github.com/BitWeb/java-core-lib.git'
+                    developerConnection = 'scm:git@github.com:BitWeb/java-core-lib.git'
+                    url = 'https://github.com/BitWeb/java-core-lib'
+                }
+            }
         }
     }
     repositories {
         maven {
-            def releasesRepoUrl = "https://nexus.bitweb.ee/repository/maven-public/"
-            def snapshotsRepoUrl = "https://nexus.bitweb.ee/repository/maven-snapshot/"
-
-            name 'nexus'
-            url = project.version.contains('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            def releasesRepoUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+            def snapshotsRepoUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
+            url = version.contains('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
             credentials {
-                username = project.repoUser
-                password = project.repoPassword
+                username = project.mavenCentralUsername
+                password = project.mavenCentralPassword
             }
         }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+javadoc {
+    if(JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
     }
 }
 
