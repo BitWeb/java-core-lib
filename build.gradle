@@ -22,8 +22,10 @@ version '3.0.0'
 sourceCompatibility = JavaVersion.VERSION_17
 
 apply from: "test.gradle"
-apply from: "library.gradle"
 apply from: "sonarcloud.gradle"
+if (project.hasProperty('mavenCentralUsername') & project.hasProperty('mavenCentralPassword')) {
+    apply from: "library.gradle"
+}
 
 repositories {
     mavenCentral()
