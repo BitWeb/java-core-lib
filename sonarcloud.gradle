@@ -15,6 +15,7 @@ sonarqube {
     properties {
         property "sonar.organization", "bitwebou"
         property "sonar.projectName", "java-core-lib"
+        property "sonar.projectKey", "bitwebou_java-core-lib"
         property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.exclusions", "build/generated/**"
     }
