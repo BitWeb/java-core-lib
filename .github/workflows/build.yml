@@ -26,7 +26,7 @@ jobs:
       - name: Run tests
         run: ./gradlew unitTest integrationTest --fail-fast
       - name: Generate reports
-        run: ./gradlew jacocoTestReport
+        run: ./gradlew jacocoUnitTestReport jacocoIntegrationTestReport
       - name: Run Sonar analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
