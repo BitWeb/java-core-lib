@@ -1,6 +1,7 @@
 apply plugin: 'java-library'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
+apply plugin: 'io.github.gradle-nexus.publish-plugin'
 
 java {
     withJavadocJar()
@@ -63,12 +64,14 @@ publishing {
             }
         }
     }
+}
+
+nexusPublishing {
     repositories {
-        maven {
-            def releasesRepoUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
-            def snapshotsRepoUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
-            url = version.contains('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-            credentials {
+        if (project.hasProperty('mavenCentralUsername') & project.hasProperty('mavenCentralPassword')) {
+            sonatype {
+                nexusUrl.set(uri("https://oss.sonatype.org/service/local/"))
+                snapshotRepositoryUrl.set(uri("https://oss.sonatype.org/content/repositories/snapshots"))
                 username = project.mavenCentralUsername
                 password = project.mavenCentralPassword
             }
@@ -77,6 +80,9 @@ publishing {
 }
 
 signing {
+    if (project.hasProperty("signingKey") & project.hasProperty("signingPassword")) {
+        useInMemoryPgpKeys(project.signingKey, project.signingPassword)
+    }
     sign publishing.publications.mavenJava
 }
 
