@@ -1,6 +1,7 @@
 name: Build Java Core Library
 
 on:
+  pull_request:
   push:
     branches: [ "master" ]
   workflow_dispatch:
@@ -11,6 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
@@ -20,15 +23,14 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: 8.4
-      - name: Inject nexus credentials
-        env:
-          NEXUS_USER: ${{secrets.NEXUS_USER}}
-          NEXUS_PASSWORD: ${{secrets.NEXUS_PASSWORD}}
-        run: ./deploy/injectGradleCredentials.sh $NEXUS_USER $NEXUS_PASSWORD "gradle.properties"
       - name: Run tests
         run: ./gradlew unitTest integrationTest --fail-fast
       - name: Generate reports
-        run: ./gradlew jacocoUnitTestReport jacocoIntegrationTestReport
+        run: ./gradlew jacocoTestReport
+      - name: Run Sonar analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew sonar -x test --no-watch-fs
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
@@ -38,27 +40,7 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
-        with:
-          distribution: temurin
-          java-version: 17
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: 8.4
-      - name: Inject nexus credentials
-        env:
-          NEXUS_USER: ${{secrets.NEXUS_USER}}
-          NEXUS_PASSWORD: ${{secrets.NEXUS_PASSWORD}}
-        run: ./deploy/injectGradleCredentials.sh $NEXUS_USER $NEXUS_PASSWORD "gradle.properties"
-      - name: Run build with Gradle Wrapper
-        run: ./gradlew build -x test
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: [test, build]
+    needs: [test]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
@@ -71,3 +53,9 @@ jobs:
           gradle-version: 8.4
       - name: Run build with Gradle Wrapper
         run: ./gradlew build -x test
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: jar
+          path: build/libs/**
+          retention-days: 5
