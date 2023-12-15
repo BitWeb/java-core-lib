@@ -25,9 +25,34 @@ publishing {
                 }
                 developers {
                     developer {
-                        id = 'erichjag'
+                        id = 'Jorich'
                         name = 'Erich Jagomägis'
                         email = 'erich@bitweb.ee'
+                    }
+                    developer {
+                        id = 'rammrain'
+                        name = 'Rain Ramm'
+                        email = 'rain@bitweb.ee'
+                    }
+                    developer {
+                        id = 'meritlaidroo'
+                        name = 'Merit Laidroo'
+                        email = 'merit.laidroo@bitweb.ee'
+                    }
+                    developer {
+                        id = 'taavisikk'
+                        name = 'Taavi Sikk'
+                        email = 'taavi.sikk@bitweb.ee'
+                    }
+                    developer {
+                        id = 'ennoeller'
+                        name = 'Enno Eller'
+                        email = 'enno.eller@bitweb.ee'
+                    }
+                    developer {
+                        id = 'pr11t'
+                        name = 'Priit Pärkson'
+                        email = 'priit.parkson@bitweb.ee'
                     }
                 }
                 scm {
