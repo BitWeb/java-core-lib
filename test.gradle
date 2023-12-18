@@ -1,16 +1,10 @@
 apply plugin: 'jacoco'
 
-jacocoTestReport {
-    reports {
-        xml.required = true
-    }
-}
-
 test {
     useJUnitPlatform()
 }
 
-task unitTest(type: Test) {
+tasks.register('unitTest', Test) {
     group("verification")
 
     useJUnitPlatform {
@@ -18,7 +12,7 @@ task unitTest(type: Test) {
     }
 }
 
-task integrationTest(type: Test) {
+tasks.register('integrationTest', Test) {
     group("verification")
 
     useJUnitPlatform {
@@ -26,7 +20,7 @@ task integrationTest(type: Test) {
     }
 }
 
-task jacocoUnitTestReport(type: JacocoReport) {
+tasks.register('jacocoUnitTestReport', JacocoReport) {
     sourceSets sourceSets.main
     executionData unitTest
 
@@ -35,11 +29,16 @@ task jacocoUnitTestReport(type: JacocoReport) {
     }
 }
 
-task jacocoIntegrationTestReport(type: JacocoReport) {
+tasks.register('jacocoIntegrationTestReport', JacocoReport) {
     sourceSets sourceSets.main
     executionData integrationTest
 
     reports {
         xml.required = true
     }
+}
+
+tasks.register('testAndReport', Test) {
+    tasks.getByName('integrationTest').mustRunAfter('unitTest')
+    dependsOn('unitTest', 'integrationTest', 'jacocoUnitTestReport', 'jacocoIntegrationTestReport')
 }

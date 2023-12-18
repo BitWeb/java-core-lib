@@ -23,10 +23,8 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: 8.4
-      - name: Run tests
-        run: ./gradlew unitTest integrationTest --fail-fast
-      - name: Generate reports
-        run: ./gradlew jacocoUnitTestReport jacocoIntegrationTestReport
+      - name: Run tests and generate reports
+        run: ./gradlew testAndReport
       - name: Run Sonar analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
