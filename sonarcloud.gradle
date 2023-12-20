@@ -13,9 +13,8 @@ apply plugin: org.sonarqube.gradle.SonarQubePlugin
 
 sonarqube {
     properties {
-        property "sonar.organization", "bitwebou"
-        property "sonar.projectName", "java-core-lib"
-        property "sonar.projectKey", "bitwebou_java-core-lib"
+        property "sonar.projectKey", "BitWeb_java-core-lib"
+        property "sonar.organization", "bitweb-oss"
         property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.exclusions", "build/generated/**"
     }
