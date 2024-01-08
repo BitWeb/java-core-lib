@@ -1,0 +1,17 @@
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    reviewers:
+      - "Jorich"
+      - "pr11t"
+      - "rammrain"
+    groups:
+      all-deps-minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
