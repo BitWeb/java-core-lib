@@ -24,6 +24,10 @@ java {
     sourceCompatibility = '17'
 }
 
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs.add("-parameters")
+}
+
 apply from: "test.gradle"
 apply from: "sonarcloud.gradle"
 apply from: "library.gradle"
