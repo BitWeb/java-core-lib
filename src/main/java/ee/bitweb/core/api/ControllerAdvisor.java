@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import ee.bitweb.core.exception.persistence.ConflictException;
 import ee.bitweb.core.exception.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolationException;
@@ -66,10 +67,10 @@ public class ControllerAdvisor {
     }
 
     @ResponseBody
-    @ExceptionHandler(PersistenceException.class)
+    @ExceptionHandler(ConflictException.class)
     public PersistenceErrorResponse handleConflictException(
             HttpServletResponse response,
-            PersistenceException e
+            ConflictException e
     ) {
         setDefaultHeaders(response, e.getCode());
 
@@ -82,7 +83,7 @@ public class ControllerAdvisor {
     @ExceptionHandler(EntityNotFoundException.class)
     public PersistenceErrorResponse handleEntityNotFoundException(
             HttpServletResponse response,
-            PersistenceException e
+            EntityNotFoundException e
     ) {
         setDefaultHeaders(response, e.getCode());
 
