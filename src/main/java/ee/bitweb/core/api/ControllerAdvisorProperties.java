@@ -63,7 +63,14 @@ public class ControllerAdvisorProperties {
         private Level multipartException = Level.WARN;
 
         @NotNull
+        @Deprecated(since = "3.1.0", forRemoval = true)
         private Level persistenceException = Level.ERROR;
+
+        @NotNull
+        private Level entityNotFoundException = persistenceException;
+
+        @NotNull
+        private Level conflictException = persistenceException;
 
         @NotNull
         private Level retrofitException = Level.INFO;

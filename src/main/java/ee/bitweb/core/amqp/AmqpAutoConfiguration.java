@@ -17,10 +17,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.ErrorHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Configuration
@@ -39,14 +39,15 @@ public class AmqpAutoConfiguration {
             ConnectionFactory connectionFactory,
             MessageConverter converter,
             SimpleRabbitListenerContainerFactoryConfigurer configurer,
-            List<AmqpListenerInterceptor> interceptors
+            List<AmqpListenerInterceptor> interceptors,
+            Optional<ConditionalRejectingErrorHandler> errorHandler
     ) {
         log.info("Creating a default SimpleRabbitListenerContainerFactory");
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         configurer.configure(factory, connectionFactory);
         factory.setMessageConverter(converter);
 
-        factory.setErrorHandler(createDefaultErrorHandler());
+        factory.setErrorHandler(errorHandler.orElse(createDefaultErrorHandler()));
 
         var sortedInterceptors = sortTraceIdInterceptorToFirst(interceptors);
         for (AmqpListenerInterceptor interceptor : sortedInterceptors) {
@@ -74,7 +75,7 @@ public class AmqpAutoConfiguration {
         return sorted;
     }
 
-    private ErrorHandler createDefaultErrorHandler() {
+    private ConditionalRejectingErrorHandler createDefaultErrorHandler() {
         ConditionalRejectingErrorHandler errorHandler = new ConditionalRejectingErrorHandler(
                 new CoreExceptionStrategy()
         );
