@@ -30,6 +30,7 @@ class ScheduledJobTest {
 
     SchedulerTraceIdResolver schedulerTraceIdResolver;
     TestJob testJob;
+    CustomErrorHandlerJob customErrorHandlerJob;
 
     @Mock
     ScheduledRunnable scheduledRunnable;
@@ -38,6 +39,7 @@ class ScheduledJobTest {
     void beforeEach() {
         MDC.clear();
         logger = (Logger) LoggerFactory.getLogger(ScheduledJob.class);
+
         memoryAppender = new MemoryAppender();
         memoryAppender.setContext((LoggerContext) LoggerFactory.getILoggerFactory());
         logger.setLevel(Level.DEBUG);
@@ -50,6 +52,7 @@ class ScheduledJobTest {
         );
 
         testJob = new TestJob(scheduledRunnable, schedulerTraceIdResolver);
+        customErrorHandlerJob = new CustomErrorHandlerJob(scheduledRunnable, schedulerTraceIdResolver);
     }
 
     @Test
@@ -96,6 +99,30 @@ class ScheduledJobTest {
         );
     }
 
+    @Test
+    @DisplayName("Unsuccessful job should log in custom way correctly and clear MDC")
+    void testUnsuccessfulJobWithCustomErrorHandler() {
+        // given
+        doThrow(RuntimeException.class).when(scheduledRunnable).run();
+
+        // when
+        customErrorHandlerJob.runTestJob();
+
+        // then
+        verify(scheduledRunnable, times(1)).run();
+
+        var errorMessages = memoryAppender.search("ee.bitweb.core.scheduled.ScheduledJobTest$CustomErrorHandlerJob failed: null", Level.WARN);
+
+        assertAll(
+                () -> assertEquals(3, memoryAppender.getSize()),
+                () -> assertEquals(1, memoryAppender.search("Started ee.bitweb.core.scheduled.ScheduledJobTest$CustomErrorHandlerJob", Level.INFO).size()),
+                () -> assertEquals(1, errorMessages.size()),
+                () -> assertEquals("java.lang.RuntimeException", errorMessages.get(0).getThrowableProxy().getClassName()), // validates that cause has been added to log message
+                () -> assertEquals(1, memoryAppender.search("Finished ee.bitweb.core.scheduled.ScheduledJobTest$CustomErrorHandlerJob", Level.INFO).size()),
+                () -> assertNull(MDC.getCopyOfContextMap())
+        );
+    }
+
     static class TestJob extends ScheduledJob<ScheduledRunnable> {
 
         public TestJob(ScheduledRunnable runnable, SchedulerTraceIdResolver traceIdResolver) {
@@ -104,6 +131,24 @@ class ScheduledJobTest {
 
         public void runTestJob() {
             run();
+        }
+    }
+
+    static class CustomErrorHandlerJob extends ScheduledJob<ScheduledRunnable> {
+
+        public Logger log = (Logger) LoggerFactory.getLogger(ScheduledJob.class);
+
+        public CustomErrorHandlerJob(ScheduledRunnable runnable, SchedulerTraceIdResolver traceIdResolver) {
+            super(runnable, traceIdResolver);
+        }
+
+        public void runTestJob() {
+            run();
+        }
+
+        @Override
+        protected void handleException(Exception e) {
+            log.warn("{} failed: {}", getClass().getName(), e.getMessage(), e);
         }
     }
 }
