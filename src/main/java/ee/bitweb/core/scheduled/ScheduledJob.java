@@ -19,11 +19,15 @@ public abstract class ScheduledJob<T extends ScheduledRunnable> {
         try {
             runnable.run();
         } catch (Exception e) {
-            log.error("{} failed: {}", getClass().getName(), e.getMessage(), e);
+           handleException(e);
         }
 
         log.info("Finished {}", getClass().getName());
 
         traceIdResolver.getContext().clear();
+    }
+
+    protected void handleException(Exception e) {
+        log.error("{} failed: {}", getClass().getName(), e.getMessage(), e);
     }
 }

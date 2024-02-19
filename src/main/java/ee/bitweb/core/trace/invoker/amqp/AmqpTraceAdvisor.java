@@ -16,6 +16,7 @@ public class AmqpTraceAdvisor implements AmqpListenerInterceptor {
 
     private final AmqpTraceIdResolver resolver;
     private final TraceIdContext context;
+    private final boolean clearContextOnException;
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
@@ -28,10 +29,15 @@ public class AmqpTraceAdvisor implements AmqpListenerInterceptor {
             }
         }
         try {
-            return invocation.proceed();
-        } finally {
-            log.debug("Message has been processed, clearing trace id context.");
+            Object result = invocation.proceed();
             context.clear();
+
+            return result;
+        } catch (Throwable t) {
+            if (clearContextOnException) {
+                context.clear();
+            }
+            throw t;
         }
     }
 }

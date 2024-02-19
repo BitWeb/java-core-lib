@@ -1,14 +1,13 @@
 package ee.bitweb.core.trace;
 
+import ee.bitweb.core.amqp.CoreExceptionStrategy;
 import ee.bitweb.core.trace.context.TraceIdContext;
 import ee.bitweb.core.trace.creator.TraceIdCreator;
-import ee.bitweb.core.trace.invoker.amqp.AmqpTraceAdvisor;
-import ee.bitweb.core.trace.invoker.amqp.AmqpTraceBeforePublishMessageProcessor;
-import ee.bitweb.core.trace.invoker.amqp.AmqpTraceIdResolver;
-import ee.bitweb.core.trace.invoker.amqp.AmqpTraceProperties;
+import ee.bitweb.core.trace.invoker.amqp.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.MessagePostProcessor;
+import org.springframework.amqp.rabbit.listener.ConditionalRejectingErrorHandler;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -16,6 +15,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.Optional;
 
 @Slf4j
 @Configuration
@@ -50,9 +51,25 @@ public class TraceIdAmqpAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public AmqpTraceAdvisor amqpTraceAdvisor(AmqpTraceIdResolver resolver, TraceIdContext context) {
+    public AmqpTraceAdvisor amqpTraceAdvisor(AmqpTraceIdResolver resolver, TraceIdContext context, Optional<ConditionalRejectingErrorHandler> errorHandler) {
         log.info("Creating default AmqpTraceAdvisor");
 
-        return new AmqpTraceAdvisor(resolver, context);
+        ConditionalRejectingErrorHandler handler = errorHandler.orElse(null);
+
+        return new AmqpTraceAdvisor(resolver, context, !(handler instanceof AmqpTraceAwareExceptionHandler));
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ConditionalRejectingErrorHandler amqpTraceAwareExceptionHandler(TraceIdContext context) {
+        log.info("Creating default AmqpTraceAwareExceptionHandler");
+
+        ConditionalRejectingErrorHandler handler = new AmqpTraceAwareExceptionHandler(
+                context,
+                new CoreExceptionStrategy()
+        );
+        handler.setDiscardFatalsWithXDeath(false);
+
+        return handler;
     }
 }
