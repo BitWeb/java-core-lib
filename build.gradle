@@ -92,7 +92,7 @@ dependencies {
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-amqp', version: "${springBootVersion}"
 
     // https://mvnrepository.com/artifact/org.json/json
-    testImplementation group: 'org.json', name: 'json', version: '20231013'
+    testImplementation group: 'org.json', name: 'json', version: '20240205'
 
     // https://mvnrepository.com/artifact/ee.bitweb/spring-test-core
     testImplementation group: 'ee.bitweb', name: 'spring-test-core', version: '2.+'
