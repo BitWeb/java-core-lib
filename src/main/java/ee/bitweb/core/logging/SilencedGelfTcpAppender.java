@@ -15,8 +15,6 @@ public class SilencedGelfTcpAppender extends GelfTcpAppender {
         try {
             appendMessage(binMessage);
         } catch (CoreException ignored) {
-            log.info("Ignored exception: {}", ignored.getMessage());
-//            System.out.println("Ignored exception: %s".formatted(ignored.getMessage()));
             // Catching and ignoring CoreException which will be thrown if application can't connect to Graylog, because we don't want the application
             // to stop.
         }
