@@ -60,6 +60,8 @@ class SilencedGelfTcpAppenderTest {
         mockConnection.connect(serverSocket.getLocalSocketAddress());
         log.info("Created mock connection to fill server backlog");
 
+        new Socket().connect(serverSocket.getLocalSocketAddress(), 100);
+
         Context context = new LoggerContext();
 
         SilencedGelfTcpAppender appender = new SilencedGelfTcpAppender();

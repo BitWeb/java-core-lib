@@ -3,7 +3,9 @@ package ee.bitweb.core.logging;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import de.siegmar.logbackgelf.GelfTcpAppender;
 import ee.bitweb.core.exception.CoreException;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class SilencedGelfTcpAppender extends GelfTcpAppender {
 
     @Override
@@ -13,7 +15,8 @@ public class SilencedGelfTcpAppender extends GelfTcpAppender {
         try {
             appendMessage(binMessage);
         } catch (CoreException ignored) {
-            System.out.println("Ignored exception: %s".formatted(ignored.getMessage()));
+            log.info("Ignored exception: {}", ignored.getMessage());
+//            System.out.println("Ignored exception: %s".formatted(ignored.getMessage()));
             // Catching and ignoring CoreException which will be thrown if application can't connect to Graylog, because we don't want the application
             // to stop.
         }
