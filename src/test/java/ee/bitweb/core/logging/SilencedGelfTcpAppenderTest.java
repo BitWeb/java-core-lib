@@ -101,6 +101,8 @@ class SilencedGelfTcpAppenderTest {
     }
 
     private void listenAndAccept() {
+        log.info("Starting listener");
+
         while (!serverSocket.isClosed()) {
             try {
                 Socket socket = serverSocket.accept();
