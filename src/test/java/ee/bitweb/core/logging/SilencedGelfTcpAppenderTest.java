@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -19,21 +21,39 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 @Tag("unit")
 class SilencedGelfTcpAppenderTest {
 
-    private static ServerSocket serverSocket;
-    private static Socket mockConnection;
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
+
+    private ServerSocket serverSocket;
+    private Socket mockConnection;
 
     @BeforeAll
     static void beforeAll() throws IOException {
-        // Create server socket with single element backlog queue (1) and dynamically allocated port (0)
-        serverSocket = new ServerSocket(0, 1);
-
-        // Fill backlog queue by this request so consequent requests will be blocked
-        mockConnection = new Socket();
-        mockConnection.connect(serverSocket.getLocalSocketAddress());
     }
 
-    @AfterAll
-    static void afterAll() throws IOException {
+    @BeforeEach
+    void setUp() throws IOException {
+        // Create server socket with single element backlog queue (1) and dynamically allocated port (0)
+        serverSocket = new ServerSocket(0, 1);
+    }
+
+    void listenAndAccept() {
+        while (!serverSocket.isClosed()) {
+            try {
+                Socket socket = serverSocket.accept();
+
+                System.out.println("connected");
+
+                if (socket.isConnected()) {
+                    socket.close();
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @AfterEach
+    void tearDown() throws IOException {
         if (mockConnection != null && mockConnection.isConnected()) {
             mockConnection.close();
         }
@@ -46,7 +66,31 @@ class SilencedGelfTcpAppenderTest {
     @Test
     @DisplayName("Should not throw any exceptions and continue running when connection to GELF TCP endpoint cannot be made")
     @Timeout(value = 300, unit = TimeUnit.MILLISECONDS)
-    void noExceptionIsThrownWhenConnectionIsUnsuccessful() {
+    void noExceptionIsThrownWhenConnectionIsUnsuccessful() throws IOException {
+        // Fill backlog queue by this request so consequent requests will be blocked
+        mockConnection = new Socket();
+        mockConnection.connect(serverSocket.getLocalSocketAddress());
+
+        Context context = new LoggerContext();
+
+        SilencedGelfTcpAppender appender = new SilencedGelfTcpAppender();
+        appender.setContext(context);
+        appender.setGraylogHost("127.0.0.1");
+        appender.setGraylogPort(serverSocket.getLocalPort());
+        appender.setMaxRetries(0);
+        appender.setConnectTimeout(100);
+        appender.setSocketTimeout(100);
+        appender.start();
+
+        assertDoesNotThrow(() -> appender.doAppend(createLoggingEvent()));
+    }
+
+    @Test
+    @DisplayName("Should not throw any exceptions and continue running when connection to GELF TCP endpoint is successful")
+    @Timeout(value = 200, unit = TimeUnit.MILLISECONDS)
+    void noExceptionIsThrownWhenConnectionIsSuccessful() {
+        EXECUTOR_SERVICE.execute(this::listenAndAccept);
+
         Context context = new LoggerContext();
 
         SilencedGelfTcpAppender appender = new SilencedGelfTcpAppender();
