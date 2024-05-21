@@ -60,7 +60,8 @@ class SilencedGelfTcpAppenderTest {
         mockConnection.connect(serverSocket.getLocalSocketAddress());
         log.info("Created mock connection to fill server backlog");
 
-        new Socket().connect(serverSocket.getLocalSocketAddress(), 100);
+//        new Socket().connect(serverSocket.getLocalSocketAddress());
+//        new Socket().connect(serverSocket.getLocalSocketAddress(), 100);
 
         Context context = new LoggerContext();
 
@@ -79,21 +80,43 @@ class SilencedGelfTcpAppenderTest {
     @Test
     @DisplayName("Should not throw any exceptions and continue running when connection to GELF TCP endpoint is successful")
     @Timeout(value = 200, unit = TimeUnit.MILLISECONDS)
-    void noExceptionIsThrownWhenConnectionIsSuccessful() {
-        executor.execute(this::listenAndAccept);
+    void noExceptionIsThrownWhenConnectionIsSuccessful() throws IOException {
+        ServerSocket socket = new ServerSocket(0, 1);
 
-        Context context = new LoggerContext();
+        new Thread(() -> {
+            log.info("Starting listener");
 
-        SilencedGelfTcpAppender appender = new SilencedGelfTcpAppender();
-        appender.setContext(context);
-        appender.setGraylogHost("127.0.0.1");
-        appender.setGraylogPort(serverSocket.getLocalPort());
-        appender.setMaxRetries(0);
-        appender.setConnectTimeout(100);
-        appender.setSocketTimeout(100);
-        appender.start();
+            while (!socket.isClosed()) {
+                try {
+                    Socket connection = socket.accept();
 
-        assertDoesNotThrow(() -> appender.doAppend(createLoggingEvent()));
+                    log.info("Connection accepted, closing connection");
+
+                    if (connection.isConnected()) {
+                        connection.close();
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }).start();
+
+        try {
+            Context context = new LoggerContext();
+
+            SilencedGelfTcpAppender appender = new SilencedGelfTcpAppender();
+            appender.setContext(context);
+            appender.setGraylogHost("127.0.0.1");
+            appender.setGraylogPort(socket.getLocalPort());
+            appender.setMaxRetries(0);
+            appender.setConnectTimeout(100);
+            appender.setSocketTimeout(100);
+            appender.start();
+
+            assertDoesNotThrow(() -> appender.doAppend(createLoggingEvent()));
+        } finally {
+            socket.close();
+        }
     }
 
     private ILoggingEvent createLoggingEvent() {
