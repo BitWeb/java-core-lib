@@ -21,19 +21,15 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 @Tag("unit")
 class SilencedGelfTcpAppenderTest {
 
-    private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
-
+    private ExecutorService executor;
     private ServerSocket serverSocket;
     private Socket mockConnection;
 
-    @BeforeAll
-    static void beforeAll() throws IOException {
-    }
-
     @BeforeEach
     void setUp() throws IOException {
-        // Create server socket with single element backlog queue (1) and dynamically allocated port (0)
         serverSocket = new ServerSocket(0, 1);
+
+        executor = Executors.newSingleThreadExecutor();
     }
 
     void listenAndAccept() {
@@ -54,6 +50,8 @@ class SilencedGelfTcpAppenderTest {
 
     @AfterEach
     void tearDown() throws IOException {
+        executor.shutdownNow();
+
         if (mockConnection != null && mockConnection.isConnected()) {
             mockConnection.close();
         }
@@ -89,7 +87,7 @@ class SilencedGelfTcpAppenderTest {
     @DisplayName("Should not throw any exceptions and continue running when connection to GELF TCP endpoint is successful")
     @Timeout(value = 200, unit = TimeUnit.MILLISECONDS)
     void noExceptionIsThrownWhenConnectionIsSuccessful() {
-        EXECUTOR_SERVICE.execute(this::listenAndAccept);
+        executor.execute(this::listenAndAccept);
 
         Context context = new LoggerContext();
 
