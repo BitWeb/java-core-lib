@@ -80,7 +80,7 @@ class SilencedGelfTcpAppenderTest {
     @Test
     @DisplayName("Should not throw any exceptions and continue running when connection to GELF TCP endpoint is successful")
     @Timeout(value = 200, unit = TimeUnit.MILLISECONDS)
-    void noExceptionIsThrownWhenConnectionIsSuccessful() throws IOException {
+    void noExceptionIsThrownWhenConnectionIsSuccessful() throws IOException, InterruptedException {
         ServerSocket socket = new ServerSocket(0, 1);
 
         new Thread(() -> {
@@ -100,6 +100,10 @@ class SilencedGelfTcpAppenderTest {
                 }
             }
         }).start();
+
+        Thread.sleep(1);
+
+        log.info("Continue");
 
         try {
             Context context = new LoggerContext();
