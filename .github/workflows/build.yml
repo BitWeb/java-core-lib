@@ -41,6 +41,7 @@ jobs:
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
+        if: matrix.Java == '17'
         with:
           name: report
           path: build/reports/**
