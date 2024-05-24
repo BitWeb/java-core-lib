@@ -41,9 +41,8 @@ jobs:
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
-        if: matrix.Java == '17'
         with:
-          name: report
+          name: report-java-${{ matrix.Java }}
           path: build/reports/**
           retention-days: 5
 
