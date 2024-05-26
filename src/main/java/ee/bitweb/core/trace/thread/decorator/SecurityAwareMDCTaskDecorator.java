@@ -4,6 +4,7 @@ import ee.bitweb.core.trace.thread.ThreadTraceIdResolver;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.MDC;
 import org.springframework.core.task.TaskDecorator;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Map;
@@ -16,7 +17,7 @@ public class SecurityAwareMDCTaskDecorator implements TaskDecorator {
     @Override
     public Runnable decorate(Runnable runnable) {
         Map<String, String> contextMap = MDC.getCopyOfContextMap();
-        var securityContext = SecurityContextHolder.getContext();
+        SecurityContext securityContext = SecurityContextHolder.getContext();
 
         return () -> {
             try {

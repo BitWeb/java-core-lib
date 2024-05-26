@@ -23,7 +23,7 @@ class SecurityAwareMDCTaskDecoratorTest {
         Mockito.when(resolver.resolve()).thenReturn(null);
         MDC.put("custom-key", "custom-value");
 
-        new BasicMDCTaskDecorator(resolver).decorate(() -> {
+        new SecurityAwareMDCTaskDecorator(resolver).decorate(() -> {
             assertEquals("custom-value", MDC.get("custom-key"));
         }).run();
 
@@ -38,7 +38,7 @@ class SecurityAwareMDCTaskDecoratorTest {
         MDC.put("custom-key", "custom-value");
 
         try {
-            new BasicMDCTaskDecorator(resolver).decorate(() -> {
+            new SecurityAwareMDCTaskDecorator(resolver).decorate(() -> {
                 assertEquals("custom-value", MDC.get("custom-key"));
 
                 throw new RuntimeException();
