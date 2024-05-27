@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.MockSettings;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.MDC;
@@ -46,6 +48,18 @@ class BasicMDCTaskDecoratorTest {
         } catch (RuntimeException ignored) {
             assertNull(MDC.get("custom-key"));
         }
+
+        Mockito.verifyNoMoreInteractions(resolver);
+    }
+
+    @Test
+    void testMDCIsPopulatedGivenMDCContextMapIsNull() {
+        Mockito.when(resolver.resolve()).thenReturn(null);
+        assertNull(MDC.getCopyOfContextMap());
+
+        new BasicMDCTaskDecorator(resolver).decorate(() -> {
+            assertNotNull(MDC.getCopyOfContextMap());
+        }).run();
 
         Mockito.verifyNoMoreInteractions(resolver);
     }

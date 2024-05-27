@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.MDC;
 import org.springframework.core.task.TaskDecorator;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -14,11 +15,11 @@ public class BasicMDCTaskDecorator implements TaskDecorator {
 
     @Override
     public Runnable decorate(Runnable runnable) {
-        Map<String, String> contextMap = MDC.getCopyOfContextMap();
+        final Map<String, String> contextMap = MDC.getCopyOfContextMap();
 
         return () -> {
             try {
-                MDC.setContextMap(contextMap);
+                MDC.setContextMap(contextMap == null ? new HashMap<>() : contextMap);
                 resolver.resolve();
 
                 runnable.run();
