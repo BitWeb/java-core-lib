@@ -9,6 +9,10 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ '17', '21' ]
+    name: Test with Java ${{ matrix.Java }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -19,15 +23,18 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: ${{ matrix.java }}
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.6
 
       - name: Run tests and generate reports
         run: ./gradlew testAndReport
 
       - name: Run Sonar analysis
+        if: matrix.Java == '17'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -36,7 +43,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: report
+          name: report-java-${{ matrix.Java }}
           path: build/reports/**
           retention-days: 5
 

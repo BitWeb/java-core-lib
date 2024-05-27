@@ -1,5 +1,7 @@
 version: 2
+
 updates:
+
   - package-ecosystem: "gradle"
     directory: "/"
     schedule:
@@ -15,3 +17,12 @@ updates:
         update-types:
           - "minor"
           - "patch"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    reviewers:
+      - "Jorich"
+      - "pr11t"
+      - "rammrain"
