@@ -33,12 +33,12 @@ public class RetrofitApiBuilder<T> {
 
     private final String url;
     private final Class<T> definition;
-    private final HttpLoggingInterceptor loggingInterceptor;
+    private final Interceptor loggingInterceptor;
 
     private Converter.Factory converterFactory;
     private OkHttpClient.Builder clientBuilder;
 
-    public static <T> RetrofitApiBuilder<T>  create(String baseUrl, Class<T> definition) {
+    public static <T> RetrofitApiBuilder<T> create(String baseUrl, Class<T> definition) {
         return new RetrofitApiBuilder<>(
                 baseUrl,
                 definition,
@@ -47,7 +47,15 @@ public class RetrofitApiBuilder<T> {
         );
     }
 
-    private RetrofitApiBuilder(String url, Class<T> definition, HttpLoggingInterceptor loggingInterceptor) {
+    public static <T> RetrofitApiBuilder<T> create(String baseUrl, Class<T> definition, Interceptor loggingInterceptor) {
+        return new RetrofitApiBuilder<>(
+                baseUrl,
+                definition,
+                loggingInterceptor
+        );
+    }
+
+    private RetrofitApiBuilder(String url, Class<T> definition, Interceptor loggingInterceptor) {
         this.url = url;
         this.definition = definition;
         this.loggingInterceptor = loggingInterceptor;
@@ -97,13 +105,21 @@ public class RetrofitApiBuilder<T> {
     }
 
     public RetrofitApiBuilder<T> loggingLevel(LoggingLevel level) {
-        loggingInterceptor.setLevel(level.getLevel());
+        if (loggingInterceptor instanceof HttpLoggingInterceptor httpLoggingInterceptor) {
+            httpLoggingInterceptor.setLevel(level.getLevel());
+        } else {
+            log.error("Unknown logging interceptor used, unable to set logging level.");
+        }
 
         return this;
     }
 
     public RetrofitApiBuilder<T> suppressedHeaders(List<String> headers) {
-        headers.forEach(loggingInterceptor::redactHeader);
+        if (loggingInterceptor instanceof HttpLoggingInterceptor httpLoggingInterceptor) {
+            headers.forEach(httpLoggingInterceptor::redactHeader);
+        } else {
+            log.error("Unknown logging interceptor used, unable to set logging level.");
+        }
 
         return this;
     }
@@ -166,7 +182,7 @@ public class RetrofitApiBuilder<T> {
                 .build().create(definition);
     }
 
-    private OkHttpClient.Builder createDefaultBuilder(HttpLoggingInterceptor loggingInterceptor) {
+    private OkHttpClient.Builder createDefaultBuilder(Interceptor loggingInterceptor) {
         var httpClientBuilder = new OkHttpClient.Builder();
         httpClientBuilder.interceptors().add(loggingInterceptor);
 
