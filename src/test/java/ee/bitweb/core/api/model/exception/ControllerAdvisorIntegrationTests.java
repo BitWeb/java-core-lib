@@ -30,10 +30,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("MockedInvokerTraceIdCreator")
 @SpringBootTest(
-        classes= TestSpringApplication.class,
+        classes = TestSpringApplication.class,
         properties = {
                 "ee.bitweb.core.trace.auto-configuration=true",
-                "ee.bitweb.core.controller-advice.auto-configuration=true"
+                "ee.bitweb.core.controller-advice.auto-configuration=true",
+                "ee.bitweb.core.controller-advice.show-detailed-field-names=false"
         }
 )
 class ControllerAdvisorIntegrationTests {
@@ -118,7 +119,7 @@ class ControllerAdvisorIntegrationTests {
     }
 
     @Test
-    void onConstraintViolationExceptionInCodeShoudReturnBadRequestError() throws Exception {
+    void onConstraintViolationExceptionInCodeShouldReturnBadRequestError() throws Exception {
         MockHttpServletRequestBuilder mockMvcBuilder = get(TestPingController.BASE_URL + "/constraint-violation")
                 .header(TRACE_ID_HEADER_NAME, "1234567890");
 
@@ -136,6 +137,7 @@ class ControllerAdvisorIntegrationTests {
     @Test
     void onConstraintViolationExceptionShouldReturnBadRequestError() throws Exception {
         TestPingController.ComplexValidatedObject data = new TestPingController.ComplexValidatedObject();
+        data.setNestedObject(new TestPingController.SimpleValidatedObject());
 
         MockHttpServletRequestBuilder mockMvcBuilder = post(TestPingController.BASE_URL + "/validated")
                 .header(TRACE_ID_HEADER_NAME, "1234567890")
@@ -148,6 +150,8 @@ class ControllerAdvisorIntegrationTests {
                 List.of(
                         Error.notBlank("complexProperty"),
                         Error.notNull("complexProperty"),
+                        Error.notBlank("nestedObject.simpleProperty"),
+                        Error.notNull("nestedObject.simpleProperty"),
                         Error.notEmpty("objects"),
                         Error.notNull("objects")
                 )
@@ -158,6 +162,7 @@ class ControllerAdvisorIntegrationTests {
     @Test
     void onConstraintViolationExceptionInNestedObjectShouldReturnBadRequestError() throws Exception {
         TestPingController.ComplexValidatedObject data = new TestPingController.ComplexValidatedObject();
+        data.setNestedObject(new TestPingController.SimpleValidatedObject());
         data.setObjects(List.of(new TestPingController.SimpleValidatedObject()));
 
         MockHttpServletRequestBuilder mockMvcBuilder = post(TestPingController.BASE_URL + "/validated")
@@ -171,8 +176,45 @@ class ControllerAdvisorIntegrationTests {
                 List.of(
                         Error.notBlank("complexProperty"),
                         Error.notNull("complexProperty"),
+                        Error.notBlank("nestedObject.simpleProperty"),
+                        Error.notNull("nestedObject.simpleProperty"),
                         Error.notBlank("objects[0].simpleProperty"),
                         Error.notNull("objects[0].simpleProperty")
+                )
+        );
+        assertIdField(result);
+    }
+
+    @Test
+    void onConstraintViolationExceptionInListObjectShouldReturnBadRequestError() throws Exception {
+        TestPingController.SimpleValidatedObject firstValidSimpleObject = new TestPingController.SimpleValidatedObject();
+        firstValidSimpleObject.setSimpleProperty("property");
+
+        TestPingController.ComplexValidatedObject complexObject = new TestPingController.ComplexValidatedObject();
+        complexObject.setNestedObject(new TestPingController.SimpleValidatedObject());
+        complexObject.setObjects(List.of(firstValidSimpleObject, new TestPingController.SimpleValidatedObject()));
+
+        List<TestPingController.ComplexValidatedObject> data = List.of(
+                new TestPingController.ComplexValidatedObject(),
+                complexObject
+        );
+
+        MockHttpServletRequestBuilder mockMvcBuilder = post(TestPingController.BASE_URL + "/validated-list")
+                .header(TRACE_ID_HEADER_NAME, "1234567890")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(mapper.writeValueAsString(data));
+
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        ResponseAssertions.assertConstraintViolationErrorResponse(
+                result,
+                List.of(
+                        Error.notBlank("complexProperty"),
+                        Error.notNull("complexProperty"),
+                        Error.notNull("nestedObject"),
+                        Error.notEmpty("objects"),
+                        Error.notNull("objects"),
+                        Error.notBlank("simpleProperty"),
+                        Error.notNull("simpleProperty")
                 )
         );
         assertIdField(result);
@@ -195,12 +237,9 @@ class ControllerAdvisorIntegrationTests {
     }
 
     @Test
-    void onConstraintViolationExceptionWithinNestedObjectInGetRequestShouldReturnBadRequestError() throws Exception {
-        TestPingController.ComplexValidatedObject data = new TestPingController.ComplexValidatedObject();
-
+    void onMethodArgumentNotValidExceptionWithinSimpleObjectInGetRequestShouldReturnBadRequestError() throws Exception {
         MockHttpServletRequestBuilder mockMvcBuilder = get(TestPingController.BASE_URL + "/validated")
-                .header(TRACE_ID_HEADER_NAME, "1234567890")
-                .content(mapper.writeValueAsString(data));
+                .header(TRACE_ID_HEADER_NAME, "1234567890");
 
         ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
         ResponseAssertions.assertValidationErrorResponse(
@@ -237,7 +276,7 @@ class ControllerAdvisorIntegrationTests {
     }
 
     @Test
-    void onMissingMultipartRequestPartShouldReturnBadRequestError () throws Exception {
+    void onMissingMultipartRequestPartShouldReturnBadRequestError() throws Exception {
         MockHttpServletRequestBuilder mockMvcBuilder =
                 multipart(TestPingController.BASE_URL + "/import")
                         .header(TRACE_ID_HEADER_NAME, "1234567890");
@@ -371,7 +410,7 @@ class ControllerAdvisorIntegrationTests {
     }
 
     @Test
-    void testDateFieldBindException() throws Exception {
+    void testDateFieldMethodArgumentNotValidException() throws Exception {
         MockHttpServletRequestBuilder mockMvcBuilder = get(TestPingController.BASE_URL + "/complex-data")
                 .header(TRACE_ID_HEADER_NAME, "1234567890")
                 .contentType(MediaType.APPLICATION_JSON)

@@ -13,7 +13,6 @@ import ee.bitweb.core.api.model.exception.FieldErrorResponse;
 import ee.bitweb.core.api.model.exception.GenericErrorResponse;
 import ee.bitweb.core.api.model.exception.PersistenceErrorResponse;
 import ee.bitweb.core.api.model.exception.ValidationErrorResponse;
-import ee.bitweb.core.exception.persistence.PersistenceException;
 import ee.bitweb.core.exception.validation.InvalidFormatValidationException;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
@@ -164,7 +163,7 @@ public class ControllerAdvisor {
         log(properties.getLogging().getConstraintViolationException(), e.getMessage(), e);
 
         return logAndReturn(
-                new ValidationErrorResponse(getResponseId(), ExceptionConverter.convert(e))
+                new ValidationErrorResponse(getResponseId(), ExceptionConverter.convert(e, properties.isShowDetailedFieldNames()))
         );
     }
 

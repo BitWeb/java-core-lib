@@ -54,6 +54,9 @@ public class TestPingController {
     @GetMapping("/validated")
     public void getValidated(@Valid SimpleValidatedObject data) {}
 
+    @PostMapping("/validated-list")
+    public void postValidatedList(@RequestBody List<@Valid ComplexValidatedObject> data) {}
+
     @GetMapping("/complex-data")
     public void dateFieldParam(ComplexData data) {}
 
@@ -120,6 +123,10 @@ public class TestPingController {
         @NotNull
         @NotBlank
         private String complexProperty;
+
+        @Valid
+        @NotNull
+        private SimpleValidatedObject nestedObject;
 
         @Valid
         @NotNull

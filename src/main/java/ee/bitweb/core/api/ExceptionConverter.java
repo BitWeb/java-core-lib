@@ -8,7 +8,6 @@ import org.springframework.validation.BindingResult;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -20,11 +19,15 @@ public class ExceptionConverter {
     public static final String CONSTRAINT_VIOLATION_MESSAGE = "CONSTRAINT_VIOLATION";
 
     public static ValidationException convert(ConstraintViolationException e) {
+        return convert(e, false);
+    }
+
+    public static ValidationException convert(ConstraintViolationException e, boolean showDetailedFieldNames) {
         Set<FieldError> fieldErrors = e
                 .getConstraintViolations()
                 .stream()
                 .map(error -> new FieldError(
-                        getFieldName(error),
+                        getFieldName(error, showDetailedFieldNames),
                         getValidatorName(error),
                         error.getMessage()
                 ))
@@ -40,21 +43,23 @@ public class ExceptionConverter {
                 error.getField(),
                 error.getCodes() != null ? error.getCodes()[0].split("\\.")[0] : null,
                 parseMessage(error)
-        )).collect(Collectors.toList()));
+        )).toList());
 
         fieldErrors.addAll(bindingResult.getGlobalErrors().stream().map(error -> new FieldError(
                 error.getObjectName(),
                 error.getCodes() != null ? error.getCodes()[0].split("\\.")[0] : null,
                 error.getDefaultMessage()
-        )).collect(Collectors.toList()));
+        )).toList());
 
         return new ValidationException(ErrorMessage.INVALID_ARGUMENT.toString(), fieldErrors);
     }
 
-    private static String getFieldName(ConstraintViolation<?> error) {
-        String[] parts = error.getPropertyPath().toString().split("\\.");
+    private static String getFieldName(ConstraintViolation<?> error, boolean showDetailedFieldNames) {
+        if (showDetailedFieldNames) {
+            return FieldNameResolver.resolve(error);
+        }
 
-        return parts[parts.length - 1];
+        return FieldNameResolver.resolveWithRegex(error);
     }
 
     private static String getValidatorName(ConstraintViolation<?> constraintViolation) {
