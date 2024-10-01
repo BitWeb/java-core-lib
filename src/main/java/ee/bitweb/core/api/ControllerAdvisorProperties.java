@@ -23,6 +23,7 @@ public class ControllerAdvisorProperties {
     static final String PREFIX = "ee.bitweb.core.controller-advice";
 
     private boolean autoConfiguration = false;
+    private boolean showDetailedFieldNames = false;
 
     @Valid
     private Logging logging = new Logging();
