@@ -57,6 +57,7 @@ class RetrofitLoggingInterceptorTest {
 
     @BeforeEach
     void beforeEach() {
+        context.clear();
         context.set("TEST");
 
         logger = (Logger) LoggerFactory.getLogger(RetrofitLoggingInterceptor.class);
