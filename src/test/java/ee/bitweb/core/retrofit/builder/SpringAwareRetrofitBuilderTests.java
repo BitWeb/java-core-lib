@@ -34,8 +34,6 @@ class SpringAwareRetrofitBuilderTests {
     @RegisterExtension
     private static final MockServer server = new MockServer(HttpMethod.GET, "/request");
 
-
-
     @Autowired
     private SpringAwareRetrofitBuilder builder;
 
@@ -139,34 +137,6 @@ class SpringAwareRetrofitBuilderTests {
                 BASE_URL  + server.getPort(),
                 ExternalServiceApi.class
         ).add(
-                customInterceptor
-        ).build();
-
-        ExternalServiceApi.Payload response = api.get().execute().body();
-        Assertions.assertAll(
-                () -> Assertions.assertEquals("message", response.getMessage()),
-                () -> Assertions.assertEquals(1, response.getValue()),
-                () -> Assertions.assertEquals(1, interceptor1.getCount()),
-                () -> Assertions.assertEquals(1, interceptor2.getCount()),
-                () -> Assertions.assertEquals(1, customInterceptor.getCount())
-        );
-    }
-
-    @Test
-    void addedCustomInterceptorAsLoggingInterceptorIsAppliedToApi() throws Exception {
-        context.set("some-trace-id-value");
-        mockServerGet(
-                List.of(
-                        new Header(config.getHeaderName(), "some-trace-id-value")
-                ),
-                "message",
-                1
-        );
-        RequestCountInterceptor customInterceptor = new RequestCountInterceptor();
-
-        ExternalServiceApi api = builder.create(
-                BASE_URL  + server.getPort(),
-                ExternalServiceApi.class,
                 customInterceptor
         ).build();
 

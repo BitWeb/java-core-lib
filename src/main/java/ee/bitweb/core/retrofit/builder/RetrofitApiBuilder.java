@@ -3,10 +3,12 @@ package ee.bitweb.core.retrofit.builder;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import ee.bitweb.core.retrofit.logging.LoggingInterceptor;
+import ee.bitweb.core.retrofit.logging.LoggingLevel;
+import ee.bitweb.core.retrofit.logging.RetrofitLoggingInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
@@ -33,7 +35,7 @@ public class RetrofitApiBuilder<T> {
 
     private final String url;
     private final Class<T> definition;
-    private final Interceptor loggingInterceptor;
+    private final LoggingInterceptor loggingInterceptor;
 
     private Converter.Factory converterFactory;
     private OkHttpClient.Builder clientBuilder;
@@ -42,12 +44,12 @@ public class RetrofitApiBuilder<T> {
         return new RetrofitApiBuilder<>(
                 baseUrl,
                 definition,
-                new HttpLoggingInterceptor()
-                        .setLevel(DEFAULT_LOGGING_LEVEL.getLevel())
+                new RetrofitLoggingInterceptor()
+                        .setLevel(DEFAULT_LOGGING_LEVEL)
         );
     }
 
-    public static <T> RetrofitApiBuilder<T> create(String baseUrl, Class<T> definition, Interceptor loggingInterceptor) {
+    public static <T> RetrofitApiBuilder<T> create(String baseUrl, Class<T> definition, LoggingInterceptor loggingInterceptor) {
         return new RetrofitApiBuilder<>(
                 baseUrl,
                 definition,
@@ -55,7 +57,7 @@ public class RetrofitApiBuilder<T> {
         );
     }
 
-    private RetrofitApiBuilder(String url, Class<T> definition, Interceptor loggingInterceptor) {
+    private RetrofitApiBuilder(String url, Class<T> definition, LoggingInterceptor loggingInterceptor) {
         this.url = url;
         this.definition = definition;
         this.loggingInterceptor = loggingInterceptor;
@@ -105,21 +107,13 @@ public class RetrofitApiBuilder<T> {
     }
 
     public RetrofitApiBuilder<T> loggingLevel(LoggingLevel level) {
-        if (loggingInterceptor instanceof HttpLoggingInterceptor httpLoggingInterceptor) {
-            httpLoggingInterceptor.setLevel(level.getLevel());
-        } else {
-            log.error("Unknown logging interceptor used, unable to set logging level.");
-        }
+        loggingInterceptor.setLevel(level);
 
         return this;
     }
 
     public RetrofitApiBuilder<T> suppressedHeaders(List<String> headers) {
-        if (loggingInterceptor instanceof HttpLoggingInterceptor httpLoggingInterceptor) {
-            headers.forEach(httpLoggingInterceptor::redactHeader);
-        } else {
-            log.error("Unknown logging interceptor used, unable to set logging level.");
-        }
+        headers.forEach(loggingInterceptor::redactHeader);
 
         return this;
     }

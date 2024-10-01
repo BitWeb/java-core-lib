@@ -2,9 +2,9 @@ package ee.bitweb.core.retrofit.builder;
 
 import ee.bitweb.core.retrofit.RetrofitProperties;
 import ee.bitweb.core.retrofit.interceptor.InterceptorBean;
+import ee.bitweb.core.retrofit.logging.LoggingInterceptor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Interceptor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import retrofit2.Converter;
@@ -26,7 +26,7 @@ public class SpringAwareRetrofitBuilder {
         return configure(RetrofitApiBuilder.create(baseUrl, definition));
     }
 
-    public <T> RetrofitApiBuilder<T> create(String baseUrl, Class<T> definition, Interceptor loggingInterceptor) {
+    public <T> RetrofitApiBuilder<T> create(String baseUrl, Class<T> definition, LoggingInterceptor loggingInterceptor) {
         return configure(RetrofitApiBuilder.create(baseUrl, definition, loggingInterceptor));
     }
 
