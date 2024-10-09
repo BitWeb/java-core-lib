@@ -3,10 +3,12 @@ package ee.bitweb.core.retrofit.builder;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import ee.bitweb.core.retrofit.logging.LoggingInterceptor;
+import ee.bitweb.core.retrofit.logging.LoggingLevel;
+import ee.bitweb.core.retrofit.logging.RetrofitLoggingInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
@@ -33,21 +35,29 @@ public class RetrofitApiBuilder<T> {
 
     private final String url;
     private final Class<T> definition;
-    private final HttpLoggingInterceptor loggingInterceptor;
+    private final LoggingInterceptor loggingInterceptor;
 
     private Converter.Factory converterFactory;
     private OkHttpClient.Builder clientBuilder;
 
-    public static <T> RetrofitApiBuilder<T>  create(String baseUrl, Class<T> definition) {
+    public static <T> RetrofitApiBuilder<T> create(String baseUrl, Class<T> definition) {
         return new RetrofitApiBuilder<>(
                 baseUrl,
                 definition,
-                new HttpLoggingInterceptor()
-                        .setLevel(DEFAULT_LOGGING_LEVEL.getLevel())
+                new RetrofitLoggingInterceptor()
+                        .setLevel(DEFAULT_LOGGING_LEVEL)
         );
     }
 
-    private RetrofitApiBuilder(String url, Class<T> definition, HttpLoggingInterceptor loggingInterceptor) {
+    public static <T> RetrofitApiBuilder<T> create(String baseUrl, Class<T> definition, LoggingInterceptor loggingInterceptor) {
+        return new RetrofitApiBuilder<>(
+                baseUrl,
+                definition,
+                loggingInterceptor
+        );
+    }
+
+    private RetrofitApiBuilder(String url, Class<T> definition, LoggingInterceptor loggingInterceptor) {
         this.url = url;
         this.definition = definition;
         this.loggingInterceptor = loggingInterceptor;
@@ -97,7 +107,7 @@ public class RetrofitApiBuilder<T> {
     }
 
     public RetrofitApiBuilder<T> loggingLevel(LoggingLevel level) {
-        loggingInterceptor.setLevel(level.getLevel());
+        loggingInterceptor.setLevel(level);
 
         return this;
     }
@@ -166,7 +176,7 @@ public class RetrofitApiBuilder<T> {
                 .build().create(definition);
     }
 
-    private OkHttpClient.Builder createDefaultBuilder(HttpLoggingInterceptor loggingInterceptor) {
+    private OkHttpClient.Builder createDefaultBuilder(Interceptor loggingInterceptor) {
         var httpClientBuilder = new OkHttpClient.Builder();
         httpClientBuilder.interceptors().add(loggingInterceptor);
 
