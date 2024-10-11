@@ -47,7 +47,15 @@ public class RetrofitProperties {
 
         @NotNull
         private LoggingLevel level = LoggingLevel.BASIC;
+
+        @NotNull
+        private Long maxLoggableRequestBodySize = 1024 * 10L;
+
+        @NotNull
+        private Long maxLoggableResponseBodySize = 1024 * 10L;
+
         private List<@NotBlank String> suppressedHeaders = new ArrayList<>();
+        private List<@NotBlank String> redactedBodyUrls = new ArrayList<>();
     }
 
     @Getter

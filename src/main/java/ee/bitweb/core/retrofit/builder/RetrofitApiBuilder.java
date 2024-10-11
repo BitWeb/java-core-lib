@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import ee.bitweb.core.retrofit.logging.LoggingInterceptor;
 import ee.bitweb.core.retrofit.logging.LoggingLevel;
 import ee.bitweb.core.retrofit.logging.RetrofitLoggingInterceptor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -35,6 +36,8 @@ public class RetrofitApiBuilder<T> {
 
     private final String url;
     private final Class<T> definition;
+
+    @Getter
     private final LoggingInterceptor loggingInterceptor;
 
     private Converter.Factory converterFactory;
@@ -45,7 +48,7 @@ public class RetrofitApiBuilder<T> {
                 baseUrl,
                 definition,
                 new RetrofitLoggingInterceptor()
-                        .setLevel(DEFAULT_LOGGING_LEVEL)
+                        .setLoggingLevel(DEFAULT_LOGGING_LEVEL)
         );
     }
 
@@ -107,13 +110,31 @@ public class RetrofitApiBuilder<T> {
     }
 
     public RetrofitApiBuilder<T> loggingLevel(LoggingLevel level) {
-        loggingInterceptor.setLevel(level);
+        loggingInterceptor.setLoggingLevel(level);
+
+        return this;
+    }
+
+    public RetrofitApiBuilder<T> setMaxLoggableRequestBodySize(int size) {
+        loggingInterceptor.setMaxLoggableRequestSize(size);
+
+        return this;
+    }
+
+    public RetrofitApiBuilder<T> setMaxLoggableResponseBodySize(int size) {
+        loggingInterceptor.setMaxLoggableResponseSize(size);
 
         return this;
     }
 
     public RetrofitApiBuilder<T> suppressedHeaders(List<String> headers) {
         headers.forEach(loggingInterceptor::redactHeader);
+
+        return this;
+    }
+
+    public RetrofitApiBuilder<T> bodyRedactedUrls(List<String> urls) {
+        urls.forEach(loggingInterceptor::addRedactBodyURL);
 
         return this;
     }
@@ -176,7 +197,7 @@ public class RetrofitApiBuilder<T> {
                 .build().create(definition);
     }
 
-    private OkHttpClient.Builder createDefaultBuilder(Interceptor loggingInterceptor) {
+    private OkHttpClient.Builder createDefaultBuilder(LoggingInterceptor loggingInterceptor) {
         var httpClientBuilder = new OkHttpClient.Builder();
         httpClientBuilder.interceptors().add(loggingInterceptor);
 

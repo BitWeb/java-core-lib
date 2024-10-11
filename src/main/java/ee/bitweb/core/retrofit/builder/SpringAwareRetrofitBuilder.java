@@ -33,6 +33,9 @@ public class SpringAwareRetrofitBuilder {
     private <T> RetrofitApiBuilder<T> configure(RetrofitApiBuilder<T> api) {
         return api.addAll(new ArrayList<>(defaultInterceptors))
                 .loggingLevel(properties.getLogging().getLevel())
+                .setMaxLoggableRequestBodySize(properties.getLogging().getMaxLoggableRequestBodySize().intValue())
+                .setMaxLoggableResponseBodySize(properties.getLogging().getMaxLoggableResponseBodySize().intValue())
+                .bodyRedactedUrls(properties.getLogging().getRedactedBodyUrls())
                 .suppressedHeaders(properties.getLogging().getSuppressedHeaders())
                 .callTimeout(properties.getTimeout().getCall())
                 .connectTimeout(properties.getTimeout().getConnect())

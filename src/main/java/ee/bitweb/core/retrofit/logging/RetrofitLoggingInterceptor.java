@@ -5,11 +5,13 @@ import okhttp3.*;
 import okio.Buffer;
 import okio.GzipSource;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.MDC;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
@@ -21,12 +23,56 @@ public class RetrofitLoggingInterceptor implements LoggingInterceptor {
     private static final String CONTENT_TYPE = "Content-Type";
     private static final String CONTENT_LENGTH = "Content-Length";
 
-    private LoggingLevel loggingLevel = LoggingLevel.BASIC;
+    private static final String REQUEST_METHOD_KEY = "RequestMethod";
+    private static final String REQUEST_URL_KEY = "RequestUrl";
+    private static final String REQUEST_PROTOCOL_KEY = "RequestProtocol";
+    private static final String REQUEST_DURATION_KEY = "RequestDuration";
+    private static final String REQUEST_BODY_SIZE_KEY = "RequestBodySize";
+    private static final String REQUEST_HEADERS_KEY = "RequestHeaders";
+    private static final String REQUEST_BODY_KEY = "RequestBody";
+    private static final String RESPONSE_CODE_KEY = "ResponseCode";
+    private static final String RESPONSE_MESSAGE_KEY = "ResponseMessage";
+    private static final String RESPONSE_BODY_SIZE_KEY = "ResponseBodySize";
+    private static final String RESPONSE_HEADERS_KEY = "ResponseHeaders";
+    private static final String RESPONSE_BODY_KEY = "ResponseBody";
+
+    private final List<LoggingLevel> loggingLevel = new ArrayList<>();
     private final Set<String> redactHeaders = new HashSet<>();
+    private final Set<String> redactBodyUrls = new HashSet<>();
+
+    private int maxLoggableRequestSize = Integer.MAX_VALUE;
+    private int maxLoggableResponseSize = Integer.MAX_VALUE;
 
     @Override
-    public LoggingInterceptor setLevel(LoggingLevel level) {
-        this.loggingLevel = level;
+    public LoggingInterceptor setLoggingLevel(LoggingLevel level) {
+        this.loggingLevel.clear();
+
+        List.of(LoggingLevel.BASIC, LoggingLevel.HEADERS, LoggingLevel.BODY).forEach(option -> {
+            if (level.getLevel() >= option.getLevel()) {
+                this.loggingLevel.add(option);
+            }
+        });
+
+        return this;
+    }
+
+    @Override
+    public LoggingInterceptor setMaxLoggableRequestSize(int size) {
+        this.maxLoggableRequestSize = size;
+
+        return this;
+    }
+
+    @Override
+    public LoggingInterceptor setMaxLoggableResponseSize(int size) {
+        this.maxLoggableResponseSize = size;
+
+        return this;
+    }
+
+    @Override
+    public LoggingInterceptor addRedactBodyURL(String url) {
+        this.redactBodyUrls.add(url.toLowerCase());
 
         return this;
     }
@@ -39,88 +85,78 @@ public class RetrofitLoggingInterceptor implements LoggingInterceptor {
     @NotNull
     @Override
     public Response intercept(@NotNull Chain chain) throws IOException {
-        if (loggingLevel.getLevel() == 0) {
+        if (loggingLevel.isEmpty()) {
             return chain.proceed(chain.request());
         }
 
-        var request = chain.request();
-        var connection = chain.connection();
+        Map<String, String> container = new HashMap<>();
 
-        try {
-            StringBuilder sb = new StringBuilder();
-
-            sb.append(getRequestDescription(request, connection));
-
-            if (loggingLevel.getLevel() >= 2) {
-                sb.append("\n").append(getRequestHeaders(request));
-            }
-
-            if (loggingLevel.getLevel() >= 3) {
-                sb.append("\n").append(getRequestBody(request));
-            }
-
-            log.info("{}", sb);
-        } catch (Exception e) {
-            log.error("Unable to log request.", e);
-        }
+        addRequestLogEntries(container, chain);
 
         var startNs = System.nanoTime();
 
         Response response;
         try {
-            response = chain.proceed(request);
+            response = chain.proceed(chain.request());
         } catch (Exception e) {
-            log.warn("<-- HTTP FAILED", e);
+            writeFailedLogMessage(container, e);
             throw e;
         }
 
-        var durationMs = NANOSECONDS.toMillis(System.nanoTime() - startNs);
+        container.put(REQUEST_DURATION_KEY, String.valueOf(NANOSECONDS.toMillis(System.nanoTime() - startNs)));
 
-        try {
-            StringBuilder sb = new StringBuilder();
+        addResponseLogEntries(container, response);
 
-            sb.append(getResponseDescription(response, durationMs));
-
-            if (loggingLevel.getLevel() >= 2) {
-                sb.append("\n").append(getResponseHeaders(response));
-            }
-
-            if (loggingLevel.getLevel() >= 3) {
-                sb.append("\n").append(getResponseBody(response));
-            }
-
-            log.info("{}", sb);
-        } catch (Exception e) {
-            log.error("Unable to log response", e);
-        }
+        writeLogMessage(container);
 
         return response;
     }
 
-    protected String getRequestDescription(Request request, Connection connection) {
-        return "--> %s %s%s".formatted(request.method(), request.url(), connection != null ? connection.protocol() : "");
-    }
+    protected void addRequestLogEntries(Map<String, String> container, Chain chain) {
+        var request = chain.request();
+        var connection = chain.connection();
 
-    protected String getResponseDescription(Response response, long durationMs) {
-        String bodySize;
+        try {
+            container.put(REQUEST_METHOD_KEY, request.method());
+            container.put(REQUEST_PROTOCOL_KEY, connection != null ? connection.protocol().toString() : "-");
+            container.put(REQUEST_URL_KEY, request.url().toString());
+            container.put(REQUEST_BODY_SIZE_KEY, request.body() != null ? String.valueOf(request.body().contentLength()) : "-");
 
-        if (response.body() != null && response.body().contentLength() != -1L) {
-            bodySize = "%s-byte".formatted(response.body().contentLength());
-        } else {
-            bodySize = "unknown length";
+            if (loggingLevel.contains(LoggingLevel.HEADERS)) {
+                container.put(REQUEST_HEADERS_KEY, getRequestHeadersString(request));
+            }
+
+            if (loggingLevel.contains(LoggingLevel.BODY)) {
+                container.put(REQUEST_BODY_KEY, getRequestBody(request));
+            }
+        } catch (Exception e) {
+            log.error("Unable to log request.", e);
         }
-
-        return "<-- %s%s %s %sms, body size %s".formatted(
-                response.code(),
-                response.message().isEmpty() ? "" : " " + response.message(),
-                response.request().url(),
-                durationMs,
-                bodySize
-        );
     }
 
-    protected String getRequestHeaders(Request request) throws IOException {
-        List<String> headerRows = new ArrayList<>();
+    protected void addResponseLogEntries(Map<String, String> container, Response response) {
+        try {
+            container.put(RESPONSE_CODE_KEY, String.valueOf(response.code()));
+            container.put(RESPONSE_BODY_SIZE_KEY, response.body() != null ? String.valueOf(response.body().contentLength()) : "-");
+
+            if (!response.message().isEmpty()) {
+                container.put(RESPONSE_MESSAGE_KEY, response.message());
+            }
+
+            if (loggingLevel.contains(LoggingLevel.HEADERS)) {
+                container.put(RESPONSE_HEADERS_KEY, addResponseHeaders(response));
+            }
+
+            if (loggingLevel.contains(LoggingLevel.BODY)) {
+                container.put(RESPONSE_BODY_KEY, getResponseBody(response));
+            }
+        } catch (Exception e) {
+            log.error("Unable to log response", e);
+        }
+    }
+
+    protected String getRequestHeadersString(Request request) throws IOException {
+        Map<String, String> result = new HashMap<>();
 
         var requestHeaders = request.headers();
         var requestBody = request.body();
@@ -129,26 +165,26 @@ public class RetrofitLoggingInterceptor implements LoggingInterceptor {
         String contentLength = getRequestContentLengthValue(requestHeaders, requestBody);
 
         if (contentType != null) {
-            addHeaderToRows(headerRows, CONTENT_TYPE, contentType);
+            addHeaderToResult(result, CONTENT_TYPE, contentType);
         }
 
         if (contentLength != null) {
-            addHeaderToRows(headerRows, CONTENT_LENGTH, contentLength);
+            addHeaderToResult(result, CONTENT_LENGTH, contentLength);
         }
 
         for (int i = 0; i < requestHeaders.size(); i++) {
             var name = requestHeaders.name(i);
-            if (List.of("content-type", "content-length").contains(name.toLowerCase())) {
+            if (CONTENT_TYPE.equalsIgnoreCase(name) || CONTENT_LENGTH.equalsIgnoreCase(name)) {
                 continue;
             }
-            addHeaderToRows(headerRows, name, requestHeaders.value(i));
+            addHeaderToResult(result, name, requestHeaders.value(i));
         }
 
-        return headerRowsToString(headerRows);
+        return writeHeadersMapAsString(result);
     }
 
-    protected String getResponseHeaders(Response response) {
-        List<String> headerRows = new ArrayList<>();
+    protected String addResponseHeaders(Response response) {
+        Map<String, String> result = new HashMap<>();
 
         var responseHeaders = response.headers();
         var responseBody = response.body();
@@ -157,22 +193,22 @@ public class RetrofitLoggingInterceptor implements LoggingInterceptor {
         String contentLength = getResponseContentLengthValue(responseHeaders, responseBody);
 
         if (contentType != null) {
-            addHeaderToRows(headerRows, CONTENT_TYPE, contentType);
+            addHeaderToResult(result, CONTENT_TYPE, contentType);
         }
 
         if (contentLength != null) {
-            addHeaderToRows(headerRows, CONTENT_LENGTH, contentLength);
+            addHeaderToResult(result, CONTENT_LENGTH, contentLength);
         }
 
         for (int i = 0; i < responseHeaders.size(); i++) {
             var name = responseHeaders.name(i);
-            if (List.of("content-type", "content-length").contains(name.toLowerCase())) {
+            if (CONTENT_TYPE.equalsIgnoreCase(name) || CONTENT_LENGTH.equalsIgnoreCase(name)) {
                 continue;
             }
-            addHeaderToRows(headerRows, name, responseHeaders.value(i));
+            addHeaderToResult(result, name, responseHeaders.value(i));
         }
 
-        return headerRowsToString(headerRows);
+        return writeHeadersMapAsString(result);
     }
 
     protected String getRequestContentTypeValue(Headers headers, RequestBody body) {
@@ -231,11 +267,8 @@ public class RetrofitLoggingInterceptor implements LoggingInterceptor {
         return null;
     }
 
-    protected void addHeaderToRows(List<String> headerRows, String name, String value) {
-        headerRows.add("\t%s: %s".formatted(
-                name,
-                redactHeaders.contains(name.toLowerCase()) ? " " : value
-        ));
+    protected void addHeaderToResult(Map<String, String> result, String name, String value) {
+        result.put(name, redactHeaders.contains(name.toLowerCase()) ? " " : value);
     }
 
     protected String headerRowsToString(List<String> headerRows) {
@@ -252,6 +285,8 @@ public class RetrofitLoggingInterceptor implements LoggingInterceptor {
 
         if (body == null) {
             return "null";
+        } else if (isRedactBodyUrl(request.url().toString())) {
+            return "(body redacted)";
         } else if (bodyHasUnknownEncoding(request.headers())) {
             return "(encoded body omitted)";
         } else if (body.isDuplex()) {
@@ -267,7 +302,16 @@ public class RetrofitLoggingInterceptor implements LoggingInterceptor {
 
             if (isProbablyUtf8(buffer)) {
                 assert charSet != null;
-                return buffer.readString(charSet);
+                var bodyString = buffer.readString(charSet);
+
+                if (request.body().contentLength() > maxLoggableRequestSize) {
+                    return "%s ... Content size: %s characters".formatted(
+                            bodyString.substring(0, maxLoggableRequestSize),
+                            request.body().contentLength()
+                    );
+                }
+
+                return bodyString;
             } else {
                 return ("binary body omitted");
             }
@@ -275,7 +319,9 @@ public class RetrofitLoggingInterceptor implements LoggingInterceptor {
     }
 
     protected String getResponseBody(Response response) throws IOException {
-        if (!promisesBody(response)) {
+        if (isRedactBodyUrl(response.request().url().toString())) {
+            return "(body redacted)";
+        } else if (!promisesBody(response)) {
             return "";
         } else if (bodyHasUnknownEncoding(response.headers())) {
             return "(encoded body omitted)";
@@ -304,11 +350,23 @@ public class RetrofitLoggingInterceptor implements LoggingInterceptor {
             }
 
             if (contentLength != 0L) {
-                return buffer.clone().readString(charset);
+                var bodyString = buffer.clone().readString(charset);
+                if (contentLength > maxLoggableResponseSize) {
+                    return "%s ... Content size: %s characters".formatted(
+                            bodyString.substring(0, maxLoggableResponseSize),
+                            contentLength
+                    );
+                }
+
+                return bodyString;
             } else {
                 return "";
             }
         }
+    }
+
+    protected boolean isRedactBodyUrl(String url) {
+        return redactBodyUrls.contains(url);
     }
 
     protected boolean bodyHasUnknownEncoding(Headers headers) {
@@ -346,5 +404,55 @@ public class RetrofitLoggingInterceptor implements LoggingInterceptor {
             log.trace("", e);
             return false;
         }
+    }
+
+    protected void writeFailedLogMessage(Map<String, String> container, Exception e) {
+        Map<String, String> currentContext = MDC.getCopyOfContextMap();
+
+        container.forEach(MDC::put);
+
+        log.warn(
+                "Failed to process request. Method({}), URL({})",
+                get(container, REQUEST_METHOD_KEY),
+                get(container, REQUEST_URL_KEY),
+                e
+        );
+
+        if (currentContext != null) {
+            MDC.setContextMap(currentContext);
+        }
+    }
+
+    protected void writeLogMessage(Map<String, String> container) {
+        Map<String, String> currentContext = MDC.getCopyOfContextMap();
+
+        container.forEach(MDC::put);
+
+        log.info(
+                "Method({}), URL({}) Status({}) ResponseSize({}) Duration({} ms)",
+                get(container, REQUEST_METHOD_KEY),
+                get(container, REQUEST_URL_KEY),
+                get(container, RESPONSE_CODE_KEY),
+                get(container, RESPONSE_BODY_SIZE_KEY),
+                get(container, REQUEST_DURATION_KEY)
+        );
+
+        if (currentContext != null) {
+            MDC.setContextMap(currentContext);
+        }
+    }
+
+    protected String get(Map<String, String> container, String key) {
+        if (container.containsKey(key)) {
+            return container.get(key);
+        }
+
+        return "-";
+    }
+
+    protected String writeHeadersMapAsString(Map<String, String> headersMap) {
+        return headersMap.entrySet().stream()
+                .map(entry -> "%s: %s".formatted(entry.getKey(), entry.getValue()))
+                .collect(Collectors.joining("; "));
     }
 }
