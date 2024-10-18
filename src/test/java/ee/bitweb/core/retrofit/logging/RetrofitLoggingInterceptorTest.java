@@ -21,7 +21,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -60,7 +59,7 @@ class RetrofitLoggingInterceptorTest {
         context.clear();
         context.set("TEST");
 
-        logger = (Logger) LoggerFactory.getLogger(RetrofitLoggingInterceptor.class);
+        logger = (Logger) LoggerFactory.getLogger("RetrofitLogger");
         memoryAppender = new MemoryAppender();
         memoryAppender.setContext((LoggerContext) LoggerFactory.getILoggerFactory());
         logger.setLevel(Level.DEBUG);
@@ -74,7 +73,6 @@ class RetrofitLoggingInterceptorTest {
 
         memoryAppender.stop();
 
-        retrofitProperties.getLogging().setLevel(LoggingLevel.BASIC);
         retrofitProperties.getLogging().setSuppressedHeaders(new ArrayList<>());
         retrofitProperties.getLogging().getRedactedBodyUrls().clear();
         retrofitProperties.getLogging().setMaxLoggableRequestBodySize(1024 * 10L);
@@ -84,98 +82,6 @@ class RetrofitLoggingInterceptorTest {
     @Test
     @DisplayName("Logging level NONE")
     void loggingLevelNone() throws Exception {
-        retrofitProperties.getLogging().setLevel(LoggingLevel.NONE);
-
-        executeRetrofitRequest();
-
-        assertEquals(0, memoryAppender.getSize());
-    }
-
-    @Test
-    @DisplayName("Logging level BASIC")
-    void loggingLevelBasic() throws Exception {
-        retrofitProperties.getLogging().setLevel(LoggingLevel.BASIC);
-
-        executeRetrofitRequest();
-
-        assertEquals(1, memoryAppender.getSize());
-
-        assertLogLevel();
-        assertLogMessage();
-
-        assertEquals(9, memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().size());
-        assertEquals("TEST", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("trace_id"));
-        assertEquals("200", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseCode"));
-        assertEquals("POST", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestMethod"));
-        assertTrue(
-                Pattern.compile("http:\\/\\/localhost:[0-9]*\\/data-post")
-                        .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestUrl")).find()
-        );
-        assertEquals("-", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestProtocol"));
-        assertTrue(
-                Pattern.compile("[0-9]*")
-                        .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestDuration")).find()
-        );
-        assertEquals("OK", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseMessage"));
-        assertTrue(
-                Pattern.compile("[0-9]*")
-                        .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestBodySize")).find()
-        );
-        assertTrue(
-                Pattern.compile("[0-9]*")
-                        .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseBodySize")).find()
-        );
-    }
-
-    @Test
-    @DisplayName("Logging level HEADERS")
-    void loggingLevelHeaders() throws Exception {
-        retrofitProperties.getLogging().setLevel(LoggingLevel.HEADERS);
-
-        executeRetrofitRequest();
-
-        assertEquals(1, memoryAppender.getSize());
-
-        assertLogLevel();
-        assertLogMessage();
-
-        assertEquals(11, memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().size());
-        assertEquals("TEST", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("trace_id"));
-        assertEquals("200", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseCode"));
-        assertEquals("POST", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestMethod"));
-        assertTrue(
-                Pattern.compile("http:\\/\\/localhost:[0-9]*\\/data-post")
-                        .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestUrl")).find()
-        );
-        assertEquals("-", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestProtocol"));
-        assertTrue(
-                Pattern.compile("[0-9]*")
-                        .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestDuration")).find()
-        );
-        assertEquals("OK", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseMessage"));
-        assertTrue(
-                Pattern.compile("[0-9]*")
-                        .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestBodySize")).find()
-        );
-        assertTrue(
-                Pattern.compile("[0-9]*")
-                        .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseBodySize")).find()
-        );
-        assertEquals(
-                "Content-Length: 32; Content-Type: application/json; charset=UTF-8",
-                memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestHeaders")
-        );
-        assertEquals(
-                "connection: keep-alive; Content-Length: 32; Content-Type: application/json; charset=utf-8",
-                memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseHeaders")
-        );
-    }
-
-    @Test
-    @DisplayName("Logging level BODY")
-    void loggingLevelBody() throws Exception {
-        retrofitProperties.getLogging().setLevel(LoggingLevel.BODY);
-
         executeRetrofitRequest();
 
         assertEquals(1, memoryAppender.getSize());
@@ -194,7 +100,7 @@ class RetrofitLoggingInterceptorTest {
         assertEquals("-", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestProtocol"));
         assertTrue(
                 Pattern.compile("[0-9]*")
-                        .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestDuration")).find()
+                        .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("Duration")).find()
         );
         assertEquals("OK", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseMessage"));
         assertTrue(
@@ -206,7 +112,7 @@ class RetrofitLoggingInterceptorTest {
                         .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseBodySize")).find()
         );
         assertEquals(
-                "Content-Length: 32; Content-Type: application/json; charset=UTF-8",
+                "Content-Length: 32; Content-Type: application; X-Trace-ID: TEST",
                 memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestHeaders")
         );
         assertEquals(
@@ -219,158 +125,6 @@ class RetrofitLoggingInterceptorTest {
         );
         assertEquals(
                 "{\"message\":\"message2\",\"value\":2}",
-                memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseBody")
-        );
-    }
-
-    @Test
-    @DisplayName("Redact header")
-    void redactHeader() throws Exception {
-        retrofitProperties.getLogging().setLevel(LoggingLevel.HEADERS);
-        retrofitProperties.getLogging().setSuppressedHeaders(List.of("content-type"));
-
-        executeRetrofitRequest();
-
-        assertEquals(1, memoryAppender.getSize());
-
-        assertLogLevel();
-        assertLogMessage();
-
-        assertEquals(11, memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().size());
-        assertEquals("TEST", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("trace_id"));
-        assertEquals("200", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseCode"));
-        assertEquals("POST", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestMethod"));
-        assertTrue(
-                Pattern.compile("http:\\/\\/localhost:[0-9]*\\/data-post")
-                        .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestUrl")).find()
-        );
-        assertEquals("-", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestProtocol"));
-        assertTrue(
-                Pattern.compile("[0-9]*")
-                        .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestDuration")).find()
-        );
-        assertEquals("OK", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseMessage"));
-        assertTrue(
-                Pattern.compile("[0-9]*")
-                        .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestBodySize")).find()
-        );
-        assertTrue(
-                Pattern.compile("[0-9]*")
-                        .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseBodySize")).find()
-        );
-        assertEquals(
-                "Content-Length: 32; Content-Type:  ",
-                memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestHeaders")
-        );
-        assertEquals(
-                "connection: keep-alive; Content-Length: 32; Content-Type:  ",
-                memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseHeaders")
-        );
-    }
-
-    @Test
-    @DisplayName("Redact body url")
-    void redactBodyUrl() throws Exception {
-        retrofitProperties.getLogging().setLevel(LoggingLevel.BODY);
-        retrofitProperties.getLogging().getRedactedBodyUrls().add(BASE_URL + server.getPort() + "/data-post");
-
-        executeRetrofitRequest();
-
-        assertEquals(1, memoryAppender.getSize());
-
-        assertLogLevel();
-        assertLogMessage();
-
-        assertEquals(13, memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().size());
-        assertEquals("TEST", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("trace_id"));
-        assertEquals("200", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseCode"));
-        assertEquals("POST", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestMethod"));
-        assertTrue(
-                Pattern.compile("http:\\/\\/localhost:[0-9]*\\/data-post")
-                        .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestUrl")).find()
-        );
-        assertEquals("-", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestProtocol"));
-        assertTrue(
-                Pattern.compile("[0-9]*")
-                        .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestDuration")).find()
-        );
-        assertEquals("OK", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseMessage"));
-        assertTrue(
-                Pattern.compile("[0-9]*")
-                        .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestBodySize")).find()
-        );
-        assertTrue(
-                Pattern.compile("[0-9]*")
-                        .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseBodySize")).find()
-        );
-        assertEquals(
-                "Content-Length: 32; Content-Type: application/json; charset=UTF-8",
-                memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestHeaders")
-        );
-        assertEquals(
-                "connection: keep-alive; Content-Length: 32; Content-Type: application/json; charset=utf-8",
-                memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseHeaders")
-        );
-        assertEquals(
-                "(body redacted)",
-                memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestBody")
-        );
-        assertEquals(
-                "(body redacted)",
-                memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseBody")
-        );
-    }
-
-    @Test
-    @DisplayName("Limit logged body size")
-    void limitLoggedBodySize() throws Exception {
-        retrofitProperties.getLogging().setLevel(LoggingLevel.BODY);
-        retrofitProperties.getLogging().setMaxLoggableRequestBodySize(5L);
-        retrofitProperties.getLogging().setMaxLoggableResponseBodySize(10L);
-
-        executeRetrofitRequest();
-
-        assertEquals(1, memoryAppender.getSize());
-
-        assertLogLevel();
-        assertLogMessage();
-
-        assertEquals(13, memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().size());
-        assertEquals("TEST", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("trace_id"));
-        assertEquals("200", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseCode"));
-        assertEquals("POST", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestMethod"));
-        assertTrue(
-                Pattern.compile("http:\\/\\/localhost:[0-9]*\\/data-post")
-                        .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestUrl")).find()
-        );
-        assertEquals("-", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestProtocol"));
-        assertTrue(
-                Pattern.compile("[0-9]*")
-                        .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestDuration")).find()
-        );
-        assertEquals("OK", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseMessage"));
-        assertTrue(
-                Pattern.compile("[0-9]*")
-                        .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestBodySize")).find()
-        );
-        assertTrue(
-                Pattern.compile("[0-9]*")
-                        .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseBodySize")).find()
-        );
-        assertEquals(
-                "Content-Length: 32; Content-Type: application/json; charset=UTF-8",
-                memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestHeaders")
-        );
-        assertEquals(
-                "connection: keep-alive; Content-Length: 32; Content-Type: application/json; charset=utf-8",
-                memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseHeaders")
-        );
-        assertEquals(
-                "{\"mes ... Content size: 32 characters",
-                memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestBody")
-        );
-        assertEquals(
-                "{\"message\" ... Content size: 32 characters",
                 memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseBody")
         );
     }

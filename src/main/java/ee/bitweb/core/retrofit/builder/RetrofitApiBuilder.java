@@ -3,10 +3,8 @@ package ee.bitweb.core.retrofit.builder;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import ee.bitweb.core.retrofit.logging.LoggingInterceptor;
-import ee.bitweb.core.retrofit.logging.LoggingLevel;
+import ee.bitweb.core.exception.CoreException;
 import ee.bitweb.core.retrofit.logging.RetrofitLoggingInterceptor;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -23,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 public class RetrofitApiBuilder<T> {
 
     public static final ObjectMapper DEFAULT_OBJECT_MAPPER = new ObjectMapper();
-    public static final LoggingLevel DEFAULT_LOGGING_LEVEL = LoggingLevel.BASIC;
 
     static {
         DEFAULT_OBJECT_MAPPER.registerModule(new JavaTimeModule())
@@ -37,22 +34,10 @@ public class RetrofitApiBuilder<T> {
     private final String url;
     private final Class<T> definition;
 
-    @Getter
-    private final LoggingInterceptor loggingInterceptor;
-
     private Converter.Factory converterFactory;
     private OkHttpClient.Builder clientBuilder;
 
-    public static <T> RetrofitApiBuilder<T> create(String baseUrl, Class<T> definition) {
-        return new RetrofitApiBuilder<>(
-                baseUrl,
-                definition,
-                new RetrofitLoggingInterceptor()
-                        .setLoggingLevel(DEFAULT_LOGGING_LEVEL)
-        );
-    }
-
-    public static <T> RetrofitApiBuilder<T> create(String baseUrl, Class<T> definition, LoggingInterceptor loggingInterceptor) {
+    public static <T> RetrofitApiBuilder<T> create(String baseUrl, Class<T> definition, RetrofitLoggingInterceptor loggingInterceptor) {
         return new RetrofitApiBuilder<>(
                 baseUrl,
                 definition,
@@ -60,10 +45,9 @@ public class RetrofitApiBuilder<T> {
         );
     }
 
-    private RetrofitApiBuilder(String url, Class<T> definition, LoggingInterceptor loggingInterceptor) {
+    private RetrofitApiBuilder(String url, Class<T> definition, RetrofitLoggingInterceptor loggingInterceptor) {
         this.url = url;
         this.definition = definition;
-        this.loggingInterceptor = loggingInterceptor;
 
         clientBuilder = createDefaultBuilder(loggingInterceptor);
     }
@@ -105,36 +89,6 @@ public class RetrofitApiBuilder<T> {
     public RetrofitApiBuilder<T> replaceAllOfType(Interceptor interceptor) {
         removeAll(interceptor.getClass());
         add(interceptor);
-
-        return this;
-    }
-
-    public RetrofitApiBuilder<T> loggingLevel(LoggingLevel level) {
-        loggingInterceptor.setLoggingLevel(level);
-
-        return this;
-    }
-
-    public RetrofitApiBuilder<T> setMaxLoggableRequestBodySize(int size) {
-        loggingInterceptor.setMaxLoggableRequestSize(size);
-
-        return this;
-    }
-
-    public RetrofitApiBuilder<T> setMaxLoggableResponseBodySize(int size) {
-        loggingInterceptor.setMaxLoggableResponseSize(size);
-
-        return this;
-    }
-
-    public RetrofitApiBuilder<T> suppressedHeaders(List<String> headers) {
-        headers.forEach(loggingInterceptor::redactHeader);
-
-        return this;
-    }
-
-    public RetrofitApiBuilder<T> bodyRedactedUrls(List<String> urls) {
-        urls.forEach(loggingInterceptor::addRedactBodyURL);
 
         return this;
     }
@@ -189,6 +143,20 @@ public class RetrofitApiBuilder<T> {
                 url, definition.getName(), clientBuilder.interceptors(), factory
         );
 
+        if (clientBuilder.interceptors().stream().filter(RetrofitLoggingInterceptor.class::isInstance).toList().size() > 1) {
+            throw new CoreException("Multiple logging interceptors detected at build.");
+        }
+
+        clientBuilder.interceptors().sort((i1, i2) -> {
+            if (i1 instanceof RetrofitLoggingInterceptor) {
+                return -1;
+            } else if (i2 instanceof RetrofitLoggingInterceptor) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+
         return new Retrofit
                 .Builder()
                 .baseUrl(url)
@@ -197,9 +165,12 @@ public class RetrofitApiBuilder<T> {
                 .build().create(definition);
     }
 
-    private OkHttpClient.Builder createDefaultBuilder(LoggingInterceptor loggingInterceptor) {
+    private OkHttpClient.Builder createDefaultBuilder(RetrofitLoggingInterceptor loggingInterceptor) {
         var httpClientBuilder = new OkHttpClient.Builder();
-        httpClientBuilder.interceptors().add(loggingInterceptor);
+
+        if (loggingInterceptor != null) {
+            httpClientBuilder.interceptors().add(loggingInterceptor);
+        }
 
         return httpClientBuilder;
     }

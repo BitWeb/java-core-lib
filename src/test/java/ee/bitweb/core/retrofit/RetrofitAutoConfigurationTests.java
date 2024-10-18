@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import retrofit2.Converter;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
@@ -27,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
                 "ee.bitweb.core.retrofit.auth-token-injector.whitelist-urls[0]=^http?:\\\\/\\\\/localhost:\\\\d{3,5}\\\\/.*"
         }
 )
+@ActiveProfiles("retrofit")
 class RetrofitAutoConfigurationTests {
 
     @Autowired
