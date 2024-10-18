@@ -5,7 +5,10 @@ import ee.bitweb.core.retrofit.helpers.ExternalServiceApi;
 import ee.bitweb.http.server.mock.MockServer;
 import io.netty.handler.codec.http.HttpMethod;
 import org.json.JSONObject;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -24,7 +27,7 @@ class RetrofitExecutorTests {
 
     @BeforeAll
     public static void beforeAll() {
-        api = RetrofitApiBuilder.create(BASE_URL + server.getPort(), ExternalServiceApi.class).build();
+        api = RetrofitApiBuilder.create(BASE_URL + server.getPort(), ExternalServiceApi.class, null).build();
     }
 
     @Test
@@ -135,7 +138,8 @@ class RetrofitExecutorTests {
     void onConnectionExceptionShouldThrowRetrofitException() {
         ExternalServiceApi api = RetrofitApiBuilder.create(
                 "http://some-random-url",
-                ExternalServiceApi.class
+                ExternalServiceApi.class,
+                null
         ).build();
 
         RetrofitException exception = Assertions.assertThrows(

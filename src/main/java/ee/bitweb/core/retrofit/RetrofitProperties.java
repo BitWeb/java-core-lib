@@ -1,25 +1,24 @@
 package ee.bitweb.core.retrofit;
 
-import ee.bitweb.core.retrofit.builder.LoggingLevel;
+import ee.bitweb.core.retrofit.logging.mappers.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.HttpHeaders;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static ee.bitweb.core.retrofit.RetrofitProperties.PREFIX;
 
-@Component
 @Setter
 @Getter
 @Validated
@@ -46,8 +45,30 @@ public class RetrofitProperties {
     public static class Logging {
 
         @NotNull
-        private LoggingLevel level = LoggingLevel.BASIC;
+        private Long maxLoggableRequestBodySize = 1024 * 10L;
+
+        @NotNull
+        private Long maxLoggableResponseBodySize = 1024 * 10L;
+
         private List<@NotBlank String> suppressedHeaders = new ArrayList<>();
+        private List<@NotBlank String> redactedBodyUrls = new ArrayList<>();
+
+        @NotNull
+        private List<@NotBlank String> mappers = new ArrayList<>(
+                Arrays.asList(
+                        RetrofitRequestMethodMapper.KEY,
+                        RetrofitRequestProtocolMapper.KEY,
+                        RetrofitRequestUrlMapper.KEY,
+                        RetrofitRequestHeadersMapper.KEY,
+                        RetrofitRequestBodySizeMapper.KEY,
+                        RetrofitRequestBodyMapper.KEY,
+                        RetrofitResponseStatusCodeMapper.KEY,
+                        RetrofitResponseMessageMapper.KEY,
+                        RetrofitResponseHeadersMapper.KEY,
+                        RetrofitResponseBodySizeMapper.KEY,
+                        RetrofitResponseBodyMapper.KEY
+                )
+        );
     }
 
     @Getter

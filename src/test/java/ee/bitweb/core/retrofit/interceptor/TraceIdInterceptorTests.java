@@ -7,7 +7,9 @@ import ee.bitweb.core.trace.invoker.http.TraceIdFilterConfig;
 import ee.bitweb.http.server.mock.MockServer;
 import io.netty.handler.codec.http.HttpMethod;
 import org.json.JSONObject;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
@@ -60,8 +62,9 @@ class TraceIdInterceptorTests {
 
     private ExternalServiceApi createApi() {
         return RetrofitApiBuilder.create(
-                BASE_URL  + server.getPort(),
-                ExternalServiceApi.class
+                BASE_URL + server.getPort(),
+                ExternalServiceApi.class,
+                null
         ).add(
                 new TraceIdInterceptor(config, context)
         ).build();

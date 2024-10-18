@@ -8,7 +8,9 @@ import ee.bitweb.http.server.mock.MockServer;
 import io.netty.handler.codec.http.HttpMethod;
 import okhttp3.OkHttpClient;
 import org.json.JSONObject;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mockito;
@@ -32,8 +34,9 @@ class RetrofitApiBuilderTests {
     void defaultBuilderWorksAsExpected() throws Exception {
         mockServerGet("message", "1");
         ExternalServiceApi api = RetrofitApiBuilder.create(
-                BASE_URL  + server.getPort(),
-                ExternalServiceApi.class
+                BASE_URL + server.getPort(),
+                ExternalServiceApi.class,
+                null
         ).build();
 
         ExternalServiceApi.Payload response = api.get().execute().body();
@@ -49,8 +52,9 @@ class RetrofitApiBuilderTests {
         RequestCountInterceptor customInterceptor = new RequestCountInterceptor();
 
         ExternalServiceApi api = RetrofitApiBuilder.create(
-                BASE_URL  + server.getPort(),
-                ExternalServiceApi.class
+                BASE_URL + server.getPort(),
+                ExternalServiceApi.class,
+                null
         ).add(
                 customInterceptor
         ).build();
@@ -70,8 +74,9 @@ class RetrofitApiBuilderTests {
         RequestCountInterceptor customInterceptor2 = new RequestCountInterceptor();
 
         ExternalServiceApi api = RetrofitApiBuilder.create(
-                BASE_URL  + server.getPort(),
-                ExternalServiceApi.class
+                BASE_URL + server.getPort(),
+                ExternalServiceApi.class,
+                null
         ).addAll(
                 List.of(
                         customInterceptor1,
@@ -96,8 +101,9 @@ class RetrofitApiBuilderTests {
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder().addInterceptor(interceptor);
 
         ExternalServiceApi api = RetrofitApiBuilder.create(
-                BASE_URL  + server.getPort(),
-                ExternalServiceApi.class
+                BASE_URL + server.getPort(),
+                ExternalServiceApi.class,
+                null
         ).clientBuilder(
                 clientBuilder
         ).build();
@@ -118,8 +124,9 @@ class RetrofitApiBuilderTests {
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder().addInterceptor(interceptor);
 
         ExternalServiceApi api = RetrofitApiBuilder.create(
-                BASE_URL  + server.getPort(),
-                ExternalServiceApi.class
+                BASE_URL + server.getPort(),
+                ExternalServiceApi.class,
+                null
         ).clientBuilder(
                 clientBuilder
         ).emptyInterceptors().build();
@@ -140,8 +147,9 @@ class RetrofitApiBuilderTests {
         RequestCountInterceptor customInterceptor2 = new RequestCountInterceptor();
 
         ExternalServiceApi api = RetrofitApiBuilder.create(
-                BASE_URL  + server.getPort(),
-                ExternalServiceApi.class
+                BASE_URL + server.getPort(),
+                ExternalServiceApi.class,
+                null
         ).addAll(
                 List.of(
                         customInterceptor1,
@@ -170,7 +178,7 @@ class RetrofitApiBuilderTests {
         }).when(clientBuilder).build();
 
         ExternalServiceApi api = RetrofitApiBuilder
-                .create(BASE_URL  + server.getPort(), ExternalServiceApi.class)
+                .create(BASE_URL + server.getPort(), ExternalServiceApi.class, null)
                 .clientBuilder(clientBuilder)
                 .callTimeout(999)
                 .build();
@@ -190,7 +198,7 @@ class RetrofitApiBuilderTests {
         }).when(clientBuilder).build();
 
         ExternalServiceApi api = RetrofitApiBuilder
-                .create(BASE_URL + server.getPort(), ExternalServiceApi.class)
+                .create(BASE_URL + server.getPort(), ExternalServiceApi.class, null)
                 .clientBuilder(clientBuilder)
                 .connectTimeout(999)
                 .build();
@@ -210,7 +218,7 @@ class RetrofitApiBuilderTests {
         }).when(clientBuilder).build();
 
         ExternalServiceApi api = RetrofitApiBuilder
-                .create(BASE_URL  + server.getPort(), ExternalServiceApi.class)
+                .create(BASE_URL + server.getPort(), ExternalServiceApi.class, null)
                 .clientBuilder(clientBuilder)
                 .readTimeout(999)
                 .build();
@@ -230,7 +238,7 @@ class RetrofitApiBuilderTests {
         }).when(clientBuilder).build();
 
         ExternalServiceApi api = RetrofitApiBuilder
-                .create(BASE_URL  + server.getPort(), ExternalServiceApi.class)
+                .create(BASE_URL + server.getPort(), ExternalServiceApi.class, null)
                 .clientBuilder(clientBuilder)
                 .writeTimeout(999)
                 .build();
@@ -247,8 +255,9 @@ class RetrofitApiBuilderTests {
         Converter.Factory converter = JacksonConverterFactory.create(mapper);
 
         ExternalServiceApi api = RetrofitApiBuilder.create(
-                BASE_URL  + server.getPort(),
-                ExternalServiceApi.class
+                BASE_URL + server.getPort(),
+                ExternalServiceApi.class,
+                null
         ).converter(
                 converter
         ).build();

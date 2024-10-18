@@ -34,8 +34,6 @@ class SpringAwareRetrofitBuilderTests {
     @RegisterExtension
     private static final MockServer server = new MockServer(HttpMethod.GET, "/request");
 
-
-
     @Autowired
     private SpringAwareRetrofitBuilder builder;
 

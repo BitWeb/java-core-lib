@@ -7,7 +7,9 @@ import ee.bitweb.core.retrofit.interceptor.auth.criteria.WhitelistCriteria;
 import ee.bitweb.http.server.mock.MockServer;
 import io.netty.handler.codec.http.HttpMethod;
 import org.json.JSONObject;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.Mock;
@@ -167,7 +169,8 @@ class AuthTokenInjectInterceptorTests {
     private RetrofitApiBuilder<ExternalServiceApi> createBuilder() {
         return RetrofitApiBuilder.create(
                 BASE_URL + server.getPort(),
-                ExternalServiceApi.class
+                ExternalServiceApi.class,
+                null
         );
     }
 

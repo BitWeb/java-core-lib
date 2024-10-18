@@ -3,10 +3,10 @@ package ee.bitweb.core.retrofit.helpers;
 import ee.bitweb.core.retrofit.interceptor.auth.TokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
-@ActiveProfiles("retrofit")
+@Profile("retrofit")
 public class RetrofitConfiguration {
 
     @Bean("interceptor1")
