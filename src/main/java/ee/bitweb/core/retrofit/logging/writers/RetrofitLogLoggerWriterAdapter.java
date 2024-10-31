@@ -21,10 +21,12 @@ public class RetrofitLogLoggerWriterAdapter implements RetrofitLogWriteAdapter {
     public void write(Map<String, String> container) {
         Map<String, String> currentContext = MDC.getCopyOfContextMap();
 
-        log(container);
-
-        if (currentContext != null) {
-            MDC.setContextMap(currentContext);
+        try {
+            log(container);
+        } finally {
+            if (currentContext != null) {
+                MDC.setContextMap(currentContext);
+            }
         }
     }
 
