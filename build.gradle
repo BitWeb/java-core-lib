@@ -38,7 +38,7 @@ repositories {
 
 dependencies {
     // https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-catalina
-    compileOnly group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '10.1.30'
+    compileOnly group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '11.0.0'
 
     // https://mvnrepository.com/artifact/org.springframework/spring-webmvc
     compileOnly group: 'org.springframework', name: 'spring-webmvc', version: "${springVersion}"
