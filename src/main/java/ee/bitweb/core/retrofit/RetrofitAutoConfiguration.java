@@ -1,10 +1,12 @@
 package ee.bitweb.core.retrofit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ee.bitweb.core.retrofit.builder.LoggingLevel;
 import ee.bitweb.core.retrofit.interceptor.auth.AuthTokenInjectInterceptor;
 import ee.bitweb.core.retrofit.interceptor.auth.TokenProvider;
 import ee.bitweb.core.retrofit.interceptor.auth.criteria.AuthTokenCriteria;
 import ee.bitweb.core.retrofit.interceptor.auth.criteria.WhitelistCriteria;
+import ee.bitweb.core.retrofit.logging.NoopRetrofitLoggingInterceptor;
 import ee.bitweb.core.retrofit.logging.RetrofitLoggingInterceptor;
 import ee.bitweb.core.retrofit.logging.RetrofitLoggingInterceptorImplementation;
 import ee.bitweb.core.retrofit.logging.mappers.*;
@@ -76,8 +78,15 @@ public class RetrofitAutoConfiguration {
     @Bean("defaultRetrofitLoggingInterceptor")
     @Primary
     public RetrofitLoggingInterceptor defaultRetrofitLoggingInterceptor(
-            List<RetrofitLoggingMapper> mappers
+            List<RetrofitLoggingMapper> mappers,
+            RetrofitProperties properties
     ) {
+        if (properties.getLogging().getLevel() == LoggingLevel.NONE) {
+            log.info("Create Default Retrofit Logging Interceptor for logging level NONE");
+
+            return new NoopRetrofitLoggingInterceptor();
+        }
+
         log.info(
                 "Create Default Retrofit Logging Interceptor with writer {}",
                 RetrofitLogLoggerWriterAdapter.class.getSimpleName()
@@ -90,25 +99,23 @@ public class RetrofitAutoConfiguration {
         return new RetrofitLoggingInterceptorImplementation(mappers, new RetrofitLogLoggerWriterAdapter());
     }
 
+    // testida üle, kui on vajadus mapper üle kirjutada
     @Bean
+    @ConditionalOnMissingBean
     @ConditionalOnEnabledRetrofitMapper(mapper = RetrofitRequestMethodMapper.KEY)
     public RetrofitRequestMethodMapper retrofitRequestMethodMapper() {
         return new RetrofitRequestMethodMapper();
     }
 
     @Bean
-    @ConditionalOnEnabledRetrofitMapper(mapper = RetrofitRequestProtocolMapper.KEY)
-    public RetrofitRequestProtocolMapper retrofitRequestProtocolMapper() {
-        return new RetrofitRequestProtocolMapper();
-    }
-
-    @Bean
+    @ConditionalOnMissingBean
     @ConditionalOnEnabledRetrofitMapper(mapper = RetrofitRequestUrlMapper.KEY)
     public RetrofitRequestUrlMapper retrofitRequestUrlMapper() {
         return new RetrofitRequestUrlMapper();
     }
 
     @Bean
+    @ConditionalOnMissingBean
     @ConditionalOnEnabledRetrofitMapper(mapper = RetrofitRequestHeadersMapper.KEY)
     public RetrofitRequestHeadersMapper retrofitRequestHeadersMapper(
             RetrofitProperties retrofitProperties
@@ -117,12 +124,14 @@ public class RetrofitAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     @ConditionalOnEnabledRetrofitMapper(mapper = RetrofitRequestBodySizeMapper.KEY)
     public RetrofitRequestBodySizeMapper retrofitRequestBodySizeMapper() {
         return new RetrofitRequestBodySizeMapper();
     }
 
     @Bean
+    @ConditionalOnMissingBean
     @ConditionalOnEnabledRetrofitMapper(mapper = RetrofitRequestBodyMapper.KEY)
     public RetrofitRequestBodyMapper retrofitRequestBodyMapper(
             RetrofitProperties retrofitProperties
@@ -134,18 +143,14 @@ public class RetrofitAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     @ConditionalOnEnabledRetrofitMapper(mapper = RetrofitResponseStatusCodeMapper.KEY)
     public RetrofitResponseStatusCodeMapper retrofitResponseStatusCodeMapper() {
         return new RetrofitResponseStatusCodeMapper();
     }
 
     @Bean
-    @ConditionalOnEnabledRetrofitMapper(mapper = RetrofitResponseMessageMapper.KEY)
-    public RetrofitResponseMessageMapper retrofitResponseMessageMapper() {
-        return new RetrofitResponseMessageMapper();
-    }
-
-    @Bean
+    @ConditionalOnMissingBean
     @ConditionalOnEnabledRetrofitMapper(mapper = RetrofitResponseHeadersMapper.KEY)
     public RetrofitResponseHeadersMapper retrofitResponseHeadersMapper(
             RetrofitProperties retrofitProperties
@@ -154,12 +159,14 @@ public class RetrofitAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     @ConditionalOnEnabledRetrofitMapper(mapper = RetrofitResponseBodySizeMapper.KEY)
     public RetrofitResponseBodySizeMapper retrofitResponseBodySizeMapper() {
         return new RetrofitResponseBodySizeMapper();
     }
 
     @Bean
+    @ConditionalOnMissingBean
     @ConditionalOnEnabledRetrofitMapper(mapper = RetrofitResponseBodyMapper.KEY)
     public RetrofitResponseBodyMapper responseBodyMapper(
             RetrofitProperties retrofitProperties

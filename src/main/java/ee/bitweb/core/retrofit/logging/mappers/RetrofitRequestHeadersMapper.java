@@ -20,7 +20,7 @@ public class RetrofitRequestHeadersMapper implements RetrofitLoggingMapper {
     private final Set<String> redactHeaders;
 
     @Override
-    public String getValue(Connection connection, Request request, Response response) {
+    public String getValue(Request request, Response response) {
         try {
             return getRequestHeadersString(request);
         } catch (IOException e) {

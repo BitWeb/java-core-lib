@@ -29,7 +29,7 @@ class RetrofitRequestBodyMapperTest {
                 new HashMap<>()
         );
 
-        var value = mapper.getValue(null, request, null);
+        var value = mapper.getValue(request, null);
 
         Assertions.assertEquals("(body redacted)", value);
     }
@@ -50,7 +50,7 @@ class RetrofitRequestBodyMapperTest {
                 new HashMap<>()
         );
 
-        var value = mapper.getValue(null, request, null);
+        var value = mapper.getValue(request, null);
 
         Assertions.assertEquals("(encoded body omitted)", value);
     }
@@ -71,7 +71,7 @@ class RetrofitRequestBodyMapperTest {
                 new HashMap<>()
         );
 
-        var value = mapper.getValue(null, request, null);
+        var value = mapper.getValue(request, null);
 
         Assertions.assertEquals("12 ... Content size: 3 characters", value);
     }

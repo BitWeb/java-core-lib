@@ -87,10 +87,8 @@ public class RetrofitApiBuilder<T> {
     }
 
     public RetrofitApiBuilder<T> replaceAllOfType(Interceptor interceptor) {
-        removeAll(interceptor.getClass());
-        add(interceptor);
-
-        return this;
+        return removeAll(interceptor.getClass())
+                .add(interceptor);
     }
 
     public RetrofitApiBuilder<T> addAll(Collection<Interceptor> interceptors) {
@@ -138,13 +136,8 @@ public class RetrofitApiBuilder<T> {
     public T build() {
         Converter.Factory factory = converterFactory != null ? converterFactory : DEFAULT_CONVERTER_FACTORY;
 
-        log.info(
-                "Built Retrofit API for host {} with definition {}, interceptors {} and converter factory {}",
-                url, definition.getName(), clientBuilder.interceptors(), factory
-        );
-
         if (clientBuilder.interceptors().stream().filter(RetrofitLoggingInterceptor.class::isInstance).toList().size() > 1) {
-            throw new CoreException("Multiple logging interceptors detected at build.");
+            throw new CoreException("Multiple logging interceptors detected at build for definition %s".formatted(definition.getName()));
         }
 
         clientBuilder.interceptors().sort((i1, i2) -> {
@@ -156,6 +149,11 @@ public class RetrofitApiBuilder<T> {
                 return 0;
             }
         });
+
+        log.info(
+                "Built Retrofit API for host {} with definition {}, interceptors {} and converter factory {}",
+                url, definition.getName(), clientBuilder.interceptors(), factory
+        );
 
         return new Retrofit
                 .Builder()

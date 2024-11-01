@@ -2,7 +2,6 @@ package ee.bitweb.core.retrofit.logging.mappers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Connection;
 import okhttp3.Request;
 import okhttp3.Response;
 import okio.Buffer;
@@ -23,7 +22,7 @@ public class RetrofitRequestBodyMapper implements RetrofitLoggingMapper {
     private final Set<String> redactBodyUrls;
 
     @Override
-    public String getValue(Connection connection, Request request, Response response) {
+    public String getValue(Request request, Response response) {
         try {
             return getRequestBody(request);
         } catch (IOException e) {
@@ -35,6 +34,16 @@ public class RetrofitRequestBodyMapper implements RetrofitLoggingMapper {
     @Override
     public String getKey() {
         return KEY;
+    }
+
+    /**
+     * Stub method to be able to add custom sanitization of body. For example removing passwords and other sensitive data.
+     *
+     * @param body String representation of raw request body
+     * @return sanitized body
+     */
+    protected String sanitizeBody(String body) {
+        return body;
     }
 
     private String getRequestBody(Request request) throws IOException {
@@ -61,14 +70,14 @@ public class RetrofitRequestBodyMapper implements RetrofitLoggingMapper {
                 assert charSet != null;
                 var bodyString = buffer.readString(charSet);
 
-                if (request.body().contentLength() > maxLoggableRequestSize) {
+                if (request.body() != null && request.body().contentLength() > maxLoggableRequestSize) {
                     return "%s ... Content size: %s characters".formatted(
                             bodyString.substring(0, maxLoggableRequestSize),
                             request.body().contentLength()
                     );
                 }
 
-                return bodyString;
+                return sanitizeBody(bodyString);
             } else {
                 return ("binary body omitted");
             }

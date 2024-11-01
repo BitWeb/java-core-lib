@@ -36,7 +36,7 @@ class RetrofitResponseBodyMapperTest {
                 null
         );
 
-        var value = mapper.getValue(null, null, response);
+        var value = mapper.getValue(null, response);
 
         Assertions.assertEquals("(body redacted)", value);
     }
@@ -62,7 +62,7 @@ class RetrofitResponseBodyMapperTest {
                 null
         );
 
-        var value = mapper.getValue(null, null, response);
+        var value = mapper.getValue(null, response);
 
         Assertions.assertEquals("", value);
     }
@@ -88,7 +88,7 @@ class RetrofitResponseBodyMapperTest {
                 null
         );
 
-        var value = mapper.getValue(null, null, response);
+        var value = mapper.getValue(null, response);
 
         Assertions.assertEquals("(encoded body omitted)", value);
     }
@@ -114,7 +114,7 @@ class RetrofitResponseBodyMapperTest {
                 null
         );
 
-        var value = mapper.getValue(null, null, response);
+        var value = mapper.getValue(null, response);
 
         Assertions.assertEquals("(body missing)", value);
     }

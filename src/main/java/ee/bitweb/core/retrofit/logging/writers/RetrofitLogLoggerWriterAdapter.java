@@ -1,5 +1,6 @@
 package ee.bitweb.core.retrofit.logging.writers;
 
+import ee.bitweb.core.exception.CoreException;
 import ee.bitweb.core.retrofit.logging.RetrofitLoggingInterceptorImplementation;
 import ee.bitweb.core.retrofit.logging.mappers.RetrofitRequestMethodMapper;
 import ee.bitweb.core.retrofit.logging.mappers.RetrofitRequestUrlMapper;
@@ -30,20 +31,38 @@ public class RetrofitLogLoggerWriterAdapter implements RetrofitLogWriteAdapter {
         }
     }
 
-    private void log(Map<String, String> container) {
+    protected void log(Map<String, String> container) {
         container.forEach(MDC::put);
 
-        log.info(
-                "Method({}), URL({}) Status({}) ResponseSize({}) Duration({} ms)",
-                get(container, RetrofitRequestMethodMapper.KEY),
-                get(container, RetrofitRequestUrlMapper.KEY),
-                get(container, RetrofitResponseStatusCodeMapper.KEY),
-                get(container, RetrofitResponseBodySizeMapper.KEY),
-                get(container, RetrofitLoggingInterceptorImplementation.DURATION_KEY)
-        );
+        if (!log.isInfoEnabled()) {
+            logOrThrowError();
+        } else {
+            log.info(
+                    "{} {} {} {}bytes {}ms",
+                    get(container, RetrofitRequestMethodMapper.KEY),
+                    get(container, RetrofitRequestUrlMapper.KEY),
+                    get(container, RetrofitResponseStatusCodeMapper.KEY),
+                    get(container, RetrofitResponseBodySizeMapper.KEY),
+                    get(container, RetrofitLoggingInterceptorImplementation.DURATION_KEY)
+            );
+        }
     }
 
-    private String get(Map<String, String> container, String key) {
+    protected void logOrThrowError() {
+        String message = (
+                "Retrofit interceptor has been enabled, but %s cannot write as log level does not permit INFO entries. This behaviour is strongly " +
+                        "discouraged as the interceptor consumes resources for no real result. Please set property " +
+                        "ee.bitweb.core.retrofit.logging-level=NONE if you wish to avoid this logging."
+        ).formatted(RetrofitLogLoggerWriterAdapter.class.getSimpleName());
+
+        if (log.isErrorEnabled()) {
+            log.error(message);
+        } else {
+            throw new CoreException(message);
+        }
+    }
+
+    protected String get(Map<String, String> container, String key) {
         if (container.containsKey(key)) {
             return container.get(key);
         }

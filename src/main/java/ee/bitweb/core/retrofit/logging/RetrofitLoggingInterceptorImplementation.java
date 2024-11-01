@@ -35,11 +35,19 @@ public class RetrofitLoggingInterceptorImplementation implements RetrofitLogging
             Response finalResponse = response;
 
             Request request = finalResponse != null ? finalResponse.request() : chain.request();
-            mappers.forEach(mapper -> mapper.map(chain.connection(), request, finalResponse, container));
+            mappers.forEach(mapper -> mapper.map(request, finalResponse, container));
 
             writer.write(container);
         }
 
         return response;
+    }
+
+    @Override
+    public String toString() {
+        return "RetrofitLoggingInterceptorImplementation{" +
+                "mappers=" + mappers +
+                ", writer=" + writer +
+                '}';
     }
 }

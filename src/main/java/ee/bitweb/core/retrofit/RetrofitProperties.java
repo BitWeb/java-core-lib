@@ -1,6 +1,6 @@
 package ee.bitweb.core.retrofit;
 
-import ee.bitweb.core.retrofit.logging.mappers.*;
+import ee.bitweb.core.retrofit.builder.LoggingLevel;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
@@ -13,9 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static ee.bitweb.core.retrofit.RetrofitProperties.PREFIX;
 
@@ -45,6 +43,9 @@ public class RetrofitProperties {
     public static class Logging {
 
         @NotNull
+        private LoggingLevel level = LoggingLevel.BASIC;
+
+        @NotNull
         private Long maxLoggableRequestBodySize = 1024 * 10L;
 
         @NotNull
@@ -53,22 +54,18 @@ public class RetrofitProperties {
         private List<@NotBlank String> suppressedHeaders = new ArrayList<>();
         private List<@NotBlank String> redactedBodyUrls = new ArrayList<>();
 
-        @NotNull
-        private List<@NotBlank String> mappers = new ArrayList<>(
-                Arrays.asList(
-                        RetrofitRequestMethodMapper.KEY,
-                        RetrofitRequestProtocolMapper.KEY,
-                        RetrofitRequestUrlMapper.KEY,
-                        RetrofitRequestHeadersMapper.KEY,
-                        RetrofitRequestBodySizeMapper.KEY,
-                        RetrofitRequestBodyMapper.KEY,
-                        RetrofitResponseStatusCodeMapper.KEY,
-                        RetrofitResponseMessageMapper.KEY,
-                        RetrofitResponseHeadersMapper.KEY,
-                        RetrofitResponseBodySizeMapper.KEY,
-                        RetrofitResponseBodyMapper.KEY
-                )
-        );
+        private List<@NotBlank String> mappers = new ArrayList<>();
+
+        public List<@NotBlank String> getMappers() {
+            if (level == LoggingLevel.CUSTOM) {
+                return mappers;
+            } else {
+                Set<String> enabledMappers = new HashSet<>(level.getMappers());
+                enabledMappers.addAll(mappers);
+
+                return enabledMappers.stream().toList();
+            }
+        }
     }
 
     @Getter

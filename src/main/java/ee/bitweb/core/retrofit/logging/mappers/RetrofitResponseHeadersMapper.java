@@ -18,7 +18,7 @@ public class RetrofitResponseHeadersMapper implements RetrofitLoggingMapper {
     private final Set<String> redactHeaders;
 
     @Override
-    public String getValue(Connection connection, Request request, Response response) {
+    public String getValue(Request request, Response response) {
         return getResponseHeadersString(response);
     }
 
