@@ -12,7 +12,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class RetrofitRequestBodySizeMapper implements RetrofitLoggingMapper {
 
-    public static final String KEY = "RequestBodySize";
+    public static final String KEY = "request_body_size";
 
     @Override
     public String getValue(Request request, Response response) {

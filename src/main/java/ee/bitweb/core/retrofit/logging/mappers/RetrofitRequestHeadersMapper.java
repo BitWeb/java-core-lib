@@ -15,7 +15,7 @@ import static ee.bitweb.core.retrofit.logging.mappers.RetrofitHeadersMapperHelpe
 @RequiredArgsConstructor
 public class RetrofitRequestHeadersMapper implements RetrofitLoggingMapper {
 
-    public static final String KEY = "RequestHeaders";
+    public static final String KEY = "request_headers";
 
     private final Set<String> redactHeaders;
 

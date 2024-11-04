@@ -41,6 +41,8 @@ public class AuditLogLoggerWriterAdapter implements AuditLogWriteAdapter {
 
         if (currentContext != null) {
             MDC.setContextMap(currentContext);
+        } else {
+            MDC.clear();
         }
     }
 

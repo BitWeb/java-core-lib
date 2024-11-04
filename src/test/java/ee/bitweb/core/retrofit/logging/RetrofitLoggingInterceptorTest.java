@@ -95,33 +95,33 @@ class RetrofitLoggingInterceptorTest {
         assertAll(
                 () -> assertEquals(11, memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().size()),
                 () -> assertEquals("TEST", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("trace_id")),
-                () -> assertEquals("200", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseCode")),
-                () -> assertEquals("POST", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestMethod")),
+                () -> assertEquals("200", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("response_code")),
+                () -> assertEquals("POST", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("request_method")),
                 () -> assertTrue(
                         Pattern.compile("http:\\/\\/localhost:[0-9]*\\/data-post")
-                                .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestUrl")).find()
+                                .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("request_url")).find()
                 ),
                 () -> assertTrue(
                         Pattern.compile("[0-9]*")
-                                .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("Duration")).find()
+                                .matcher(memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("duration")).find()
                 ),
-                () -> assertEquals("34", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestBodySize")),
-                () -> assertEquals("32", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseBodySize")),
+                () -> assertEquals("34", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("request_body_size")),
+                () -> assertEquals("32", memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("response_body_size")),
                 () -> assertEquals(
                         "Content-Length: 34; Content-Type: application; X-Trace-ID: TEST",
-                        memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestHeaders")
+                        memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("request_headers")
                 ),
                 () -> assertEquals(
                         "connection: keep-alive; Content-Length: 32; Content-Type: application/json; charset=utf-8",
-                        memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseHeaders")
+                        memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("response_headers")
                 ),
                 () -> assertEquals(
                         "{\"message\":\"message123\",\"value\":1}",
-                        memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("RequestBody")
+                        memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("request_body")
                 ),
                 () -> assertEquals(
                         "{\"message\":\"message2\",\"value\":2}",
-                        memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("ResponseBody")
+                        memoryAppender.getLoggedEvents().get(0).getMDCPropertyMap().get("response_body")
                 )
         );
     }

@@ -15,7 +15,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class RetrofitLoggingInterceptorImplementation implements RetrofitLoggingInterceptor {
 
-    public static final String DURATION_KEY = "Duration";
+    public static final String DURATION_KEY = "duration";
 
     private final List<RetrofitLoggingMapper> mappers;
     private final RetrofitLogWriteAdapter writer;

@@ -13,7 +13,7 @@ import static ee.bitweb.core.retrofit.logging.mappers.RetrofitHeadersMapperHelpe
 @RequiredArgsConstructor
 public class RetrofitResponseHeadersMapper implements RetrofitLoggingMapper {
 
-    public static final String KEY = "ResponseHeaders";
+    public static final String KEY = "response_headers";
 
     private final Set<String> redactHeaders;
 

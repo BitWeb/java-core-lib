@@ -16,7 +16,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @RequiredArgsConstructor
 public class RetrofitRequestBodyMapper implements RetrofitLoggingMapper {
 
-    public static final String KEY = "RequestBody";
+    public static final String KEY = "request_body";
 
     private final int maxLoggableRequestSize;
     private final Set<String> redactBodyUrls;

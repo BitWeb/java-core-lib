@@ -17,7 +17,7 @@ import static okhttp3.internal.http.HttpHeaders.promisesBody;
 @RequiredArgsConstructor
 public class RetrofitResponseBodyMapper implements RetrofitLoggingMapper {
 
-    public static final String KEY = "ResponseBody";
+    public static final String KEY = "response_body";
 
     private final Set<String> redactBodyUrls;
     private final int maxLoggableResponseSize;

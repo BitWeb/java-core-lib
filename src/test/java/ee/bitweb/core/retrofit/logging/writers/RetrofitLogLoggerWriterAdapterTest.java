@@ -6,10 +6,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ee.bitweb.core.exception.CoreException;
 import ee.bitweb.core.utils.MemoryAppender;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
@@ -33,16 +30,21 @@ class RetrofitLogLoggerWriterAdapterTest {
         memoryAppender.start();
     }
 
+    @AfterEach
+    void tearDown() {
+        MDC.clear();
+    }
+
     @Test
     @DisplayName("Event is logged with correct MDC and MDC is restored")
     void testMessageIsWrittenToLoggerWithCorrectContext() {
         // given
         MDC.put("current", "1");
         Map<String, String> container = Map.of(
-                "RequestMethod", "GET",
-                "RequestUrl", "https://localhost:3000/api?data=true&test",
-                "ResponseCode", "404",
-                "Duration", "14"
+                "request_method", "GET",
+                "request_url", "https://localhost:3000/api?data=true&test",
+                "response_code", "404",
+                "duration", "14"
         );
         RetrofitLogLoggerWriterAdapter writer = new RetrofitLogLoggerWriterAdapter();
 
@@ -59,11 +61,11 @@ class RetrofitLogLoggerWriterAdapterTest {
         assertAll(
                 () -> assertEquals(5, loggingEvent.getMDCPropertyMap().size()),
                 () -> assertEquals("1", loggingEvent.getMDCPropertyMap().get("current")),
-                () -> assertEquals("404", loggingEvent.getMDCPropertyMap().get("ResponseCode")),
-                () -> assertEquals("GET", loggingEvent.getMDCPropertyMap().get("RequestMethod")),
-                () -> assertEquals("https://localhost:3000/api?data=true&test", loggingEvent.getMDCPropertyMap().get("RequestUrl")),
-                () -> assertEquals("14", loggingEvent.getMDCPropertyMap().get("Duration")),
-                () -> assertNull(loggingEvent.getMDCPropertyMap().get("ResponseBodySize"))
+                () -> assertEquals("404", loggingEvent.getMDCPropertyMap().get("response_code")),
+                () -> assertEquals("GET", loggingEvent.getMDCPropertyMap().get("request_method")),
+                () -> assertEquals("https://localhost:3000/api?data=true&test", loggingEvent.getMDCPropertyMap().get("request_url")),
+                () -> assertEquals("14", loggingEvent.getMDCPropertyMap().get("duration")),
+                () -> assertNull(loggingEvent.getMDCPropertyMap().get("response_body_size"))
         );
 
         // then validate current MDC

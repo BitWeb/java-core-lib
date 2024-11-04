@@ -7,7 +7,7 @@ import okhttp3.Response;
 @RequiredArgsConstructor
 public class RetrofitRequestMethodMapper implements RetrofitLoggingMapper {
 
-    public static final String KEY = "RequestMethod";
+    public static final String KEY = "request_method";
 
     @Override
     public String getKey() {
