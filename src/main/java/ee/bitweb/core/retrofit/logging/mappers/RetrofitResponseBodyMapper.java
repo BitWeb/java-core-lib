@@ -71,9 +71,8 @@ public class RetrofitResponseBodyMapper implements RetrofitLoggingMapper {
         source.request(Long.MAX_VALUE);
         var buffer = source.getBuffer();
 
-        Long gzippedLength = null;
         if ("gzip".equalsIgnoreCase(response.header("Content-Encoding"))) {
-            gzippedLength = buffer.size();
+            long gzippedLength = buffer.size();
             var gzipSource = new GzipSource(buffer.clone());
             buffer = new Buffer();
             gzipSource.read(buffer, gzippedLength);

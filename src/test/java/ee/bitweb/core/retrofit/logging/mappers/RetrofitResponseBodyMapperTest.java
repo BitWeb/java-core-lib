@@ -1,14 +1,16 @@
 package ee.bitweb.core.retrofit.logging.mappers;
 
 import okhttp3.*;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.zip.GZIPOutputStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,7 +40,7 @@ class RetrofitResponseBodyMapperTest {
 
         var value = mapper.getValue(null, response);
 
-        Assertions.assertEquals("(body redacted)", value);
+        assertEquals("(body redacted)", value);
     }
 
     @Test
@@ -64,7 +66,7 @@ class RetrofitResponseBodyMapperTest {
 
         var value = mapper.getValue(null, response);
 
-        Assertions.assertEquals("", value);
+        assertEquals("", value);
     }
 
     @Test
@@ -90,7 +92,7 @@ class RetrofitResponseBodyMapperTest {
 
         var value = mapper.getValue(null, response);
 
-        Assertions.assertEquals("(encoded body omitted)", value);
+        assertEquals("(encoded body omitted)", value);
     }
 
     @Test
@@ -116,7 +118,99 @@ class RetrofitResponseBodyMapperTest {
 
         var value = mapper.getValue(null, response);
 
-        Assertions.assertEquals("(body missing)", value);
+        assertEquals("(body missing)", value);
+    }
+
+    @Test
+    @DisplayName("Response body is correctly returned")
+    void bodyAvailable() {
+        var mapper = new RetrofitResponseBodyMapper(new HashSet<>(), 4096);
+        var response = new Response(
+                request("GET"),
+                Protocol.HTTP_2,
+                "OK",
+                200,
+                null,
+                new Headers.Builder().build(),
+                ResponseBody.create("123".getBytes(), MediaType.get("application/text")),
+                null,
+                null,
+                null,
+                1,
+                2,
+                null
+        );
+
+        assertEquals("123", mapper.getValue(null, response));
+    }
+
+    @Test
+    @DisplayName("Response body is correctly shortened")
+    void bodyIsShortened() {
+        var mapper = new RetrofitResponseBodyMapper(new HashSet<>(), 2);
+        var response = new Response(
+                request("GET"),
+                Protocol.HTTP_2,
+                "OK",
+                200,
+                null,
+                new Headers.Builder().build(),
+                ResponseBody.create("123".getBytes(), MediaType.get("application/text")),
+                null,
+                null,
+                null,
+                1,
+                2,
+                null
+        );
+
+        assertEquals("12 ... Content size: 3 characters", mapper.getValue(null, response));
+    }
+
+    @Test
+    @DisplayName("Response body is correctly returned when empty")
+    void bodyIsEmpty() {
+        var mapper = new RetrofitResponseBodyMapper(new HashSet<>(), 4096);
+        var response = new Response(
+                request("GET"),
+                Protocol.HTTP_2,
+                "OK",
+                200,
+                null,
+                new Headers.Builder().build(),
+                ResponseBody.create(new byte[]{}, MediaType.get("application/text")),
+                null,
+                null,
+                null,
+                1,
+                2,
+                null
+        );
+
+        assertEquals("", mapper.getValue(null, response));
+    }
+
+    @Test
+    @DisplayName("Response body is correctly returned when response is gzipped")
+    void bodyIsGzipped() throws IOException {
+        var mapper = new RetrofitResponseBodyMapper(new HashSet<>(), 4096);
+        var response = new Response(
+                request("GET"),
+                Protocol.HTTP_2,
+                "OK",
+                200,
+                null,
+                new Headers.Builder().add("Content-Encoding", "gzip").build(),
+                ResponseBody.create(gzip("some amount of data"), MediaType.get("application/text")),
+                null,
+                null,
+                null,
+                1,
+                2,
+                null
+        );
+
+        assertEquals("some amount of data", mapper.getValue(null, response));
     }
 
     private Request request(String method) {
@@ -130,5 +224,15 @@ class RetrofitResponseBodyMapperTest {
                 RequestBody.create("123".getBytes(), MediaType.get("application/text")),
                 new HashMap<>()
         );
+    }
+
+    private byte[] gzip(String data) throws IOException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        GZIPOutputStream gzipOs = new GZIPOutputStream(os);
+        byte[] buffer = data.getBytes();
+        gzipOs.write(buffer, 0, buffer.length);
+        gzipOs.close();
+
+        return os.toByteArray();
     }
 }

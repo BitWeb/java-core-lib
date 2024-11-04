@@ -27,6 +27,8 @@ public class RetrofitLogLoggerWriterAdapter implements RetrofitLogWriteAdapter {
         } finally {
             if (currentContext != null) {
                 MDC.setContextMap(currentContext);
+            } else {
+                MDC.clear();
             }
         }
     }

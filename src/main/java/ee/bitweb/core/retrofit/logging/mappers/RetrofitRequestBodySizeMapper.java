@@ -3,6 +3,7 @@ package ee.bitweb.core.retrofit.logging.mappers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import java.io.IOException;
@@ -16,7 +17,9 @@ public class RetrofitRequestBodySizeMapper implements RetrofitLoggingMapper {
     @Override
     public String getValue(Request request, Response response) {
         try {
-            return request.body() != null ? String.valueOf(request.body().contentLength()) : "-";
+            RequestBody body = request.body();
+
+            return body != null ? String.valueOf(body.contentLength()) : "-";
         } catch (IOException e) {
             log.error("Failed to parse request content length.", e);
             return "Parse error.";
