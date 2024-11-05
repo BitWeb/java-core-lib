@@ -99,7 +99,6 @@ public class RetrofitAutoConfiguration {
         return new RetrofitLoggingInterceptorImplementation(mappers, new RetrofitLogLoggerWriterAdapter());
     }
 
-    // testida üle, kui on vajadus mapper üle kirjutada
     @Bean
     @ConditionalOnMissingBean
     @ConditionalOnEnabledRetrofitMapper(mapper = RetrofitRequestMethodMapper.KEY)
