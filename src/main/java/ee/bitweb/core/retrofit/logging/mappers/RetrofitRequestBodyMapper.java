@@ -3,6 +3,7 @@ package ee.bitweb.core.retrofit.logging.mappers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import okio.Buffer;
 
@@ -46,12 +47,12 @@ public class RetrofitRequestBodyMapper implements RetrofitLoggingMapper {
         return body;
     }
 
-    private String getRequestBody(Request request) throws IOException {
+    String getRequestBody(Request request) throws IOException {
         var body = request.body();
 
         if (body == null) {
             return "null";
-        } else if (RetrofitBodyMapperHelper.isRedactBodyUrl(redactBodyUrls, request.url().toString())) {
+        } else if (RetrofitBodyMapperHelper.isRedactBodyUrl(redactBodyUrls, request.url().url().toExternalForm())) {
             return "(body redacted)";
         } else if (RetrofitBodyMapperHelper.bodyHasUnknownEncoding(request.headers())) {
             return "(encoded body omitted)";
@@ -60,27 +61,31 @@ public class RetrofitRequestBodyMapper implements RetrofitLoggingMapper {
         } else if (body.isOneShot()) {
             return "(one-shot body omitted)";
         } else {
-            var buffer = new Buffer();
-            body.writeTo(buffer);
+            return getBodyString(body);
+        }
+    }
 
-            var contentType = body.contentType();
-            Charset charSet = contentType != null ? contentType.charset(UTF_8) : UTF_8;
+    String getBodyString(RequestBody body) throws IOException {
+        var buffer = new Buffer();
+        body.writeTo(buffer);
 
-            if (RetrofitBodyMapperHelper.isProbablyUtf8(buffer)) {
-                assert charSet != null;
-                var bodyString = buffer.readString(charSet);
+        var contentType = body.contentType();
+        Charset charSet = contentType != null ? contentType.charset(UTF_8) : UTF_8;
 
-                if (request.body() != null && request.body().contentLength() > maxLoggableRequestSize) {
-                    return "%s ... Content size: %s characters".formatted(
-                            bodyString.substring(0, maxLoggableRequestSize),
-                            request.body().contentLength()
-                    );
-                }
+        if (RetrofitBodyMapperHelper.isProbablyUtf8(buffer)) {
+            assert charSet != null;
+            var bodyString = buffer.readString(charSet);
 
-                return sanitizeBody(bodyString);
-            } else {
-                return ("binary body omitted");
+            if (body.contentLength() == -1 || body.contentLength() > maxLoggableRequestSize) {
+                return "%s ... Content size: %s characters".formatted(
+                        bodyString.substring(0, maxLoggableRequestSize),
+                        body.contentLength()
+                );
             }
+
+            return sanitizeBody(bodyString);
+        } else {
+            return "(binary body omitted)";
         }
     }
 }
