@@ -16,7 +16,7 @@ public class RetrofitRequestExecutor {
     public static <T> T execute(Call<Response<T>> request) {
         retrofit2.Response<Response<T>> response = doRequest(request);
 
-        if (response.body().getData() == null) {
+        if (response.body() == null || response.body().getData() == null) {
             throw RetrofitException.of(EMPTY_RESPONSE_BODY_ERROR, request, response);
         }
 

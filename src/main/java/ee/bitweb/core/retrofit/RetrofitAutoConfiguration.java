@@ -1,20 +1,29 @@
 package ee.bitweb.core.retrofit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ee.bitweb.core.retrofit.builder.LoggingLevel;
 import ee.bitweb.core.retrofit.interceptor.auth.AuthTokenInjectInterceptor;
 import ee.bitweb.core.retrofit.interceptor.auth.TokenProvider;
 import ee.bitweb.core.retrofit.interceptor.auth.criteria.AuthTokenCriteria;
 import ee.bitweb.core.retrofit.interceptor.auth.criteria.WhitelistCriteria;
+import ee.bitweb.core.retrofit.logging.NoopRetrofitLoggingInterceptor;
+import ee.bitweb.core.retrofit.logging.RetrofitLoggingInterceptor;
+import ee.bitweb.core.retrofit.logging.RetrofitLoggingInterceptorImplementation;
+import ee.bitweb.core.retrofit.logging.mappers.*;
+import ee.bitweb.core.retrofit.logging.writers.RetrofitLogLoggerWriterAdapter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import retrofit2.Converter;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -22,6 +31,7 @@ import java.util.regex.Pattern;
 @Configuration
 @RequiredArgsConstructor
 @ConditionalOnProperty(value = RetrofitProperties.PREFIX + ".auto-configuration", havingValue = "true")
+@EnableConfigurationProperties({RetrofitProperties.class})
 public class RetrofitAutoConfiguration {
 
     @Bean
@@ -63,5 +73,106 @@ public class RetrofitAutoConfiguration {
         criteria.validate();
 
         return criteria;
+    }
+
+    @Bean("defaultRetrofitLoggingInterceptor")
+    @Primary
+    public RetrofitLoggingInterceptor defaultRetrofitLoggingInterceptor(
+            List<RetrofitLoggingMapper> mappers,
+            RetrofitProperties properties
+    ) {
+        if (properties.getLogging().getLevel() == LoggingLevel.NONE) {
+            log.info("Create Default Retrofit Logging Interceptor for logging level NONE");
+
+            return new NoopRetrofitLoggingInterceptor();
+        }
+
+        log.info(
+                "Create Default Retrofit Logging Interceptor with writer {}",
+                RetrofitLogLoggerWriterAdapter.class.getSimpleName()
+        );
+
+        for (RetrofitLoggingMapper mapper : mappers) {
+            log.info("Applying Retrofit Log Data Mapper: {}", mapper.getClass());
+        }
+
+        return new RetrofitLoggingInterceptorImplementation(mappers, new RetrofitLogLoggerWriterAdapter());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnEnabledRetrofitMapper(mapper = RetrofitRequestMethodMapper.KEY)
+    public RetrofitRequestMethodMapper retrofitRequestMethodMapper() {
+        return new RetrofitRequestMethodMapper();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnEnabledRetrofitMapper(mapper = RetrofitRequestUrlMapper.KEY)
+    public RetrofitRequestUrlMapper retrofitRequestUrlMapper() {
+        return new RetrofitRequestUrlMapper();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnEnabledRetrofitMapper(mapper = RetrofitRequestHeadersMapper.KEY)
+    public RetrofitRequestHeadersMapper retrofitRequestHeadersMapper(
+            RetrofitProperties retrofitProperties
+    ) {
+        return new RetrofitRequestHeadersMapper(new HashSet<>(retrofitProperties.getLogging().getSuppressedHeaders()));
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnEnabledRetrofitMapper(mapper = RetrofitRequestBodySizeMapper.KEY)
+    public RetrofitRequestBodySizeMapper retrofitRequestBodySizeMapper() {
+        return new RetrofitRequestBodySizeMapper();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnEnabledRetrofitMapper(mapper = RetrofitRequestBodyMapper.KEY)
+    public RetrofitRequestBodyMapper retrofitRequestBodyMapper(
+            RetrofitProperties retrofitProperties
+    ) {
+        return new RetrofitRequestBodyMapper(
+                retrofitProperties.getLogging().getMaxLoggableRequestBodySize().intValue(),
+                new HashSet<>(retrofitProperties.getLogging().getRedactedBodyUrls())
+        );
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnEnabledRetrofitMapper(mapper = RetrofitResponseStatusCodeMapper.KEY)
+    public RetrofitResponseStatusCodeMapper retrofitResponseStatusCodeMapper() {
+        return new RetrofitResponseStatusCodeMapper();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnEnabledRetrofitMapper(mapper = RetrofitResponseHeadersMapper.KEY)
+    public RetrofitResponseHeadersMapper retrofitResponseHeadersMapper(
+            RetrofitProperties retrofitProperties
+    ) {
+        return new RetrofitResponseHeadersMapper(new HashSet<>(retrofitProperties.getLogging().getSuppressedHeaders()));
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnEnabledRetrofitMapper(mapper = RetrofitResponseBodySizeMapper.KEY)
+    public RetrofitResponseBodySizeMapper retrofitResponseBodySizeMapper() {
+        return new RetrofitResponseBodySizeMapper();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnEnabledRetrofitMapper(mapper = RetrofitResponseBodyMapper.KEY)
+    public RetrofitResponseBodyMapper responseBodyMapper(
+            RetrofitProperties retrofitProperties
+    ) {
+        return new RetrofitResponseBodyMapper(
+                new HashSet<>(retrofitProperties.getLogging().getRedactedBodyUrls()),
+                retrofitProperties.getLogging().getMaxLoggableResponseBodySize().intValue()
+        );
     }
 }

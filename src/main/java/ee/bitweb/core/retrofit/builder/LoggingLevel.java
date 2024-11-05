@@ -1,18 +1,52 @@
 package ee.bitweb.core.retrofit.builder;
 
+import ee.bitweb.core.retrofit.logging.mappers.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import okhttp3.logging.HttpLoggingInterceptor;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum LoggingLevel {
 
-    NONE(HttpLoggingInterceptor.Level.NONE),
-    BASIC(HttpLoggingInterceptor.Level.BASIC),
-    HEADERS(HttpLoggingInterceptor.Level.HEADERS),
-    BODY(HttpLoggingInterceptor.Level.BODY);
+    NONE(List.of()),
+    BASIC(basicMappers()),
+    HEADERS(headerMappers()),
+    BODY(bodyMappers()),
+    CUSTOM(List.of());
 
-    @Getter(AccessLevel.PACKAGE)
-    private HttpLoggingInterceptor.Level level;
+    private final List<String> mappers;
+
+    private static List<String> basicMappers() {
+        return new ArrayList<>(List.of(
+                RetrofitRequestMethodMapper.KEY,
+                RetrofitRequestUrlMapper.KEY,
+                RetrofitRequestBodySizeMapper.KEY,
+                RetrofitResponseStatusCodeMapper.KEY,
+                RetrofitResponseBodySizeMapper.KEY
+        ));
+    }
+
+    private static List<String> headerMappers() {
+        List<String> mappers = basicMappers();
+        mappers.addAll(List.of(
+                RetrofitRequestHeadersMapper.KEY,
+                RetrofitResponseHeadersMapper.KEY
+        ));
+
+        return mappers;
+    }
+
+    private static List<String> bodyMappers() {
+        List<String> mappers = headerMappers();
+        mappers.addAll(List.of(
+                RetrofitRequestBodyMapper.KEY,
+                RetrofitResponseBodyMapper.KEY
+        ));
+
+        return mappers;
+    }
 }

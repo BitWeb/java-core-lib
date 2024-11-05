@@ -4,21 +4,24 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import ee.bitweb.core.audit.AuditLogFilter;
-import ee.bitweb.core.audit.mappers.*;
 import ee.bitweb.core.utils.MemoryAppender;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+@Tag("unit")
 @ExtendWith(MockitoExtension.class)
 class AuditLogLoggerWriterAdapterUnitTests {
 
@@ -37,6 +40,11 @@ class AuditLogLoggerWriterAdapterUnitTests {
         memoryAppender.start();
     }
 
+    @AfterEach
+    void tearDown() {
+        MDC.clear();
+    }
+
     @Test
     void createASingleLogWithNoSecondaryFields() {
 
@@ -44,26 +52,30 @@ class AuditLogLoggerWriterAdapterUnitTests {
 
         List<ILoggingEvent> events = memoryAppender.getLoggedEvents();
 
-        Assertions.assertEquals(1, events.size());
-        Assertions.assertEquals(
+        assertEquals(1, events.size());
+        assertEquals(
                 "Method(POST),  URL(/some-url) Status(200 OK) ResponseSize(9) Duration(123 ms)",
                 events.get(0).getFormattedMessage()
         );
-        Assertions.assertEquals(8, events.get(0).getMDCPropertyMap().size());
+        assertEquals(8, events.get(0).getMDCPropertyMap().size());
+        assertNull(MDC.getCopyOfContextMap());
     }
 
     @Test
     void createASingleLogWithSecondaryFieldsAndDebugDisabled() {
+        MDC.put("key", "value");
         adapter.write(createDefaultMap());
 
         List<ILoggingEvent> events = memoryAppender.getLoggedEvents();
 
-        Assertions.assertEquals(1, events.size());
-        Assertions.assertEquals(
+        assertEquals(1, events.size());
+        assertEquals(
                 "Method(POST),  URL(/some-url) Status(200 OK) ResponseSize(9) Duration(123 ms)",
                 events.get(0).getFormattedMessage()
         );
-        Assertions.assertEquals(8, events.get(0).getMDCPropertyMap().size());
+        assertEquals(8, events.get(0).getMDCPropertyMap().size());
+        assertEquals(1, MDC.getCopyOfContextMap().size());
+        assertEquals("value", MDC.get("key"));
     }
 
     @Test
@@ -73,31 +85,31 @@ class AuditLogLoggerWriterAdapterUnitTests {
 
         List<ILoggingEvent> events = memoryAppender.getLoggedEvents();
 
-        Assertions.assertEquals(2, events.size());
-        Assertions.assertEquals(
+        assertEquals(2, events.size());
+        assertEquals(
                 "Method(POST),  URL(/some-url) Status(200 OK) ResponseSize(9) Duration(123 ms)",
                 events.get(0).getFormattedMessage()
         );
-        Assertions.assertEquals(
+        assertEquals(
                 "Debug audit log",
                 events.get(1).getFormattedMessage()
         );
-        Assertions.assertEquals(8, events.get(0).getMDCPropertyMap().size());
-        Assertions.assertEquals(4, events.get(1).getMDCPropertyMap().size());
-
+        assertEquals(8, events.get(0).getMDCPropertyMap().size());
+        assertEquals(4, events.get(1).getMDCPropertyMap().size());
+        assertNull(MDC.getCopyOfContextMap());
     }
 
 
     public Map<String, String> createDefaultMap() {
         Map<String, String> map = new HashMap<>();
 
-        map.put(TraceIdMapper.KEY, "some-trace-id");
-        map.put(ResponseStatusMapper.KEY, HttpStatus.OK.toString());
-        map.put(RequestUrlDataMapper.KEY, "/some-url");
-        map.put(AuditLogFilter.DURATION_KEY, "123");
-        map.put(RequestMethodMapper.KEY, "POST");
-        map.put(RequestBodyMapper.KEY, "Some payload");
-        map.put(ResponseBodyMapper.KEY, "Some body");
+        map.put("trace_id", "some-trace-id");
+        map.put("response_status", HttpStatus.OK.toString());
+        map.put("url", "/some-url");
+        map.put("duration", "123");
+        map.put("method", "POST");
+        map.put("request_body", "Some payload");
+        map.put("response_body", "Some body");
 
         return map;
     }
