@@ -1,8 +1,8 @@
 buildscript {
     ext {
-        springBootVersion = '3.3.4'
-        springVersion = '6.1.13'
-        jacksonVersion = '2.18.0'
+        springBootVersion = '3.3.5'
+        springVersion = '6.1.14'
+        jacksonVersion = '2.18.1'
         mockitoVersion = '5.2.+'
         retrofitVersion = '2.11.0'
     }
@@ -14,7 +14,7 @@ buildscript {
 plugins {
     id 'java'
     id "org.owasp.dependencycheck" version "10.0.4"
-    id "io.freefair.lombok" version "8.10"
+    id "io.freefair.lombok" version "8.10.2"
     id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
 }
 
