@@ -1,7 +1,7 @@
 buildscript {
     ext {
-        springBootVersion = '3.4.0'
-        springVersion = '6.2.0'
+        springBootVersion = '3.4.1'
+        springVersion = '6.2.1'
         jacksonVersion = '2.18.2'
         mockitoVersion = '5.2.+'
         retrofitVersion = '2.11.0'
@@ -38,7 +38,7 @@ repositories {
 
 dependencies {
     // https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-catalina
-    compileOnly group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '10.1.33'
+    compileOnly group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '10.1.34'
 
     // https://mvnrepository.com/artifact/org.springframework/spring-webmvc
     compileOnly group: 'org.springframework', name: 'spring-webmvc', version: "${springVersion}"
