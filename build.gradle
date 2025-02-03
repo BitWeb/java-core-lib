@@ -13,7 +13,7 @@ buildscript {
 
 plugins {
     id 'java'
-    id "org.owasp.dependencycheck" version "11.1.1"
+    id "org.owasp.dependencycheck" version "12.0.2"
     id "io.freefair.lombok" version "8.12"
     id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
 }
