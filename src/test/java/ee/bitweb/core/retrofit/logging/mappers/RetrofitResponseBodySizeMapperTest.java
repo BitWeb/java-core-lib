@@ -48,4 +48,14 @@ class RetrofitResponseBodySizeMapperTest {
         Mockito.verifyNoMoreInteractions(response);
         Mockito.verifyNoInteractions(responseBody);
     }
+
+    @Test
+    @DisplayName("When response is not available, should return '-'")
+    void testResponseIsNotAvailable() {
+        RetrofitResponseBodySizeMapper mapper = new RetrofitResponseBodySizeMapper();
+
+        assertEquals("-", mapper.getValue(null, null));
+
+        Mockito.verifyNoInteractions(response, responseBody);
+    }
 }

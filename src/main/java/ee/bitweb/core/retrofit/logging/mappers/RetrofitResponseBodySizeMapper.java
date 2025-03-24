@@ -12,6 +12,10 @@ public class RetrofitResponseBodySizeMapper implements RetrofitLoggingMapper {
 
     @Override
     public String getValue(Request request, Response response) {
+        if (response == null) {
+            return "-";
+        }
+
         ResponseBody body = response.body();
 
         return body != null ? String.valueOf(body.contentLength()) : "-";

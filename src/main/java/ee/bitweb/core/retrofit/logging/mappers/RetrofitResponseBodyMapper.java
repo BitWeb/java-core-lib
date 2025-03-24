@@ -38,7 +38,9 @@ public class RetrofitResponseBodyMapper implements RetrofitLoggingMapper {
     }
 
     protected String getResponseBody(Response response) throws IOException {
-        if (RetrofitBodyMapperHelper.isRedactBodyUrl(redactBodyUrls, response.request().url().toString())) {
+        if (response == null) {
+            return "(response missing)";
+        } else if (RetrofitBodyMapperHelper.isRedactBodyUrl(redactBodyUrls, response.request().url().toString())) {
             return "(body redacted)";
         } else if (!promisesBody(response)) {
             return "";

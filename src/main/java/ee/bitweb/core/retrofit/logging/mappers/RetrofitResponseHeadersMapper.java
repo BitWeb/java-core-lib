@@ -28,6 +28,10 @@ public class RetrofitResponseHeadersMapper implements RetrofitLoggingMapper {
     }
 
     protected String getResponseHeadersString(Response response) {
+        if (response == null) {
+            return "(response missing)";
+        }
+
         Map<String, String> result = new HashMap<>();
 
         var responseHeaders = response.headers();

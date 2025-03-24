@@ -213,6 +213,12 @@ class RetrofitResponseBodyMapperTest {
         assertEquals("some amount of data", mapper.getValue(null, response));
     }
 
+    @Test
+    @DisplayName("Response is missing")
+    void responseIsNull() {
+        assertEquals("(response missing)", new RetrofitResponseBodyMapper(new HashSet<>(), 4096).getValue(null, null));
+    }
+
     private Request request(String method) {
         return new Request(
                 new HttpUrl.Builder()
