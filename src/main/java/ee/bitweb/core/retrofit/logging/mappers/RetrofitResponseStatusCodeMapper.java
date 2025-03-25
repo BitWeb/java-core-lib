@@ -11,6 +11,10 @@ public class RetrofitResponseStatusCodeMapper implements RetrofitLoggingMapper {
 
     @Override
     public String getValue(Request request, Response response) {
+        if (response == null) {
+            return "-";
+        }
+
         return String.valueOf(response.code());
     }
 
