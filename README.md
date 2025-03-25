@@ -10,7 +10,7 @@ Library providing basic generic functionality required by any HTTP web service. 
 
 ```
 // https://mvnrepository.com/artifact/ee.bitweb/spring-core
-implementation group: 'ee.bitweb', name: 'spring-core', version: '4.0.0'
+implementation group: 'ee.bitweb', name: 'spring-core', version: '4.0.1'
 ```
 
 Review available versions in [Maven Central](https://mvnrepository.com/artifact/ee.bitweb/spring-core).
