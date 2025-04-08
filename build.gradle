@@ -1,7 +1,7 @@
 buildscript {
     ext {
-        springBootVersion = '3.4.3'
-        springVersion = '6.2.3'
+        springBootVersion = '3.4.4'
+        springVersion = '6.2.5'
         jacksonVersion = '2.18.3'
         mockitoVersion = '5.2.+'
         retrofitVersion = '2.11.0'
@@ -14,7 +14,7 @@ buildscript {
 plugins {
     id 'java'
     id "org.owasp.dependencycheck" version "12.1.0"
-    id "io.freefair.lombok" version "8.12.2"
+    id "io.freefair.lombok" version "8.13.1"
     id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
 }
 
@@ -38,7 +38,7 @@ repositories {
 
 dependencies {
     // https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-catalina
-    compileOnly group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '10.1.36'
+    compileOnly group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '10.1.39'
 
     // https://mvnrepository.com/artifact/org.springframework/spring-webmvc
     compileOnly group: 'org.springframework', name: 'spring-webmvc', version: "${springVersion}"
