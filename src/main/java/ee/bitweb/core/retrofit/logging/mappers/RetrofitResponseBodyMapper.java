@@ -66,7 +66,6 @@ public class RetrofitResponseBodyMapper implements RetrofitLoggingMapper {
     private String parseBody(Response response) throws IOException {
         var responseBody = response.body();
         var contentType = responseBody.contentType();
-        var contentLength = responseBody.contentLength();
         var charset = contentType != null ? contentType.charset(UTF_8) : UTF_8;
 
         var source = responseBody.source();
@@ -84,20 +83,16 @@ public class RetrofitResponseBodyMapper implements RetrofitLoggingMapper {
             return "(binary %s-byte body omitted)".formatted(buffer.size());
         }
 
-        if (contentLength != 0L) {
-            var bodyString = buffer.clone().readString(charset);
-            var bodyStringLength = bodyString.length();
+        var bodyString = buffer.clone().readString(charset);
+        var bodyStringLength = bodyString.length();
 
-            if (bodyStringLength > maxLoggableResponseSize) {
-                return "%s ... Content size: %s characters".formatted(
-                        bodyString.substring(0, maxLoggableResponseSize),
-                        bodyStringLength
-                );
-            } else {
-                return sanitizeBody(bodyString);
-            }
+        if (bodyStringLength > maxLoggableResponseSize) {
+            return "%s ... Content size: %s characters".formatted(
+                    bodyString.substring(0, maxLoggableResponseSize),
+                    bodyStringLength
+            );
         } else {
-            return "";
+            return sanitizeBody(bodyString);
         }
     }
 }
