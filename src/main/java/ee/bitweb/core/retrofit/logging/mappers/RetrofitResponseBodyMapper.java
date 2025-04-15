@@ -84,7 +84,7 @@ public class RetrofitResponseBodyMapper implements RetrofitLoggingMapper {
         }
 
         var bodyString = buffer.clone().readString(charset);
-        var bodyStringLength = bodyString.length();
+        var bodyStringLength = bodyString != null ? bodyString.length() : 0;
 
         if (bodyStringLength > maxLoggableResponseSize) {
             return "%s ... Content size: %s characters".formatted(
