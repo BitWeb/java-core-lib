@@ -12,7 +12,8 @@ jobs:
     strategy:
       matrix:
         java: [ '17', '21' ]
-    name: Test with Java ${{ matrix.Java }}
+        spring-boot-version: ['3.0.13', '3.1.12', '3.2.12', '3.3.12', '3.4.6', '3.5.0']
+    name: Test with Java ${{ matrix.Java }} / Spring Boot ${{ matrix.spring-boot-version }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,6 +26,10 @@ jobs:
           distribution: temurin
           java-version: ${{ matrix.java }}
 
+      - name: Update Spring Boot version
+        run: |
+          ./gradlew useSpringBootVersion -PspringBootVersion=${{ matrix.spring-boot-version }}
+
       - name: Run tests and generate reports
         run: ./gradlew testAndReport
 
@@ -32,12 +37,12 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: report-java-${{ matrix.Java }}
+          name: report-java-${{ matrix.java }}-${{ matrix.spring-boot-version }}
           path: build/reports/**
           retention-days: 5
 
       - name: Run Sonar analysis
-        if: matrix.Java == '17'
+        if: matrix.java == '17' && matrix.spring-boot-version == '3.5.0'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
