@@ -6,10 +6,6 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
-    reviewers:
-      - "Jorich"
-      - "pr11t"
-      - "rammrain"
     groups:
       all-deps-minor-and-patch:
         patterns:
@@ -22,7 +18,3 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
-    reviewers:
-      - "Jorich"
-      - "pr11t"
-      - "rammrain"
