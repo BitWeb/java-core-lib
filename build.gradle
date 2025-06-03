@@ -1,9 +1,8 @@
 buildscript {
     ext {
-        springBootVersion = '3.4.5'
-        springVersion = '6.2.6'
+        springBootVersion = '3.5.0'
+        springVersion = '6.2.7'
         jacksonVersion = '2.19.0'
-        mockitoVersion = '5.2.+'
         retrofitVersion = '2.11.0'
     }
     dependencies {
@@ -38,7 +37,7 @@ repositories {
 
 dependencies {
     // https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-catalina
-    compileOnly group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '10.1.40'
+    compileOnly group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '10.1.41'
 
     // https://mvnrepository.com/artifact/org.springframework/spring-webmvc
     compileOnly group: 'org.springframework', name: 'spring-webmvc', version: "${springVersion}"
@@ -100,18 +99,14 @@ dependencies {
     // https://mvnrepository.com/artifact/ee.bitweb/spring-test-core
     testImplementation group: 'ee.bitweb', name: 'spring-test-core', version: '2.+'
 
-    // https://mvnrepository.com/artifact/org.mockito/mockito-inline
-    testImplementation group: 'org.mockito', name: 'mockito-inline', version: "${mockitoVersion}"
-
-    // https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter
-    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: "${mockitoVersion}"
-
     // https://mvnrepository.com/artifact/org.mock-server/mockserver-netty
     testImplementation ("org.mock-server:mockserver-netty:5.15.0") {
         exclude group: 'junit', module: 'junit'
     }
 
     testImplementation group : 'org.testcontainers', name: 'testcontainers',  version: "1.+"
+
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 configurations {
