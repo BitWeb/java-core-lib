@@ -7,14 +7,25 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  generate-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read matrix from JSON
+        id: set-matrix
+        run: |
+          MATRIX=$(jq -c '.matrix' .github/spring-versions.json)
+          echo "matrix={\"include\":$MATRIX}" >> $GITHUB_OUTPUT
+
+  regression-tests:
+    needs: generate-matrix
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        java: [ '17', '21' ]
-        spring-boot-version: ['3.0.13', '3.1.12', '3.2.12', '3.3.12', '3.4.6', '3.5.0']
-    name: Test with Java ${{ matrix.Java }} / Spring Boot ${{ matrix.spring-boot-version }}
+      matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+    name: Test with Java ${{ matrix.java }} / Spring Boot ${{ matrix.boot }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -27,9 +38,37 @@ jobs:
           distribution: temurin
           java-version: ${{ matrix.java }}
 
-      - name: Update Spring Boot version
-        run: |
-          ./gradlew useSpringBootVersion -PspringBootVersion=${{ matrix.spring-boot-version }}
+      - name: Run tests and generate reports
+        run: ./gradlew testAndReport -PspringBootVersion=${{ matrix.boot }} -PspringFrameworkVersion=${{ matrix.framework }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: report-java-${{ matrix.java }}-spring-boot-${{ matrix.boot }}
+          path: build/reports/**
+          retention-days: 5
+
+# todo kirjutada readme ka, mis põhimõttel asi toimib ning kuidas uuendada + kuidas testida erinevaid SP versioone
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        java: [ '17', '21' ]
+    name: Test with latest version of Spring Boot and Java ${{ matrix.java }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
 
       - name: Run tests and generate reports
         run: ./gradlew testAndReport
@@ -38,12 +77,12 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: report-java-${{ matrix.java }}-${{ matrix.spring-boot-version }}
+          name: report-java-${{ matrix.java }}
           path: build/reports/**
           retention-days: 5
 
       - name: Run Sonar analysis
-        if: matrix.java == '17' && matrix.spring-boot-version == '3.5.0'
+        if: matrix.java == '17'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

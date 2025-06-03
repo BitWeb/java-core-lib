@@ -1,7 +1,7 @@
 buildscript {
     ext {
         springBootVersion = project.hasProperty('springBootVersion') ? project.springBootVersion : '3.5.0'
-        springVersion = '6.2.7'
+        springVersion = project.hasProperty('springFrameworkVersion') ? project.springFrameworkVersion : '6.2.7'
         jacksonVersion = '2.19.0'
         retrofitVersion = '2.11.0'
     }
@@ -111,10 +111,4 @@ dependencies {
 
 configurations {
     testImplementation.extendsFrom compileOnly
-}
-
-tasks.register('useSpringBootVersion') {
-    doLast {
-        println "Using Spring Boot version: ${springBootVersion}"
-    }
 }
