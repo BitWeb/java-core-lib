@@ -1,6 +1,7 @@
 buildscript {
     ext {
         springBootVersion = project.hasProperty('springBootVersion') ? project.springBootVersion : '3.5.0'
+        springVersion = '6.2.7'
         jacksonVersion = '2.19.0'
         retrofitVersion = '2.11.0'
     }
@@ -39,10 +40,10 @@ dependencies {
     compileOnly group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '10.1.41'
 
     // https://mvnrepository.com/artifact/org.springframework/spring-webmvc
-    compileOnly 'org.springframework:spring-webmvc'
+    compileOnly group: 'org.springframework', name: 'spring-webmvc', version: "${springVersion}"
 
     // https://mvnrepository.com/artifact/org.springframework/spring-tx
-    compileOnly 'org.springframework:spring-tx'
+    compileOnly group: 'org.springframework', name: 'spring-tx', version: "${springVersion}"
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
     compileOnly group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: "${springBootVersion}"
