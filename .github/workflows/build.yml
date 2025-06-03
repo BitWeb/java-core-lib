@@ -49,8 +49,6 @@ jobs:
           path: build/reports/**
           retention-days: 5
 
-# todo kirjutada readme ka, mis põhimõttel asi toimib ning kuidas uuendada + kuidas testida erinevaid SP versioone
-
   test:
     runs-on: ubuntu-latest
     strategy:
