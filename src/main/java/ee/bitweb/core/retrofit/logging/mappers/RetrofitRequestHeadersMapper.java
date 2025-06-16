@@ -1,6 +1,5 @@
 package ee.bitweb.core.retrofit.logging.mappers;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 
@@ -8,16 +7,20 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static ee.bitweb.core.retrofit.logging.mappers.RetrofitHeadersMapperHelper.*;
 
 @Slf4j
-@RequiredArgsConstructor
 public class RetrofitRequestHeadersMapper implements RetrofitLoggingMapper {
 
     public static final String KEY = "request_headers";
 
     private final Set<String> redactHeaders;
+
+    public RetrofitRequestHeadersMapper(Set<String> redactHeaders) {
+        this.redactHeaders = redactHeaders.stream().map(String::toLowerCase).collect(Collectors.toSet());
+    }
 
     @Override
     public String getValue(Request request, Response response) {

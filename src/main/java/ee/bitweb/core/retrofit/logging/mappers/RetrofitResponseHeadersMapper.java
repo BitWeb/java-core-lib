@@ -1,21 +1,24 @@
 package ee.bitweb.core.retrofit.logging.mappers;
 
-import lombok.RequiredArgsConstructor;
 import okhttp3.*;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static ee.bitweb.core.retrofit.logging.mappers.RetrofitHeadersMapperHelper.CONTENT_LENGTH;
 import static ee.bitweb.core.retrofit.logging.mappers.RetrofitHeadersMapperHelper.CONTENT_TYPE;
 
-@RequiredArgsConstructor
 public class RetrofitResponseHeadersMapper implements RetrofitLoggingMapper {
 
     public static final String KEY = "response_headers";
 
     private final Set<String> redactHeaders;
+
+    public RetrofitResponseHeadersMapper(Set<String> redactHeaders) {
+        this.redactHeaders = redactHeaders.stream().map(String::toLowerCase).collect(Collectors.toSet());
+    }
 
     @Override
     public String getValue(Request request, Response response) {
