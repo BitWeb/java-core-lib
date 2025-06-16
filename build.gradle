@@ -1,9 +1,10 @@
 buildscript {
     ext {
-        springBootVersion = '3.5.0'
-        springVersion = '6.2.7'
+        springBootVersion = project.hasProperty('springBootVersion') ? project.springBootVersion : '3.5.0'
+        springVersion = project.hasProperty('springFrameworkVersion') ? project.springFrameworkVersion : '6.2.7'
         jacksonVersion = '2.19.0'
         retrofitVersion = '2.11.0'
+        mockitoVersion = '5.2.+' // At least Mockito 5.2.0 is required to Mock final classes
     }
     dependencies {
         classpath 'org.owasp:dependency-check-gradle'
@@ -79,7 +80,7 @@ dependencies {
     compileOnly group: 'com.squareup.okhttp3', name: 'logging-interceptor', version: '4.12.0'
 
     // https://mvnrepository.com/artifact/de.siegmar/logback-gelf
-    compileOnly group: 'de.siegmar', name: 'logback-gelf', version: '6.1.1'
+    compileOnly group: 'de.siegmar', name: 'logback-gelf', version: '5.0.+'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: "${springBootVersion}"
@@ -98,6 +99,12 @@ dependencies {
 
     // https://mvnrepository.com/artifact/ee.bitweb/spring-test-core
     testImplementation group: 'ee.bitweb', name: 'spring-test-core', version: '2.+'
+
+    // https://mvnrepository.com/artifact/org.mockito/mockito-core
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: "${mockitoVersion}"
+
+    // https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: "${mockitoVersion}"
 
     // https://mvnrepository.com/artifact/org.mock-server/mockserver-netty
     testImplementation ("org.mock-server:mockserver-netty:5.15.0") {
