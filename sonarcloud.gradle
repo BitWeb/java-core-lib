@@ -11,7 +11,7 @@ buildscript {
 }
 apply plugin: org.sonarqube.gradle.SonarQubePlugin
 
-sonarqube {
+sonar {
     properties {
         property "sonar.projectKey", "BitWeb_java-core-lib"
         property "sonar.organization", "bitweb-oss"
