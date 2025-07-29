@@ -19,7 +19,7 @@ plugins {
 }
 
 group 'ee.bitweb'
-version '4.0.2'
+version '4.0.3'
 java {
     sourceCompatibility = '17'
 }
