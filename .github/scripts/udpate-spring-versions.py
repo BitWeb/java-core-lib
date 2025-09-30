@@ -6,12 +6,8 @@ from xml.etree import ElementTree as ET
 import urllib.request
 
 # Configuration
-managed_minors = {"3.0", "3.1", "3.2", "3.3", "3.4"}
+managed_minors = {"3.4"}
 boot_java_compatibility = {
-    "3.0": ["17"],           # Java 21 not supported
-    "3.1": ["17", "21"],
-    "3.2": ["17", "21"],
-    "3.3": ["17", "21"],
     "3.4": ["17", "21"]
 }
 output_path = ".github/spring-versions.json"
