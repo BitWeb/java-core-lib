@@ -270,4 +270,14 @@ class RetrofitRequestBodyMapperTest {
         Mockito.verify(request, Mockito.times(1)).headers();
         Mockito.verifyNoInteractions(requestBody);
     }
+
+    @Test
+    @DisplayName("Request content bytes count differs from character count")
+    void requestContentBytesCountDiffersFromCharacterCount() throws IOException {
+        // "õäöü" is 4 characters, but 8 bytes
+        var customBody = RequestBody.create("õäöü", MediaType.parse("text/plain"));
+        var mapper = new RetrofitRequestBodyMapper(5, Set.of());
+
+        assertEquals("õäöü", mapper.getBodyString(customBody));
+    }
 }

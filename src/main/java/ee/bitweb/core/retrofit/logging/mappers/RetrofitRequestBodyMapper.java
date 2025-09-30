@@ -76,7 +76,7 @@ public class RetrofitRequestBodyMapper implements RetrofitLoggingMapper {
             assert charSet != null;
             var bodyString = buffer.readString(charSet);
 
-            if (body.contentLength() == -1 || body.contentLength() > maxLoggableRequestSize) {
+            if (body.contentLength() == -1 || bodyString.length() > maxLoggableRequestSize) {
                 return "%s ... Content size: %s characters".formatted(
                         bodyString.substring(0, maxLoggableRequestSize),
                         body.contentLength()
