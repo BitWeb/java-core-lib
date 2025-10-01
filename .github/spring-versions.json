@@ -1,13 +1,13 @@
 {
   "matrix": [
     {
-      "boot": "3.4.6",
-      "framework": "6.2.7",
+      "boot": "3.4.10",
+      "framework": "6.2.11",
       "java": "17"
     },
     {
-      "boot": "3.4.6",
-      "framework": "6.2.7",
+      "boot": "3.4.10",
+      "framework": "6.2.11",
       "java": "21"
     }
   ]
