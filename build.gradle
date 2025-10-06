@@ -2,9 +2,9 @@ buildscript {
     ext {
         springBootVersion = project.hasProperty('springBootVersion') ? project.springBootVersion : '3.5.0'
         springVersion = project.hasProperty('springFrameworkVersion') ? project.springFrameworkVersion : '6.2.7'
-        jacksonVersion = '2.19.0'
+        jacksonVersion = '2.20.0'
         retrofitVersion = '2.11.0'
-        mockitoVersion = '5.2.+' // At least Mockito 5.2.0 is required to Mock final classes
+        mockitoVersion = '5.20.+' // At least Mockito 5.2.0 is required to Mock final classes
     }
     dependencies {
         classpath 'org.owasp:dependency-check-gradle'
@@ -13,7 +13,7 @@ buildscript {
 
 plugins {
     id 'java'
-    id "org.owasp.dependencycheck" version "12.1.1"
+    id "org.owasp.dependencycheck" version "12.1.6"
     id "io.freefair.lombok" version "8.13.1"
     id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
 }
@@ -38,7 +38,7 @@ repositories {
 
 dependencies {
     // https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-catalina
-    compileOnly group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '10.1.41'
+    compileOnly group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '10.1.46'
 
     // https://mvnrepository.com/artifact/org.springframework/spring-webmvc
     compileOnly group: 'org.springframework', name: 'spring-webmvc', version: "${springVersion}"
