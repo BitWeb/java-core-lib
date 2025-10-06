@@ -3,7 +3,7 @@ buildscript {
         springBootVersion = project.hasProperty('springBootVersion') ? project.springBootVersion : '3.5.0'
         springVersion = project.hasProperty('springFrameworkVersion') ? project.springFrameworkVersion : '6.2.7'
         jacksonVersion = '2.20.0'
-        retrofitVersion = '2.11.0'
+        retrofitVersion = '3.0.0'
         mockitoVersion = '5.20.+' // At least Mockito 5.2.0 is required to Mock final classes
     }
     dependencies {
