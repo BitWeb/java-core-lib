@@ -80,7 +80,7 @@ dependencies {
     compileOnly group: 'com.squareup.okhttp3', name: 'logging-interceptor', version: '4.12.0'
 
     // https://mvnrepository.com/artifact/de.siegmar/logback-gelf
-    compileOnly group: 'de.siegmar', name: 'logback-gelf', version: '5.0.+'
+    compileOnly group: 'de.siegmar', name: 'logback-gelf', version: '6.1.+'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: "${springBootVersion}"
