@@ -15,7 +15,7 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     name: Generate version matrix
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Read matrix from JSON
         id: set-matrix
         run: |
@@ -31,7 +31,7 @@ jobs:
     name: Test Spring Boot ${{ matrix.boot }} / Java ${{ matrix.java }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -61,7 +61,7 @@ jobs:
     name: Test Spring Boot latest / Java ${{ matrix.java }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -103,7 +103,7 @@ jobs:
     steps:
       # IMPORTANT: pull_request_target defaults to checking out the base branch; explicitly use the PR HEAD SHA
       - name: Checkout PR HEAD
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
@@ -127,7 +127,7 @@ jobs:
     needs: [ test ]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Java
         uses: actions/setup-java@v5
