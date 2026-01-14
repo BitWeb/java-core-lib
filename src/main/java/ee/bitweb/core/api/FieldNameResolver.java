@@ -1,8 +1,6 @@
 package ee.bitweb.core.api;
 
-
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ElementKind;
 import jakarta.validation.Path;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -10,15 +8,12 @@ import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.hibernate.validator.internal.engine.path.NodeImpl;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 
-import java.util.EnumSet;
-
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FieldNameResolver {
 
     private static final String INDEX_OPEN = "[";
     private static final String INDEX_CLOSE = "]";
     private static final String FIELD_NAME_DELIMITER = ".";
-    private static final EnumSet<ElementKind> IGNORED_ELEMENTS = EnumSet.of(ElementKind.METHOD, ElementKind.PARAMETER);
 
     public static String resolve(ConstraintViolation<?> error) {
         if (error instanceof ConstraintViolationImpl<?> violationImpl
@@ -32,23 +27,33 @@ public class FieldNameResolver {
 
     private static String resolveFieldName(PathImpl path) {
         StringBuilder builder = new StringBuilder();
+        String parameterName = null;
+
         for (Path.Node node : path) {
-            if (!(node instanceof NodeImpl nodeImpl) || IGNORED_ELEMENTS.contains(node.getKind())) {
+            if (!(node instanceof NodeImpl nodeImpl)) {
                 continue;
             }
 
-            if (nodeImpl.isInIterable()) {
-                builder.append(INDEX_OPEN);
-                builder.append(nodeImpl.getIndex());
-                builder.append(INDEX_CLOSE);
+            switch (node.getKind()) {
+                case PARAMETER -> parameterName = nodeImpl.getName();
+                case METHOD -> {
+                    // Skip methods
+                }
+                default -> appendNode(builder, nodeImpl);
             }
-            if (!builder.isEmpty()) {
-                builder.append(FIELD_NAME_DELIMITER);
-            }
-            builder.append(nodeImpl.getName());
         }
 
-        return builder.toString();
+        return builder.isEmpty() && parameterName != null ? parameterName : builder.toString();
+    }
+
+    private static void appendNode(StringBuilder builder, NodeImpl nodeImpl) {
+        if (nodeImpl.isInIterable()) {
+            builder.append(INDEX_OPEN).append(nodeImpl.getIndex()).append(INDEX_CLOSE);
+        }
+        if (!builder.isEmpty()) {
+            builder.append(FIELD_NAME_DELIMITER);
+        }
+        builder.append(nodeImpl.getName());
     }
 
     public static String resolveWithRegex(ConstraintViolation<?> error) {
