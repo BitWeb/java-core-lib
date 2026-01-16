@@ -94,4 +94,5 @@ javadoc {
 
 jar {
     from sourceSets.main.allSource
+    manifest.attributes(Map.of("Automatic-Module-Name", "ee.bitweb.core"))
 }
