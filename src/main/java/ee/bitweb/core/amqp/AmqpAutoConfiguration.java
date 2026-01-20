@@ -1,6 +1,6 @@
 package ee.bitweb.core.amqp;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import ee.bitweb.core.trace.invoker.amqp.AmqpTraceAdvisor;
 import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.intercept.MethodInterceptor;
@@ -9,9 +9,9 @@ import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFacto
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.ConditionalRejectingErrorHandler;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.boot.autoconfigure.amqp.SimpleRabbitListenerContainerFactoryConfigurer;
+import org.springframework.boot.amqp.autoconfigure.SimpleRabbitListenerContainerFactoryConfigurer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -105,7 +105,7 @@ public class AmqpAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public MessageConverter jsonMessageConverter(ObjectMapper mapper) {
-        return new Jackson2JsonMessageConverter(mapper);
+    public MessageConverter jsonMessageConverter(JsonMapper mapper) {
+        return new JacksonJsonMessageConverter(mapper);
     }
 }

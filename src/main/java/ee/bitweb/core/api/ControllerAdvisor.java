@@ -15,8 +15,8 @@ import ee.bitweb.core.api.model.exception.PersistenceErrorResponse;
 import ee.bitweb.core.api.model.exception.ValidationErrorResponse;
 import ee.bitweb.core.exception.validation.InvalidFormatValidationException;
 
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import tools.jackson.databind.exc.InvalidFormatException;
+import tools.jackson.databind.exc.MismatchedInputException;
 import ee.bitweb.core.retrofit.RetrofitException;
 import ee.bitweb.core.trace.context.TraceIdContext;
 import lombok.RequiredArgsConstructor;

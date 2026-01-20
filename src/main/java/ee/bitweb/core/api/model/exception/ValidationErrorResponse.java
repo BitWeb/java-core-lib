@@ -4,7 +4,6 @@ import lombok.Getter;
 
 import java.util.Collection;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import ee.bitweb.core.exception.validation.ValidationException;
 
@@ -19,6 +18,6 @@ public class ValidationErrorResponse extends GenericErrorResponse {
     }
 
     public ValidationErrorResponse(String id, ValidationException e) {
-        this(id, e.getMessage(), e.getErrors().stream().map(FieldErrorResponse::new).collect(Collectors.toList()));
+        this(id, e.getMessage(), e.getErrors().stream().map(FieldErrorResponse::new).toList());
     }
 }

@@ -1,14 +1,10 @@
 package ee.bitweb.core;
 
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.databind.json.JsonMapper;
 import ee.bitweb.core.trace.creator.TraceIdCreator;
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
+import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -28,17 +24,25 @@ public class TestSpringApplication {
         SpringApplication.run(TestSpringApplication.class);
     }
 
-    @RequiredArgsConstructor
     @org.springframework.context.annotation.Configuration
     public static class Configuration {
 
-        private final ObjectMapper mapper;
+        @Bean
+        public tools.jackson.databind.ObjectMapper jackson3ObjectMapper() {
+            // Jackson 3.x for Spring Boot 4's internal use
+            return JsonMapper.builder()
+                    .disable(tools.jackson.databind.DeserializationFeature.ACCEPT_FLOAT_AS_INT)
+                    .build();
+        }
 
-        @PostConstruct
-        public void init() {
-            mapper.registerModule(new JavaTimeModule());
-            mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
-            mapper.disable(DeserializationFeature.ACCEPT_FLOAT_AS_INT);
+        @Bean
+        public com.fasterxml.jackson.databind.ObjectMapper objectMapper() {
+            // Jackson 2.x for test compatibility
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+            mapper.disable(com.fasterxml.jackson.databind.DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+            mapper.disable(com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_FLOAT_AS_INT);
+            return mapper;
         }
 
         @Bean("InvokerTraceIdCreator")
