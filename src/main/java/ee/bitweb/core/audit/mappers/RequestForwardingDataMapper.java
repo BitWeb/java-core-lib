@@ -1,6 +1,6 @@
 package ee.bitweb.core.audit.mappers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import ee.bitweb.core.audit.AuditLogProperties;
 import ee.bitweb.core.util.HttpForwardedHeaderParser;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,7 +29,7 @@ public class RequestForwardingDataMapper implements AuditLogDataMapper {
     private static final String X_FORWARDED_FOR_HEADER = "X-Forwarded-For";
 
     private final AuditLogProperties properties;
-    private final ObjectMapper mapper;
+    private final JsonMapper mapper;
 
     public String getValue(HttpServletRequest request, HttpServletResponse response) {
         Map<String, String> value = new HashMap<>();

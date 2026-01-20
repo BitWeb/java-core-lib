@@ -8,6 +8,7 @@ import org.springframework.amqp.rabbit.listener.ConditionalRejectingErrorHandler
 @RequiredArgsConstructor
 public class CoreExceptionStrategy extends ConditionalRejectingErrorHandler.DefaultExceptionStrategy {
 
+    // todo: mis ja miks vajalik? kas keegi mäletab?
     @Override
     public boolean isUserCauseFatal(Throwable t) {
         return true;

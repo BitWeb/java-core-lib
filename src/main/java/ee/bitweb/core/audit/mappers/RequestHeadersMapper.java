@@ -1,6 +1,6 @@
 package ee.bitweb.core.audit.mappers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import ee.bitweb.core.audit.AuditLogProperties;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,7 +17,7 @@ import java.util.Map;
 public class RequestHeadersMapper implements AuditLogDataMapper {
 
     private final AuditLogProperties properties;
-    private final ObjectMapper mapper;
+    private final JsonMapper mapper;
 
     public static final String KEY = "request_headers";
 

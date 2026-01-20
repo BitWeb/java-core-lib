@@ -12,8 +12,10 @@ import ee.bitweb.core.trace.thread.ThreadTraceIdFormConfig;
 import ee.bitweb.core.trace.thread.ThreadTraceIdResolver;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,6 +26,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("integration")
+@ExtendWith(MockitoExtension.class)
 @SpringBootTest(
         properties = {
                 "ee.bitweb.core.trace.auto-configuration=true",

@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
 
 @ToString
 @Getter
@@ -30,7 +31,7 @@ public class FieldErrorResponse implements Comparable<FieldErrorResponse> {
     }
 
     @Override
-    public int compareTo(FieldErrorResponse o) {
+    public int compareTo(@NotNull FieldErrorResponse o) {
         return Comparator.nullsFirst(
                 Comparator.comparing(FieldErrorResponse::getField, NULL_SAFE_STRING_COMPARATOR)
                         .thenComparing(FieldErrorResponse::getReason, NULL_SAFE_STRING_COMPARATOR)
