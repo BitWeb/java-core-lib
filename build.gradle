@@ -1,25 +1,11 @@
-buildscript {
-    ext {
-        springBootVersion = project.hasProperty('springBootVersion') ? project.springBootVersion : '3.5.0'
-        springVersion = project.hasProperty('springFrameworkVersion') ? project.springFrameworkVersion : '6.2.7'
-        jacksonVersion = '2.20.1'
-        retrofitVersion = '3.0.0'
-        mockitoVersion = '5.21.+' // At least Mockito 5.2.0 is required to Mock final classes
-    }
-    dependencies {
-        classpath 'org.owasp:dependency-check-gradle'
-    }
-}
-
 plugins {
     id 'java'
-    id "org.owasp.dependencycheck" version "12.1.9"
-    id "io.freefair.lombok" version "9.1.0"
+    id "io.freefair.lombok" version "9.2.0"
     id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
 }
 
-group 'ee.bitweb'
-version '4.0.5'
+group = 'ee.bitweb'
+version = '4.0.5'
 java {
     sourceCompatibility = '17'
 }
@@ -38,82 +24,83 @@ repositories {
 
 dependencies {
     // https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-catalina
-    compileOnly group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '10.1.50'
+    compileOnly 'org.apache.tomcat:tomcat-catalina:10.1.50'
 
     // https://mvnrepository.com/artifact/org.springframework/spring-webmvc
-    compileOnly group: 'org.springframework', name: 'spring-webmvc', version: "${springVersion}"
+    compileOnly 'org.springframework:spring-webmvc:6.2.7'
 
     // https://mvnrepository.com/artifact/org.springframework/spring-tx
-    compileOnly group: 'org.springframework', name: 'spring-tx', version: "${springVersion}"
+    compileOnly 'org.springframework:spring-tx:6.2.7'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
-    compileOnly group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: "${springBootVersion}"
+    compileOnly 'org.springframework.boot:spring-boot-starter-security:3.5.0'
 
     // https://mvnrepository.com/artifact/org.springframework.amqp/spring-amqp
-    compileOnly group: 'org.springframework.boot', name: 'spring-boot-starter-amqp', version: "${springBootVersion}"
+    compileOnly 'org.springframework.boot:spring-boot-starter-amqp:3.5.0'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor
-    annotationProcessor  group: 'org.springframework.boot', name: 'spring-boot-configuration-processor', version: "${springBootVersion}"
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor:3.5.0'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-actuator
-    compileOnly group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: "${springBootVersion}"
+    compileOnly 'org.springframework.boot:spring-boot-starter-actuator:3.5.0'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-autoconfigure
-    compileOnly group: 'org.springframework.boot', name: 'spring-boot-autoconfigure', version: "${springBootVersion}"
+    compileOnly 'org.springframework.boot:spring-boot-autoconfigure:3.5.0'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
-    compileOnly group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: "${springBootVersion}"
+    compileOnly 'org.springframework.boot:spring-boot-starter-validation:3.5.0'
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
-    compileOnly group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: "${jacksonVersion}"
+    compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.1'
 
     // https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api
-    compileOnly group: 'jakarta.validation', name: 'jakarta.validation-api', version: '3.1.1'
+    compileOnly 'jakarta.validation:jakarta.validation-api:3.1.1'
 
     // https://mvnrepository.com/artifact/com.squareup.retrofit2/retrofit
-    compileOnly group: 'com.squareup.retrofit2', name: 'retrofit', version: "${retrofitVersion}"
+    compileOnly 'com.squareup.retrofit2:retrofit:3.0.0'
 
     // https://mvnrepository.com/artifact/com.squareup.retrofit2/converter-jackson
-    compileOnly group: 'com.squareup.retrofit2', name: 'converter-jackson', version: "${retrofitVersion}"
+    compileOnly 'com.squareup.retrofit2:converter-jackson:3.0.0'
 
     // https://mvnrepository.com/artifact/com.squareup.okhttp3/logging-interceptor
-    compileOnly group: 'com.squareup.okhttp3', name: 'logging-interceptor', version: '4.12.0'
+    compileOnly 'com.squareup.okhttp3:logging-interceptor:5.3.2'
 
     // https://mvnrepository.com/artifact/de.siegmar/logback-gelf
-    compileOnly group: 'de.siegmar', name: 'logback-gelf', version: '6.1.+'
+    compileOnly 'de.siegmar:logback-gelf:6.1.+'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: "${springBootVersion}"
+    testImplementation 'org.springframework.boot:spring-boot-starter-web:3.5.0'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: "${springBootVersion}"
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.5.0'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: "${springBootVersion}"
+    testImplementation 'org.springframework.boot:spring-boot-starter-security:3.5.0'
 
     // https://mvnrepository.com/artifact/org.springframework.amqp/spring-amqp
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-amqp', version: "${springBootVersion}"
+    testImplementation 'org.springframework.boot:spring-boot-starter-amqp:3.5.0'
 
     // https://mvnrepository.com/artifact/org.json/json
-    testImplementation group: 'org.json', name: 'json', version: '20250517'
+    testImplementation 'org.json:json:20250517'
 
     // https://mvnrepository.com/artifact/ee.bitweb/spring-test-core
-    testImplementation group: 'ee.bitweb', name: 'spring-test-core', version: '2.+'
+    testImplementation 'ee.bitweb:spring-test-core:2.+'
 
     // https://mvnrepository.com/artifact/org.mockito/mockito-core
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: "${mockitoVersion}"
+    testImplementation 'org.mockito:mockito-core:5.21.+'
 
     // https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter
-    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: "${mockitoVersion}"
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.21.+'
 
     // https://mvnrepository.com/artifact/org.mock-server/mockserver-netty
-    testImplementation ("org.mock-server:mockserver-netty:5.15.0") {
+    testImplementation('org.mock-server:mockserver-netty:5.15.0') {
         exclude group: 'junit', module: 'junit'
     }
 
-    testImplementation group : 'org.testcontainers', name: 'testcontainers',  version: "1.+"
+    // https://mvnrepository.com/artifact/org.testcontainers/testcontainers
+    testImplementation 'org.testcontainers:testcontainers:1.+'
 
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 configurations {
