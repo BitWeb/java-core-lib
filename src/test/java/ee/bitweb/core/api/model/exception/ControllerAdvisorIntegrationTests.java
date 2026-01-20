@@ -427,6 +427,133 @@ class ControllerAdvisorIntegrationTests {
         assertIdField(result);
     }
 
+    @Test
+    @DisplayName("BindException: Should return validation errors for missing required form fields")
+    void onBindExceptionWithMissingRequiredFieldsShouldReturnBadRequest() throws Exception {
+        MockHttpServletRequestBuilder mockMvcBuilder = get(TestPingController.BASE_URL + "/validated-complex")
+                .header(TRACE_ID_HEADER_NAME, "1234567890");
+
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        ResponseAssertions.assertValidationErrorResponse(
+                result,
+                List.of(
+                        Error.notNull("age"),
+                        Error.notBlank("email"),
+                        Error.notBlank("name"),
+                        Error.notNull("name")
+                )
+        );
+        assertIdField(result);
+    }
+
+    @Test
+    @DisplayName("BindException: Should return validation errors for blank fields")
+    void onBindExceptionWithBlankFieldsShouldReturnBadRequest() throws Exception {
+        MockHttpServletRequestBuilder mockMvcBuilder = get(TestPingController.BASE_URL + "/validated-complex")
+                .header(TRACE_ID_HEADER_NAME, "1234567890")
+                .param("name", "")
+                .param("age", "25")
+                .param("email", "  ");
+
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        ResponseAssertions.assertValidationErrorResponse(
+                result,
+                List.of(
+                        Error.notBlank("email"),
+                        Error.notBlank("name")
+                )
+        );
+        assertIdField(result);
+    }
+
+    @Test
+    @DisplayName("BindException: Should return type mismatch error for invalid integer")
+    void onBindExceptionWithTypeMismatchShouldReturnBadRequest() throws Exception {
+        MockHttpServletRequestBuilder mockMvcBuilder = get(TestPingController.BASE_URL + "/validated-complex")
+                .header(TRACE_ID_HEADER_NAME, "1234567890")
+                .param("name", "John")
+                .param("age", "not-a-number")
+                .param("email", "john@example.com");
+
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        ResponseAssertions.assertValidationErrorResponse(
+                result,
+                List.of(
+                        new Error("age", "typeMismatch", "Unable to interpret value: not-a-number")
+                )
+        );
+        assertIdField(result);
+    }
+
+    @Test
+    @DisplayName("BindException: Should return multiple errors for type mismatch and validation")
+    void onBindExceptionWithMixedErrorsShouldReturnBadRequest() throws Exception {
+        MockHttpServletRequestBuilder mockMvcBuilder = get(TestPingController.BASE_URL + "/validated-complex")
+                .header(TRACE_ID_HEADER_NAME, "1234567890")
+                .param("name", "")
+                .param("age", "invalid")
+                .param("email", "test@example.com");
+
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        ResponseAssertions.assertValidationErrorResponse(
+                result,
+                List.of(
+                        new Error("age", "typeMismatch", "Unable to interpret value: invalid"),
+                        Error.notBlank("name")
+                )
+        );
+        assertIdField(result);
+    }
+
+    @Test
+    @DisplayName("BindException: Should handle type mismatch on form binding without @Valid")
+    void onPureBindExceptionWithTypeMismatchShouldReturnBadRequest() throws Exception {
+        MockHttpServletRequestBuilder mockMvcBuilder = get(TestPingController.BASE_URL + "/form-binding")
+                .header(TRACE_ID_HEADER_NAME, "1234567890")
+                .param("name", "John")
+                .param("count", "not-a-number");
+
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        ResponseAssertions.assertValidationErrorResponse(
+                result,
+                List.of(
+                        new Error("count", "typeMismatch", "Unable to interpret value: not-a-number")
+                )
+        );
+        assertIdField(result);
+    }
+
+    @Test
+    @DisplayName("BindException: Should handle multiple type mismatches on form binding without @Valid")
+    void onPureBindExceptionWithMultipleTypeMismatchesShouldReturnBadRequest() throws Exception {
+        MockHttpServletRequestBuilder mockMvcBuilder = get(TestPingController.BASE_URL + "/form-binding")
+                .header(TRACE_ID_HEADER_NAME, "1234567890")
+                .param("count", "abc")
+                .param("date", "invalid-date");
+
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        ResponseAssertions.assertValidationErrorResponse(
+                result,
+                List.of(
+                        new Error("count", "typeMismatch", "Unable to interpret value: abc"),
+                        new Error("date", "typeMismatch", "Unable to interpret value: invalid-date")
+                )
+        );
+        assertIdField(result);
+    }
+
+    @Test
+    @DisplayName("BindException: Should handle explicitly thrown BindException")
+    void onExplicitBindExceptionShouldReturnBadRequest() throws Exception {
+        MockHttpServletRequestBuilder mockMvcBuilder = get(TestPingController.BASE_URL + "/throw-bind-exception")
+                .header(TRACE_ID_HEADER_NAME, "1234567890");
+
+        ResultActions result = mockMvc.perform(mockMvcBuilder).andDo(print());
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.id", is("1234567890_generated-trace-id")))
+                .andExpect(jsonPath("$.message", is("INVALID_ARGUMENT")));
+    }
+
     private void testFieldPost(String field, String value, String expectedReason, String expectedMessage) throws Exception {
         MockHttpServletRequestBuilder mockMvcBuilder = post(TestPingController.BASE_URL)
                 .header(TRACE_ID_HEADER_NAME, "1234567890")
