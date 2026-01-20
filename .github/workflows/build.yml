@@ -55,7 +55,7 @@ jobs:
   sonar-dependabot:
     name: Sonar (Dependabot PRs)
     # Only run when the event is pull_request_target and the actor is Dependabot
-    if: github.event_name == 'pull_request_target' && github.actor == 'dependabot[bot]'
+    if: github.event_name == 'pull_request_target' && github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
     permissions:
       contents: read
