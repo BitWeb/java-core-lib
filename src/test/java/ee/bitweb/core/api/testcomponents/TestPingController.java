@@ -24,6 +24,7 @@ import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,19 +53,46 @@ public class TestPingController {
     }
 
     @GetMapping("/validated")
-    public void getValidated(@Valid SimpleValidatedObject data) {}
+    public void getValidated(@Valid SimpleValidatedObject data) {
+        // nothing to do
+    }
+
+    @GetMapping("/validated-complex")
+    public void getValidatedComplex(@Valid ComplexValidatedFormObject data) {
+        // nothing to do
+    }
+
+    @GetMapping("/form-binding")
+    public void formBinding(FormBindingObject data) {
+        // nothing to do
+    }
+
+    @GetMapping("/throw-bind-exception")
+    public void throwBindException() throws BindException {
+        BindException exception = new BindException(new Object(), "testObject");
+        exception.reject("TestError", "Test binding error");
+        throw exception;
+    }
 
     @PostMapping("/validated-list")
-    public void postValidatedList(@RequestBody List<@Valid ComplexValidatedObject> data) {}
+    public void postValidatedList(@RequestBody List<@Valid ComplexValidatedObject> data) {
+        // nothing to do
+    }
 
     @GetMapping("/complex-data")
-    public void dateFieldParam(ComplexData data) {}
+    public void dateFieldParam(ComplexData data) {
+        // nothing to do
+    }
 
     @GetMapping("/with-request-param")
-    public void get(@RequestParam("id") Long id) {}
+    public void get(@RequestParam("id") Long id) {
+        // nothing to do
+    }
 
     @PostMapping("/import")
-    public void uploadFile(@RequestParam("file") MultipartFile file) {}
+    public void uploadFile(@RequestParam("file") MultipartFile file) {
+        // nothing to do
+    }
 
     @GetMapping("/base-exception")
     public void throwsBaseException() {
@@ -156,6 +184,34 @@ public class TestPingController {
         private SimpleObject.EnumField enumField;
         private SimpleObject nestedTestObject;
         private List<SimpleObject> nestedTestObjectList;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    public static class ComplexValidatedFormObject {
+
+        @NotNull
+        @NotBlank
+        private String name;
+
+        @NotNull
+        private Integer age;
+
+        @NotBlank
+        private String email;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    public static class FormBindingObject {
+
+        private String name;
+
+        private Integer count;
+
+        private LocalDate date;
     }
 
     @Getter
