@@ -7,6 +7,7 @@ import ee.bitweb.core.exception.persistence.Criteria;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 @EqualsAndHashCode
@@ -27,7 +28,7 @@ public class CriteriaResponse implements Comparable<CriteriaResponse> {
     }
 
     @Override
-    public int compareTo(CriteriaResponse o) {
+    public int compareTo(@NotNull CriteriaResponse o) {
         return Comparator.nullsFirst(
                 Comparator.comparing(CriteriaResponse::getField, NULL_SAFE_STRING_COMPARATOR)
                         .thenComparing(CriteriaResponse::getValue, NULL_SAFE_STRING_COMPARATOR)

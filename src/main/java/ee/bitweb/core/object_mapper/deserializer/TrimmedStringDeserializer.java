@@ -1,25 +1,31 @@
 package ee.bitweb.core.object_mapper.deserializer;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.deser.std.StringDeserializer;
-import com.fasterxml.jackson.databind.module.SimpleModule;
+import ee.bitweb.core.util.StringUtil;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.deser.std.StdScalarDeserializer;
+import tools.jackson.databind.module.SimpleModule;
 
-import java.io.IOException;
+/**
+ * Jackson 3.x deserializer that trims whitespace from all string fields.
+ *
+ * @see Jackson2TrimmedStringDeserializer for Jackson 2.x version (Retrofit compatibility)
+ */
+public class TrimmedStringDeserializer extends StdScalarDeserializer<String> {
 
-public class TrimmedStringDeserializer extends StringDeserializer {
-
-    @Override
-    public String deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-        String value = super.deserialize(p, ctxt);
-
-        return value != null ? value.trim() : null;
+    public TrimmedStringDeserializer() {
+        super(String.class);
     }
 
-    public static void addToObjectMapper(ObjectMapper mapper) {
+    @Override
+    public String deserialize(JsonParser p, DeserializationContext ctxt) {
+        return StringUtil.trim(p.getString());
+    }
+
+    public static SimpleModule createModule() {
         SimpleModule module = new SimpleModule();
         module.addDeserializer(String.class, new TrimmedStringDeserializer());
-        mapper.registerModule(module);
+
+        return module;
     }
 }
