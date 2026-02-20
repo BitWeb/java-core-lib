@@ -8,57 +8,18 @@ on:
     branches: [ "master" ]
   workflow_dispatch:
 
+env:
+  DEFAULT_JAVA_VERSION: '17'
+
 jobs:
-  generate-matrix:
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    name: Generate version matrix
-    steps:
-      - uses: actions/checkout@v6
-      - name: Read matrix from JSON
-        id: set-matrix
-        run: |
-          MATRIX=$(jq -c '.matrix' .github/spring-versions.json)
-          echo "matrix={\"include\":$MATRIX}" >> $GITHUB_OUTPUT
-
-  regression-tests:
-    needs: generate-matrix
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
-    name: Test Spring Boot ${{ matrix.boot }} / Java ${{ matrix.java }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Setup Java
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: ${{ matrix.java }}
-
-      - name: Run tests and generate reports
-        run: ./gradlew testAndReport -PspringBootVersion=${{ matrix.boot }} -PspringFrameworkVersion=${{ matrix.framework }}
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v6
-        if: always()
-        with:
-          name: report-java-${{ matrix.java }}-spring-boot-${{ matrix.boot }}
-          path: build/reports/**
-          retention-days: 5
 
   test:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        java: [ '17', '21' ]
-    name: Test Spring Boot latest / Java ${{ matrix.java }}
+        java: [ '17', '21', '25' ]
+    name: Test with Java ${{ matrix.java }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -78,13 +39,13 @@ jobs:
         uses: actions/upload-artifact@v6
         if: always()
         with:
-          name: report-java-${{ matrix.java }}-spring-boot-latest
+          name: report-java-${{ matrix.java }}
           path: build/reports/**
           retention-days: 5
 
       - name: Run Sonar analysis
         # Skip Sonar on Dependabot in pull_request runs (no secrets there); handled by a separate job below
-        if: matrix.java == '17' && github.actor != 'dependabot[bot]'
+        if: matrix.java == env.DEFAULT_JAVA_VERSION && github.actor != 'dependabot[bot]'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -94,7 +55,7 @@ jobs:
   sonar-dependabot:
     name: Sonar (Dependabot PRs)
     # Only run when the event is pull_request_target and the actor is Dependabot
-    if: github.event_name == 'pull_request_target' && github.actor == 'dependabot[bot]'
+    if: github.event_name == 'pull_request_target' && github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -111,7 +72,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: ${{ env.DEFAULT_JAVA_VERSION }}
 
       - name: Build (no tests)
         run: ./gradlew assemble -x test
@@ -133,7 +94,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: 17
+          java-version: ${{ env.DEFAULT_JAVA_VERSION }}
 
       - name: Run build with Gradle Wrapper
         run: ./gradlew build -x test

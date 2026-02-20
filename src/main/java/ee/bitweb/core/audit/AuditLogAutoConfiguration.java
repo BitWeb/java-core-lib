@@ -1,6 +1,6 @@
 package ee.bitweb.core.audit;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import ee.bitweb.core.audit.mappers.*;
 import ee.bitweb.core.audit.writers.AuditLogLoggerWriterAdapter;
 import ee.bitweb.core.audit.writers.AuditLogWriteAdapter;
@@ -50,7 +50,7 @@ public class AuditLogAutoConfiguration {
     @ConditionalOnEnabledMapper(mapper = RequestForwardingDataMapper.KEY)
     public RequestForwardingDataMapper requestForwardingDataMapper(
             AuditLogProperties properties,
-            ObjectMapper mapper
+            JsonMapper mapper
     ) {
         return new RequestForwardingDataMapper(properties, mapper);
     }
@@ -59,7 +59,7 @@ public class AuditLogAutoConfiguration {
     @ConditionalOnEnabledMapper(mapper = RequestHeadersMapper.KEY)
     public RequestHeadersMapper requestHeadersMapper(
             AuditLogProperties properties,
-            ObjectMapper mapper
+            JsonMapper mapper
     ) {
         return new RequestHeadersMapper(properties, mapper);
     }

@@ -2,8 +2,8 @@ package ee.bitweb.core.actuator;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.actuate.autoconfigure.health.HealthEndpointProperties;
-import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
+import org.springframework.boot.health.autoconfigure.actuate.endpoint.HealthEndpointProperties;
+import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.boot.actuate.endpoint.Show;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +25,7 @@ public class ActuatorHealthSecurity {
 
     private final HealthEndpointProperties healthEndpointProperties;
 
-    protected void configure(HttpSecurity httpSecurity) throws Exception {
+    protected void configure(HttpSecurity httpSecurity) {
         List<String> allowedRoles = actuatorSecurityProperties.getHealthEndpointRoles();
 
         logUnsafeHealthEndpointWarning();

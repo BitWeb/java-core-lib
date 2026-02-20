@@ -52,7 +52,8 @@ public class AuditLogFilter implements Filter {
     ) throws ServletException, IOException {
         long start = System.currentTimeMillis();
         ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper(
-                (HttpServletRequest) request
+                (HttpServletRequest) request,
+                (int) properties.getMaxLoggableRequestSize()
         );
         ContentCachingResponseWrapper responseWrapper = new ContentCachingResponseWrapper(
                 (HttpServletResponse)  response
