@@ -1,6 +1,5 @@
 package ee.bitweb.core;
 
-
 import tools.jackson.databind.json.JsonMapper;
 import ee.bitweb.core.trace.creator.TraceIdCreator;
 import org.springframework.boot.SpringApplication;
@@ -64,7 +63,7 @@ public class TestSpringApplication {
     public static class SecurityConfiguration {
 
         @Bean
-        protected SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
+        protected SecurityFilterChain configure(HttpSecurity httpSecurity) {
             // Configure security to allow any request other than actuator requests
 
             return httpSecurity

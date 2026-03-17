@@ -51,7 +51,7 @@ public class RequestHeadersMapper implements AuditLogDataMapper {
         if (!headerValues.hasMoreElements()) return null;
 
         while (headerValues.hasMoreElements()) {
-            if (builder.length() != 0) {
+            if (!builder.isEmpty()) {
                 builder.append("|");
             }
             String headerValue = headerValues.nextElement();

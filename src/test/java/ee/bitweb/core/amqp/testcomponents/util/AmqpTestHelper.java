@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -92,11 +91,11 @@ public class AmqpTestHelper {
         return result;
     }
 
-    public <T> AmqpParsedMessage<T> convert(Message message, Class<T> clazz) throws IOException {
+    public <T> AmqpParsedMessage<T> convert(Message message, Class<T> clazz) {
         return new AmqpParsedMessage<T>(message, mapper.readValue(new String(message.getBody()), clazz));
     }
 
-    public <T> List<AmqpParsedMessage<T>> convert(List<Message> messages, Class<T> clazz) throws IOException {
+    public <T> List<AmqpParsedMessage<T>> convert(List<Message> messages, Class<T> clazz) {
         List<AmqpParsedMessage<T>> response = new ArrayList<>();
         for (Message message : messages) {
             response.add(convert(message, clazz));

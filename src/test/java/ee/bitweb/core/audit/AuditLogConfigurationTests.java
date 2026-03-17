@@ -51,7 +51,7 @@ class AuditLogConfigurationTests {
     private CustomAuditLogWriter writer;
 
     @BeforeEach
-    public void beforeEachC() {
+    void beforeEachC() {
         writer.reset();
     }
 

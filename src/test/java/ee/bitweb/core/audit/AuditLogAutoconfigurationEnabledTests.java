@@ -49,7 +49,7 @@ class AuditLogAutoconfigurationEnabledTests {
         private CustomAuditLogWriter writer;
 
         @BeforeEach
-        public void init() {
+        void init() {
                 writer.reset();
         }
 

@@ -343,6 +343,7 @@ public class ControllerAdvisor {
             case DEBUG -> log.debug(message);
             case TRACE -> log.trace(message);
             case OFF -> {
+                // nothing to do, logging has been turned off
             }
         }
     }

@@ -23,9 +23,9 @@ public class AmqpTraceAdvisor implements AmqpListenerInterceptor {
         log.debug("Attempting to resolve trace id from Incoming message.");
 
         for (Object argument : invocation.getArguments()) {
-            if (argument instanceof Message) {
+            if (argument instanceof Message message) {
                 log.debug("Found Message object argument list, invoking trace resolution.");
-                resolver.resolve((Message) argument);
+                resolver.resolve(message);
             }
         }
         try {

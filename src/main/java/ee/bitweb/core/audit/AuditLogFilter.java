@@ -33,8 +33,8 @@ public class AuditLogFilter implements Filter {
             ServletResponse response,
             FilterChain chain
     ) throws IOException, ServletException {
-        if (request instanceof HttpServletRequest) {
-            if (isBlacklisted((HttpServletRequest) request)) {
+        if (request instanceof HttpServletRequest httpRequest) {
+            if (isBlacklisted(httpRequest)) {
                 log.debug("Request is blacklisted for request logging, will skip further processing.");
                 chain.doFilter(request, response);
 
