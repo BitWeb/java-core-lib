@@ -33,8 +33,8 @@ public class AuditLogFilter implements Filter {
             ServletResponse response,
             FilterChain chain
     ) throws IOException, ServletException {
-        if (request instanceof HttpServletRequest) {
-            if (isBlacklisted((HttpServletRequest) request)) {
+        if (request instanceof HttpServletRequest httpRequest) {
+            if (isBlacklisted(httpRequest)) {
                 log.debug("Request is blacklisted for request logging, will skip further processing.");
                 chain.doFilter(request, response);
 
@@ -52,7 +52,8 @@ public class AuditLogFilter implements Filter {
     ) throws ServletException, IOException {
         long start = System.currentTimeMillis();
         ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper(
-                (HttpServletRequest) request
+                (HttpServletRequest) request,
+                (int) properties.getMaxLoggableRequestSize()
         );
         ContentCachingResponseWrapper responseWrapper = new ContentCachingResponseWrapper(
                 (HttpServletResponse)  response

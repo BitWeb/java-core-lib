@@ -6,8 +6,8 @@ import org.springframework.amqp.core.Message;
 
 @Getter
 @AllArgsConstructor
-public class AmqpParsedMessage<Body> {
+public class AmqpParsedMessage<B> {
 
     private Message message;
-    private Body body;
+    private B body;
 }

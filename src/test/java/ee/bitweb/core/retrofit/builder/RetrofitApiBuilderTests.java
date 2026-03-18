@@ -171,13 +171,13 @@ class RetrofitApiBuilderTests {
         OkHttpClient.Builder clientBuilder = Mockito.spy(OkHttpClient.Builder.class);
         AtomicReference<OkHttpClient> clientRef = new AtomicReference<>();
 
-        Mockito.doAnswer((answer) -> {
+        Mockito.doAnswer(answer -> {
             OkHttpClient client = (OkHttpClient) answer.callRealMethod();
             clientRef.set(client);
             return client;
         }).when(clientBuilder).build();
 
-        ExternalServiceApi api = RetrofitApiBuilder
+        RetrofitApiBuilder
                 .create(BASE_URL + server.getPort(), ExternalServiceApi.class, null)
                 .clientBuilder(clientBuilder)
                 .callTimeout(999)
@@ -191,13 +191,13 @@ class RetrofitApiBuilderTests {
         OkHttpClient.Builder clientBuilder = Mockito.spy(OkHttpClient.Builder.class);
         AtomicReference<OkHttpClient> clientRef = new AtomicReference<>();
 
-        Mockito.doAnswer((answer) -> {
+        Mockito.doAnswer(answer -> {
             OkHttpClient client = (OkHttpClient) answer.callRealMethod();
             clientRef.set(client);
             return client;
         }).when(clientBuilder).build();
 
-        ExternalServiceApi api = RetrofitApiBuilder
+        RetrofitApiBuilder
                 .create(BASE_URL + server.getPort(), ExternalServiceApi.class, null)
                 .clientBuilder(clientBuilder)
                 .connectTimeout(999)
@@ -211,13 +211,13 @@ class RetrofitApiBuilderTests {
         OkHttpClient.Builder clientBuilder = Mockito.spy(OkHttpClient.Builder.class);
         AtomicReference<OkHttpClient> clientRef = new AtomicReference<>();
 
-        Mockito.doAnswer((answer) -> {
+        Mockito.doAnswer(answer -> {
             OkHttpClient client = (OkHttpClient) answer.callRealMethod();
             clientRef.set(client);
             return client;
         }).when(clientBuilder).build();
 
-        ExternalServiceApi api = RetrofitApiBuilder
+        RetrofitApiBuilder
                 .create(BASE_URL + server.getPort(), ExternalServiceApi.class, null)
                 .clientBuilder(clientBuilder)
                 .readTimeout(999)
@@ -231,13 +231,13 @@ class RetrofitApiBuilderTests {
         OkHttpClient.Builder clientBuilder = Mockito.spy(OkHttpClient.Builder.class);
         AtomicReference<OkHttpClient> clientRef = new AtomicReference<>();
 
-        Mockito.doAnswer((answer) -> {
+        Mockito.doAnswer(answer -> {
             OkHttpClient client = (OkHttpClient) answer.callRealMethod();
             clientRef.set(client);
             return client;
         }).when(clientBuilder).build();
 
-        ExternalServiceApi api = RetrofitApiBuilder
+        RetrofitApiBuilder
                 .create(BASE_URL + server.getPort(), ExternalServiceApi.class, null)
                 .clientBuilder(clientBuilder)
                 .writeTimeout(999)

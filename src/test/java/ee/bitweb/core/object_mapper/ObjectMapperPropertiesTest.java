@@ -20,7 +20,7 @@ class ObjectMapperPropertiesTest {
     void shouldHaveDefaultAutoConfigurationAsFalse() {
         ObjectMapperProperties properties = new ObjectMapperProperties();
 
-        assertFalse(properties.getAutoConfiguration());
+        assertFalse(properties.isAutoConfiguration());
     }
 
     @Test
@@ -30,7 +30,7 @@ class ObjectMapperPropertiesTest {
 
         properties.setAutoConfiguration(true);
 
-        assertTrue(properties.getAutoConfiguration());
+        assertTrue(properties.isAutoConfiguration());
     }
 
     @Test
@@ -41,6 +41,6 @@ class ObjectMapperPropertiesTest {
 
         properties.setAutoConfiguration(false);
 
-        assertFalse(properties.getAutoConfiguration());
+        assertFalse(properties.isAutoConfiguration());
     }
 }

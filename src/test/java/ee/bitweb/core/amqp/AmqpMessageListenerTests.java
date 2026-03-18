@@ -37,7 +37,7 @@ class AmqpMessageListenerTests {
         private AmqpTestHelper amqpTestHelper;
 
         @AfterEach
-        public void cleanup() {
+        void cleanup() {
                 amqpTestHelper.clear(AmqpConfig.COMMAND_QUEUE_NAME);
                 amqpTestHelper.clear(AmqpConfig.COMMAND_QUEUE_SIMPLE_NAME);
                 amqpTestHelper.clear(AmqpConfig.COMMAND_DEAD_LETTER_EXCHANGE_NAME);

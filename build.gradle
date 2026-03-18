@@ -1,25 +1,11 @@
-buildscript {
-    ext {
-        springBootVersion = project.hasProperty('springBootVersion') ? project.springBootVersion : '3.5.0'
-        springVersion = project.hasProperty('springFrameworkVersion') ? project.springFrameworkVersion : '6.2.7'
-        jacksonVersion = '2.21.1'
-        retrofitVersion = '3.0.0'
-        mockitoVersion = '5.22.+' // At least Mockito 5.2.0 is required to Mock final classes
-    }
-    dependencies {
-        classpath 'org.owasp:dependency-check-gradle'
-    }
-}
-
 plugins {
     id 'java'
-    id "org.owasp.dependencycheck" version "12.2.0"
     id "io.freefair.lombok" version "9.2.0"
     id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
 }
 
-group 'ee.bitweb'
-version '4.0.5'
+group = 'ee.bitweb'
+version = '5.0.0-RC1'
 java {
     sourceCompatibility = '17'
 }
@@ -38,82 +24,95 @@ repositories {
 
 dependencies {
     // https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-catalina
-    compileOnly group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '10.1.52'
+    compileOnly 'org.apache.tomcat:tomcat-catalina:11.0.12'
 
     // https://mvnrepository.com/artifact/org.springframework/spring-webmvc
-    compileOnly group: 'org.springframework', name: 'spring-webmvc', version: "${springVersion}"
+    compileOnly 'org.springframework:spring-webmvc:7.0.0'
 
     // https://mvnrepository.com/artifact/org.springframework/spring-tx
-    compileOnly group: 'org.springframework', name: 'spring-tx', version: "${springVersion}"
+    compileOnly 'org.springframework:spring-tx:7.0.0'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
-    compileOnly group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: "${springBootVersion}"
+    compileOnly 'org.springframework.boot:spring-boot-starter-security:4.0.0'
 
     // https://mvnrepository.com/artifact/org.springframework.amqp/spring-amqp
-    compileOnly group: 'org.springframework.boot', name: 'spring-boot-starter-amqp', version: "${springBootVersion}"
+    compileOnly 'org.springframework.boot:spring-boot-starter-amqp:4.0.0'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor
-    annotationProcessor  group: 'org.springframework.boot', name: 'spring-boot-configuration-processor', version: "${springBootVersion}"
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor:4.0.0'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-actuator
-    compileOnly group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: "${springBootVersion}"
+    compileOnly 'org.springframework.boot:spring-boot-starter-actuator:4.0.0'
+
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-health (new in Spring Boot 4)
+    compileOnly 'org.springframework.boot:spring-boot-health:4.0.0'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-autoconfigure
-    compileOnly group: 'org.springframework.boot', name: 'spring-boot-autoconfigure', version: "${springBootVersion}"
+    compileOnly 'org.springframework.boot:spring-boot-autoconfigure:4.0.0'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
-    compileOnly group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: "${springBootVersion}"
+    compileOnly 'org.springframework.boot:spring-boot-starter-validation:4.0.0'
 
-    // https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
-    compileOnly group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: "${jacksonVersion}"
+    // Jackson 2.x - required for Retrofit converter-jackson (Retrofit doesn't support Jackson 3 yet)
+    compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.1'
+
+    // Jackson 3.x - required for Spring Boot 4 (ObjectMapper, ControllerAdvisor, Audit module)
+    compileOnly 'tools.jackson.core:jackson-databind:3.0.2'
+
+    // Spring Boot Jackson - provides JsonMapperBuilderCustomizer
+    compileOnly 'org.springframework.boot:spring-boot-jackson:4.0.0'
 
     // https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api
-    compileOnly group: 'jakarta.validation', name: 'jakarta.validation-api', version: '3.1.1'
+    compileOnly 'jakarta.validation:jakarta.validation-api:3.1.1'
 
     // https://mvnrepository.com/artifact/com.squareup.retrofit2/retrofit
-    compileOnly group: 'com.squareup.retrofit2', name: 'retrofit', version: "${retrofitVersion}"
+    compileOnly 'com.squareup.retrofit2:retrofit:3.0.0'
 
     // https://mvnrepository.com/artifact/com.squareup.retrofit2/converter-jackson
-    compileOnly group: 'com.squareup.retrofit2', name: 'converter-jackson', version: "${retrofitVersion}"
+    compileOnly 'com.squareup.retrofit2:converter-jackson:3.0.0'
 
     // https://mvnrepository.com/artifact/com.squareup.okhttp3/logging-interceptor
-    compileOnly group: 'com.squareup.okhttp3', name: 'logging-interceptor', version: '4.12.0'
+    compileOnly 'com.squareup.okhttp3:logging-interceptor:5.3.2'
 
     // https://mvnrepository.com/artifact/de.siegmar/logback-gelf
-    compileOnly group: 'de.siegmar', name: 'logback-gelf', version: '6.1.+'
+    compileOnly 'de.siegmar:logback-gelf:6.1.2'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: "${springBootVersion}"
+    testImplementation 'org.springframework.boot:spring-boot-starter-web:4.0.0'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: "${springBootVersion}"
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:4.0.0'
+
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-webmvc-test (new in Spring Boot 4 for MockMvc testing)
+    testImplementation 'org.springframework.boot:spring-boot-webmvc-test:4.0.0'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: "${springBootVersion}"
+    testImplementation 'org.springframework.boot:spring-boot-starter-security:4.0.0'
 
     // https://mvnrepository.com/artifact/org.springframework.amqp/spring-amqp
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-amqp', version: "${springBootVersion}"
+    testImplementation 'org.springframework.boot:spring-boot-starter-amqp:4.0.0'
 
     // https://mvnrepository.com/artifact/org.json/json
-    testImplementation group: 'org.json', name: 'json', version: '20250517'
+    testImplementation 'org.json:json:20251224'
 
     // https://mvnrepository.com/artifact/ee.bitweb/spring-test-core
-    testImplementation group: 'ee.bitweb', name: 'spring-test-core', version: '2.+'
+    testImplementation 'ee.bitweb:spring-test-core:2.0.1'
 
     // https://mvnrepository.com/artifact/org.mockito/mockito-core
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: "${mockitoVersion}"
+    testImplementation 'org.mockito:mockito-core:5.21.0'
 
     // https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter
-    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: "${mockitoVersion}"
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.21.0'
 
     // https://mvnrepository.com/artifact/org.mock-server/mockserver-netty
-    testImplementation ("org.mock-server:mockserver-netty:5.15.0") {
+    testImplementation('org.mock-server:mockserver-netty:5.15.0') {
         exclude group: 'junit', module: 'junit'
     }
 
-    testImplementation group : 'org.testcontainers', name: 'testcontainers',  version: "1.+"
+    // https://mvnrepository.com/artifact/org.testcontainers/testcontainers
+    testImplementation 'org.testcontainers:testcontainers:2.0.3'
 
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 configurations {

@@ -53,7 +53,7 @@ class HttpForwardedHeaderParserTest {
     void testParseThrowsWithEmptyString() {
         InvalidArgumentException e = assertThrows(
                 InvalidArgumentException.class,
-                () -> HttpForwardedHeaderParser.parse(((String) null)),
+                () -> HttpForwardedHeaderParser.parse(""),
                 "expected InvalidArgumentException to be thrown"
         );
 

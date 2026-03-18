@@ -1,7 +1,6 @@
 package ee.bitweb.core.api.model.exception;
 
 import ee.bitweb.core.api.ValidationErrorType;
-import ee.bitweb.core.exception.validation.FieldError;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
