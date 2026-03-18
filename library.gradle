@@ -82,8 +82,8 @@ nexusPublishing {
 signing {
     if (project.hasProperty("signingKey") & project.hasProperty("signingPassword")) {
         useInMemoryPgpKeys(project.signingKey, project.signingPassword)
+        sign publishing.publications.mavenJava
     }
-    sign publishing.publications.mavenJava
 }
 
 javadoc {

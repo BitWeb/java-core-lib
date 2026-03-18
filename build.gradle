@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'ee.bitweb'
-version = '5.0.0'
+version = '5.0.0-RC1'
 java {
     sourceCompatibility = '17'
 }
