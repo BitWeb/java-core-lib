@@ -2,7 +2,7 @@ buildscript {
     ext {
         springBootVersion = project.hasProperty('springBootVersion') ? project.springBootVersion : '3.5.0'
         springVersion = project.hasProperty('springFrameworkVersion') ? project.springFrameworkVersion : '6.2.7'
-        jacksonVersion = '2.21.1'
+        jacksonVersion = '2.21.2'
         retrofitVersion = '3.0.0'
         mockitoVersion = '5.22.+' // At least Mockito 5.2.0 is required to Mock final classes
     }
@@ -38,7 +38,7 @@ repositories {
 
 dependencies {
     // https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-catalina
-    compileOnly group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '10.1.52'
+    compileOnly group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '10.1.53'
 
     // https://mvnrepository.com/artifact/org.springframework/spring-webmvc
     compileOnly group: 'org.springframework', name: 'spring-webmvc', version: "${springVersion}"
