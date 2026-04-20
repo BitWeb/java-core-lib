@@ -10,6 +10,7 @@ on:
 
 env:
   DEFAULT_JAVA_VERSION: '17'
+  SONAR_JAVA_VERSION: '21'
 
 jobs:
 
@@ -45,7 +46,7 @@ jobs:
 
       - name: Run Sonar analysis
         # Skip Sonar on Dependabot in pull_request runs (no secrets there); handled by a separate job below
-        if: matrix.java == env.DEFAULT_JAVA_VERSION && github.actor != 'dependabot[bot]'
+        if: matrix.java == env.SONAR_JAVA_VERSION && github.actor != 'dependabot[bot]'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -72,7 +73,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: ${{ env.DEFAULT_JAVA_VERSION }}
+          java-version: ${{ env.SONAR_JAVA_VERSION }}
 
       - name: Build (no tests)
         run: ./gradlew assemble -x test
