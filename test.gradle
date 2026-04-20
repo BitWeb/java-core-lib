@@ -5,7 +5,10 @@ test {
 }
 
 tasks.register('unitTest', Test) {
-    group("verification")
+    group = "verification"
+
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
 
     useJUnitPlatform {
         excludeTags "integration"
@@ -13,7 +16,10 @@ tasks.register('unitTest', Test) {
 }
 
 tasks.register('integrationTest', Test) {
-    group("verification")
+    group = "verification"
+
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
 
     useJUnitPlatform {
         includeTags 'integration'
@@ -38,7 +44,7 @@ tasks.register('jacocoIntegrationTestReport', JacocoReport) {
     }
 }
 
-tasks.register('testAndReport', Test) {
+tasks.register('testAndReport') {
     tasks.getByName('integrationTest').mustRunAfter('unitTest')
     dependsOn('unitTest', 'integrationTest', 'jacocoUnitTestReport', 'jacocoIntegrationTestReport')
 }

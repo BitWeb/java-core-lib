@@ -1,7 +1,7 @@
 package ee.bitweb.core.audit.mapper;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 import ee.bitweb.core.audit.AuditLogProperties;
 import ee.bitweb.core.audit.mappers.RequestHeadersMapper;
 import org.junit.jupiter.api.Tag;
@@ -19,12 +19,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(MockitoExtension.class)
 class RequestHeadersMapperUnitTests {
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final JsonMapper mapper = JsonMapper.builder().build();
     private final AuditLogProperties properties = new AuditLogProperties();
     private final MockHttpServletResponse response = new MockHttpServletResponse();
 
     @Test
-    void originIsLoggedByDefault() throws JsonProcessingException {
+    void originIsLoggedByDefault() throws JacksonException {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("Origin", "http://whatever.example");
         request.addHeader("Random", "This is unnecessary data");
@@ -37,7 +37,7 @@ class RequestHeadersMapperUnitTests {
     }
 
     @Test
-    void userAgentIsLoggedByDefault() throws JsonProcessingException {
+    void userAgentIsLoggedByDefault() throws JacksonException {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("User-Agent", "Chrome");
         request.addHeader("Random", "This is unnecessary data");
@@ -50,7 +50,7 @@ class RequestHeadersMapperUnitTests {
     }
 
     @Test
-    void authorizationHeaderIsSensitiveByDefault() throws JsonProcessingException {
+    void authorizationHeaderIsSensitiveByDefault() throws JacksonException {
         AuditLogProperties properties = new AuditLogProperties();
         properties.getRequestHeaders().add("Authorization");
 

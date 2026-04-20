@@ -1,17 +1,13 @@
 package ee.bitweb.core;
 
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import ee.bitweb.core.trace.creator.TraceIdCreator;
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,6 +15,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.util.StringUtils;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 @SpringBootApplication
 @EnableConfigurationProperties
@@ -28,17 +26,19 @@ public class TestSpringApplication {
         SpringApplication.run(TestSpringApplication.class);
     }
 
-    @RequiredArgsConstructor
-    @org.springframework.context.annotation.Configuration
-    public static class Configuration {
+    @Configuration
+    public static class JacksonConfiguration {
 
-        private final ObjectMapper mapper;
+        @Bean
+        public JsonMapper jackson3ObjectMapper() {
+            return JsonMapper.builder()
+                    .disable(DeserializationFeature.ACCEPT_FLOAT_AS_INT)
+                    .build();
+        }
 
-        @PostConstruct
-        public void init() {
-            mapper.registerModule(new JavaTimeModule());
-            mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
-            mapper.disable(DeserializationFeature.ACCEPT_FLOAT_AS_INT);
+        @Bean
+        public ObjectMapper objectMapper() {
+            return new ObjectMapper();
         }
 
         @Bean("InvokerTraceIdCreator")
@@ -56,11 +56,11 @@ public class TestSpringApplication {
         }
     }
 
-    @org.springframework.context.annotation.Configuration
+    @Configuration
     public static class SecurityConfiguration {
 
         @Bean
-        protected SecurityFilterChain configure(HttpSecurity httpSecurity) throws Exception {
+        protected SecurityFilterChain configure(HttpSecurity httpSecurity) {
             // Configure security to allow any request other than actuator requests
 
             return httpSecurity

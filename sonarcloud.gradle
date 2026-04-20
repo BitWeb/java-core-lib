@@ -6,7 +6,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:6.2.0.5505")
+        classpath("org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:7.2.3.7755")
     }
 }
 apply plugin: org.sonarqube.gradle.SonarQubePlugin
@@ -15,7 +15,6 @@ sonar {
     properties {
         property "sonar.projectKey", "BitWeb_java-core-lib"
         property "sonar.organization", "bitweb-oss"
-        property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.exclusions", "build/generated/**"
     }
 }

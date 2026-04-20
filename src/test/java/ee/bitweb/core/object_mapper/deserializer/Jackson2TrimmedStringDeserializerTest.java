@@ -1,7 +1,8 @@
 package ee.bitweb.core.object_mapper.deserializer;
 
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -15,15 +16,14 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("unit")
-class TrimmedStringDeserializerTest {
+class Jackson2TrimmedStringDeserializerTest {
 
-    private JsonMapper mapper;
+    private ObjectMapper mapper;
 
     @BeforeEach
     void setUp() {
-        mapper = JsonMapper.builder()
-                .addModule(TrimmedStringDeserializer.createModule())
-                .build();
+        mapper = new ObjectMapper();
+        mapper.registerModule(Jackson2TrimmedStringDeserializer.createModule());
     }
 
     static Stream<Arguments> stringTrimmingCases() {
@@ -40,7 +40,7 @@ class TrimmedStringDeserializerTest {
 
     @ParameterizedTest(name = "Should handle {2}")
     @MethodSource("stringTrimmingCases")
-    void shouldTrimStrings(String input, String expected, String description) throws JacksonException {
+    void shouldTrimStrings(String input, String expected, String description) throws JsonProcessingException {
         String json = "\"" + escapeJson(input) + "\"";
 
         String result = mapper.readValue(json, String.class);
@@ -50,7 +50,7 @@ class TrimmedStringDeserializerTest {
 
     @Test
     @DisplayName("Should return null for null value")
-    void shouldReturnNullForNullValue() throws JacksonException {
+    void shouldReturnNullForNullValue() throws JsonProcessingException {
         String result = mapper.readValue("null", String.class);
 
         assertNull(result);
@@ -58,7 +58,7 @@ class TrimmedStringDeserializerTest {
 
     @Test
     @DisplayName("Should trim string fields in object")
-    void shouldTrimStringFieldsInObject() throws JacksonException {
+    void shouldTrimStringFieldsInObject() throws JsonProcessingException {
         String json = "{\"name\": \"  John Doe  \", \"email\": \"  john@example.com  \"}";
 
         TestObject result = mapper.readValue(json, TestObject.class);
@@ -71,7 +71,7 @@ class TrimmedStringDeserializerTest {
 
     @Test
     @DisplayName("Should trim strings in array")
-    void shouldTrimStringsInArray() throws JacksonException {
+    void shouldTrimStringsInArray() throws JsonProcessingException {
         String json = "[\"  first  \", \"  second  \", \"  third  \"]";
 
         String[] result = mapper.readValue(json, String[].class);
@@ -81,6 +81,25 @@ class TrimmedStringDeserializerTest {
                 () -> assertEquals("second", result[1]),
                 () -> assertEquals("third", result[2])
         );
+    }
+
+    @Test
+    @DisplayName("Should add module to ObjectMapper via addToObjectMapper")
+    void shouldAddModuleViaAddToObjectMapper() throws JsonProcessingException {
+        ObjectMapper separateMapper = new ObjectMapper();
+        Jackson2TrimmedStringDeserializer.addToObjectMapper(separateMapper);
+
+        String result = separateMapper.readValue("\"  trimmed  \"", String.class);
+
+        assertEquals("trimmed", result);
+    }
+
+    @Test
+    @DisplayName("Should return non-null module from createModule")
+    void shouldReturnNonNullModule() {
+        SimpleModule module = Jackson2TrimmedStringDeserializer.createModule();
+
+        assertNotNull(module);
     }
 
     private static String escapeJson(String input) {

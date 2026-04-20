@@ -1,7 +1,7 @@
 package ee.bitweb.core.audit.mapper;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 import ee.bitweb.core.audit.AuditLogProperties;
 import ee.bitweb.core.audit.mappers.RequestForwardingDataMapper;
 import org.junit.jupiter.api.Tag;
@@ -19,11 +19,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(MockitoExtension.class)
 class RequestForwardingDataMapperUnitTests {
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final JsonMapper mapper = JsonMapper.builder().build();
     private final AuditLogProperties properties = new AuditLogProperties();
 
     @Test
-    void testAddIpAddressesUsesXForwardedForHeader() throws JsonProcessingException {
+    void testAddIpAddressesUsesXForwardedForHeader() throws JacksonException {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/this");
         request.addHeader("x-forwarded-for", "192.168.69.145,192.168.69.1");
 
@@ -35,7 +35,7 @@ class RequestForwardingDataMapperUnitTests {
     }
 
     @Test
-    void testAddIpAddressesUsesXForwardedForHeaders() throws JsonProcessingException {
+    void testAddIpAddressesUsesXForwardedForHeaders() throws JacksonException {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/this");
         request.addHeader("x-forwarded-for", "192.168.69.145");
         request.addHeader("x-forwarded-for", "192.168.69.1");
@@ -49,7 +49,7 @@ class RequestForwardingDataMapperUnitTests {
     }
 
     @Test
-    void testAddForwardingHeadersParsesForwardedHeader() throws JsonProcessingException {
+    void testAddForwardingHeadersParsesForwardedHeader() throws JacksonException {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/this");
         request.addHeader("forwarded", "for=192.0.2.43,for=198.51.100.17;by=203.0.113.60;proto=http;host=example.com;secret=ruewiu");
 
@@ -66,7 +66,7 @@ class RequestForwardingDataMapperUnitTests {
     }
 
     @Test
-    void testSensitiveHeaderSettingAppliedOnForwardedHeaders() throws JsonProcessingException {
+    void testSensitiveHeaderSettingAppliedOnForwardedHeaders() throws JacksonException {
         AuditLogProperties properties = new AuditLogProperties();
         properties.getSensitiveHeaders().add("forwarded");
 

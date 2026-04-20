@@ -2,7 +2,6 @@ package ee.bitweb.core.api.model.exception;
 
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import ee.bitweb.core.exception.persistence.Criteria;
 import ee.bitweb.core.exception.persistence.PersistenceException;
@@ -21,7 +20,7 @@ public class PersistenceErrorResponse extends GenericErrorResponse {
     public PersistenceErrorResponse(String id, String message, String entity, Set<Criteria> criteria) {
         super(id, message);
         this.entity = entity;
-        this.criteria.addAll(criteria.stream().map(CriteriaResponse::new).collect(Collectors.toList()));
+        this.criteria.addAll(criteria.stream().map(CriteriaResponse::new).toList());
     }
 
     public PersistenceErrorResponse(String id, PersistenceException e) {

@@ -1,6 +1,6 @@
 package ee.bitweb.core.amqp.testcomponents.util;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import ee.bitweb.core.amqp.AmqpService;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.Message;
@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -30,7 +29,7 @@ public class AmqpTestHelper {
     private RabbitTemplate rabbitTemplate;
 
     @Autowired
-    private ObjectMapper mapper;
+    private JsonMapper mapper;
 
     public Queue createQueue() {
         return admin.declareQueue();
@@ -38,14 +37,14 @@ public class AmqpTestHelper {
 
     public void waitForResponse(String responseQueue, int size){
         Awaitility.await().atMost(10, TimeUnit.SECONDS).until(() -> {
-            Integer count = getMessageCount(responseQueue);
+            Long count = getMessageCount(responseQueue);
             return count >= size;
         });
     }
 
     public void waitForEmptyQueue(String queueName) {
         Awaitility.await().atMost(10, TimeUnit.SECONDS).until(() -> {
-            Integer count = getMessageCount(queueName);
+            Long count = getMessageCount(queueName);
             return count == 0;
         });
     }
@@ -92,11 +91,11 @@ public class AmqpTestHelper {
         return result;
     }
 
-    public <T> AmqpParsedMessage<T> convert(Message message, Class<T> clazz) throws IOException {
+    public <T> AmqpParsedMessage<T> convert(Message message, Class<T> clazz) {
         return new AmqpParsedMessage<T>(message, mapper.readValue(new String(message.getBody()), clazz));
     }
 
-    public <T> List<AmqpParsedMessage<T>> convert(List<Message> messages, Class<T> clazz) throws IOException {
+    public <T> List<AmqpParsedMessage<T>> convert(List<Message> messages, Class<T> clazz) {
         List<AmqpParsedMessage<T>> response = new ArrayList<>();
         for (Message message : messages) {
             response.add(convert(message, clazz));
@@ -104,7 +103,7 @@ public class AmqpTestHelper {
         return response;
     }
 
-    public Integer getMessageCount(String queueName) {
-        return (Integer) admin.getQueueProperties(queueName).get(RabbitAdmin.QUEUE_MESSAGE_COUNT);
+    public Long getMessageCount(String queueName) {
+        return (Long) admin.getQueueProperties(queueName).get(RabbitAdmin.QUEUE_MESSAGE_COUNT);
     }
  }

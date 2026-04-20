@@ -48,6 +48,11 @@ public class AuditLogLoggerWriterAdapter implements AuditLogWriteAdapter {
 
     private void log(Map<String, String> container) {
         MDC.setContextMap(container);
+
+        if (!log.isInfoEnabled()) {
+            return;
+        }
+
         log.info(
                 "Method({}),  URL({}) Status({}) ResponseSize({}) Duration({} ms)",
                 get(container, RequestMethodMapper.KEY),

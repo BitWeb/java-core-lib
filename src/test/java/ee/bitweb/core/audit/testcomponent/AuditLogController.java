@@ -29,7 +29,7 @@ public class AuditLogController {
 
     @GetMapping("/ignored")
     public void ignored() {
-
+        // void endpoint
     }
 
     @Getter
