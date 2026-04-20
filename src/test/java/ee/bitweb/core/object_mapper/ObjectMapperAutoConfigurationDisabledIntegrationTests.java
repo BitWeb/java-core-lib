@@ -29,4 +29,16 @@ class ObjectMapperAutoConfigurationDisabledIntegrationTests {
     void shouldNotLoadAutoConfigurationBeanWhenDisabled() {
         assertFalse(applicationContext.containsBean("objectMapperAutoConfiguration"));
     }
+
+    @Test
+    @DisplayName("Should not load coreLibJsonMapperCustomizer bean when disabled")
+    void shouldNotLoadCoreLibJsonMapperCustomizerBeanWhenDisabled() {
+        assertFalse(applicationContext.containsBean("coreLibJsonMapperCustomizer"));
+    }
+
+    @Test
+    @DisplayName("Should not load Jackson2ObjectMapperCreator inner class bean when disabled")
+    void shouldNotLoadJackson2ObjectMapperCreatorBeanWhenDisabled() {
+        assertFalse(applicationContext.containsBean("objectMapperAutoConfiguration.Jackson2ObjectMapperCreator"));
+    }
 }
