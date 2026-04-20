@@ -110,7 +110,7 @@ dependencies {
     }
 
     // https://mvnrepository.com/artifact/org.testcontainers/testcontainers
-    testImplementation 'org.testcontainers:testcontainers:2.0.4'
+    testImplementation 'org.testcontainers:testcontainers:2.0.5'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
