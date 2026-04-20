@@ -1,12 +1,13 @@
 package ee.bitweb.core;
 
-import tools.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.bitweb.core.trace.creator.TraceIdCreator;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,6 +15,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
 import org.springframework.util.StringUtils;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 @SpringBootApplication
 @EnableConfigurationProperties
@@ -23,25 +26,19 @@ public class TestSpringApplication {
         SpringApplication.run(TestSpringApplication.class);
     }
 
-    @org.springframework.context.annotation.Configuration
-    public static class Configuration {
+    @Configuration
+    public static class JacksonConfiguration {
 
         @Bean
-        public tools.jackson.databind.ObjectMapper jackson3ObjectMapper() {
-            // Jackson 3.x for Spring Boot 4's internal use
+        public JsonMapper jackson3ObjectMapper() {
             return JsonMapper.builder()
-                    .disable(tools.jackson.databind.DeserializationFeature.ACCEPT_FLOAT_AS_INT)
+                    .disable(DeserializationFeature.ACCEPT_FLOAT_AS_INT)
                     .build();
         }
 
         @Bean
-        public com.fasterxml.jackson.databind.ObjectMapper objectMapper() {
-            // Jackson 2.x for test compatibility
-            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-            mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
-            mapper.disable(com.fasterxml.jackson.databind.DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
-            mapper.disable(com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_FLOAT_AS_INT);
-            return mapper;
+        public ObjectMapper objectMapper() {
+            return new ObjectMapper();
         }
 
         @Bean("InvokerTraceIdCreator")
@@ -59,7 +56,7 @@ public class TestSpringApplication {
         }
     }
 
-    @org.springframework.context.annotation.Configuration
+    @Configuration
     public static class SecurityConfiguration {
 
         @Bean

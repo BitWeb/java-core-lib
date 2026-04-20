@@ -8,6 +8,8 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
@@ -15,6 +17,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.cfg.DateTimeFeature;
+
+import static com.fasterxml.jackson.databind.DeserializationFeature.*;
 
 /**
  * Auto-configuration for ObjectMapper (Jackson 2) and JsonMapper (Jackson 3).
@@ -50,8 +54,30 @@ public class ObjectMapperAutoConfiguration {
     }
 
     /**
-     * Jackson 2 ObjectMapper customizer for Retrofit compatibility.
-     * Configures the ObjectMapper bean with the same behavior as JsonMapper.
+     * Creates a Jackson 2 ObjectMapper bean when none exists and Jackson 2 is on the classpath.
+     */
+    @Slf4j
+    @Configuration
+    @ConditionalOnClass(ObjectMapper.class)
+    @ConditionalOnMissingBean(ObjectMapper.class)
+    static class Jackson2ObjectMapperCreator {
+
+        @Bean
+        public ObjectMapper objectMapper() {
+            log.info("Creating Core Library ObjectMapper (Jackson 2) bean");
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            Jackson2TrimmedStringDeserializer.addToObjectMapper(objectMapper);
+            objectMapper.registerModule(new JavaTimeModule());
+            objectMapper.disable(ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+            objectMapper.disable(ACCEPT_FLOAT_AS_INT);
+
+            return objectMapper;
+        }
+    }
+
+    /**
+     * Customizes an existing Jackson 2 ObjectMapper bean with core library defaults.
      */
     @Slf4j
     @Configuration
@@ -67,8 +93,8 @@ public class ObjectMapperAutoConfiguration {
 
             Jackson2TrimmedStringDeserializer.addToObjectMapper(objectMapper);
             objectMapper.registerModule(new JavaTimeModule());
-            objectMapper.disable(com.fasterxml.jackson.databind.DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
-            objectMapper.disable(com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_FLOAT_AS_INT);
+            objectMapper.disable(ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+            objectMapper.disable(ACCEPT_FLOAT_AS_INT);
         }
     }
 }
