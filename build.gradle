@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id "io.freefair.lombok" version "9.2.0"
+    id "io.freefair.lombok" version "9.5.0"
     id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
 }
 
@@ -33,34 +33,34 @@ dependencies {
     compileOnly 'org.springframework:spring-tx:7.0.7'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
-    compileOnly 'org.springframework.boot:spring-boot-starter-security:4.0.5'
+    compileOnly 'org.springframework.boot:spring-boot-starter-security:4.0.6'
 
     // https://mvnrepository.com/artifact/org.springframework.amqp/spring-amqp
-    compileOnly 'org.springframework.boot:spring-boot-starter-amqp:4.0.5'
+    compileOnly 'org.springframework.boot:spring-boot-starter-amqp:4.0.6'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor:4.0.5'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor:4.0.6'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-actuator
-    compileOnly 'org.springframework.boot:spring-boot-starter-actuator:4.0.5'
+    compileOnly 'org.springframework.boot:spring-boot-starter-actuator:4.0.6'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-health (new in Spring Boot 4)
-    compileOnly 'org.springframework.boot:spring-boot-health:4.0.5'
+    compileOnly 'org.springframework.boot:spring-boot-health:4.0.6'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-autoconfigure
-    compileOnly 'org.springframework.boot:spring-boot-autoconfigure:4.0.5'
+    compileOnly 'org.springframework.boot:spring-boot-autoconfigure:4.0.6'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
-    compileOnly 'org.springframework.boot:spring-boot-starter-validation:4.0.5'
+    compileOnly 'org.springframework.boot:spring-boot-starter-validation:4.0.6'
 
     // Jackson 2.x - required for Retrofit converter-jackson (Retrofit doesn't support Jackson 3 yet)
-    compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.2'
+    compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.3'
 
     // Jackson 3.x - required for Spring Boot 4 (ObjectMapper, ControllerAdvisor, Audit module)
-    compileOnly 'tools.jackson.core:jackson-databind:3.1.2'
+    compileOnly 'tools.jackson.core:jackson-databind:3.1.3'
 
     // Spring Boot Jackson - provides JsonMapperBuilderCustomizer
-    compileOnly 'org.springframework.boot:spring-boot-jackson:4.0.5'
+    compileOnly 'org.springframework.boot:spring-boot-jackson:4.0.6'
 
     // https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api
     compileOnly 'jakarta.validation:jakarta.validation-api:3.1.1'
@@ -78,19 +78,19 @@ dependencies {
     compileOnly 'de.siegmar:logback-gelf:6.1.2'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
-    testImplementation 'org.springframework.boot:spring-boot-starter-web:4.0.5'
+    testImplementation 'org.springframework.boot:spring-boot-starter-web:4.0.6'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
-    testImplementation 'org.springframework.boot:spring-boot-starter-test:4.0.5'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:4.0.6'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-webmvc-test (new in Spring Boot 4 for MockMvc testing)
-    testImplementation 'org.springframework.boot:spring-boot-webmvc-test:4.0.5'
+    testImplementation 'org.springframework.boot:spring-boot-webmvc-test:4.0.6'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
-    testImplementation 'org.springframework.boot:spring-boot-starter-security:4.0.5'
+    testImplementation 'org.springframework.boot:spring-boot-starter-security:4.0.6'
 
     // https://mvnrepository.com/artifact/org.springframework.amqp/spring-amqp
-    testImplementation 'org.springframework.boot:spring-boot-starter-amqp:4.0.5'
+    testImplementation 'org.springframework.boot:spring-boot-starter-amqp:4.0.6'
 
     // https://mvnrepository.com/artifact/org.json/json
     testImplementation 'org.json:json:20251224'
@@ -110,7 +110,7 @@ dependencies {
     }
 
     // https://mvnrepository.com/artifact/org.testcontainers/testcontainers
-    testImplementation 'org.testcontainers:testcontainers:2.0.4'
+    testImplementation 'org.testcontainers:testcontainers:2.0.5'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
