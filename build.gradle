@@ -54,10 +54,10 @@ dependencies {
     compileOnly 'org.springframework.boot:spring-boot-starter-validation:4.0.6'
 
     // Jackson 2.x - required for Retrofit converter-jackson (Retrofit doesn't support Jackson 3 yet)
-    compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.3'
+    compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.22.0'
 
     // Jackson 3.x - required for Spring Boot 4 (ObjectMapper, ControllerAdvisor, Audit module)
-    compileOnly 'tools.jackson.core:jackson-databind:3.1.3'
+    compileOnly 'tools.jackson.core:jackson-databind:3.1.4'
 
     // Spring Boot Jackson - provides JsonMapperBuilderCustomizer
     compileOnly 'org.springframework.boot:spring-boot-jackson:4.0.6'
