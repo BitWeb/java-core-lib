@@ -93,7 +93,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-amqp:4.0.6'
 
     // https://mvnrepository.com/artifact/org.json/json
-    testImplementation 'org.json:json:20251224'
+    testImplementation 'org.json:json:20260522'
 
     // https://mvnrepository.com/artifact/ee.bitweb/spring-test-core
     testImplementation 'ee.bitweb:spring-test-core:2.0.1'
