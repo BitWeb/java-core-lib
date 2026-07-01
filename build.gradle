@@ -27,40 +27,40 @@ dependencies {
     compileOnly 'org.apache.tomcat:tomcat-catalina:11.0.21'
 
     // https://mvnrepository.com/artifact/org.springframework/spring-webmvc
-    compileOnly 'org.springframework:spring-webmvc:7.0.7'
+    compileOnly 'org.springframework:spring-webmvc:7.0.8'
 
     // https://mvnrepository.com/artifact/org.springframework/spring-tx
-    compileOnly 'org.springframework:spring-tx:7.0.7'
+    compileOnly 'org.springframework:spring-tx:7.0.8'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
-    compileOnly 'org.springframework.boot:spring-boot-starter-security:4.0.6'
+    compileOnly 'org.springframework.boot:spring-boot-starter-security:4.1.0'
 
     // https://mvnrepository.com/artifact/org.springframework.amqp/spring-amqp
-    compileOnly 'org.springframework.boot:spring-boot-starter-amqp:4.0.6'
+    compileOnly 'org.springframework.boot:spring-boot-starter-amqp:4.1.0'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor:4.0.6'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor:4.1.0'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-actuator
-    compileOnly 'org.springframework.boot:spring-boot-starter-actuator:4.0.6'
+    compileOnly 'org.springframework.boot:spring-boot-starter-actuator:4.1.0'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-health (new in Spring Boot 4)
-    compileOnly 'org.springframework.boot:spring-boot-health:4.0.6'
+    compileOnly 'org.springframework.boot:spring-boot-health:4.1.0'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-autoconfigure
-    compileOnly 'org.springframework.boot:spring-boot-autoconfigure:4.0.6'
+    compileOnly 'org.springframework.boot:spring-boot-autoconfigure:4.1.0'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
-    compileOnly 'org.springframework.boot:spring-boot-starter-validation:4.0.6'
+    compileOnly 'org.springframework.boot:spring-boot-starter-validation:4.1.0'
 
     // Jackson 2.x - required for Retrofit converter-jackson (Retrofit doesn't support Jackson 3 yet)
     compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.22.0'
 
     // Jackson 3.x - required for Spring Boot 4 (ObjectMapper, ControllerAdvisor, Audit module)
-    compileOnly 'tools.jackson.core:jackson-databind:3.1.4'
+    compileOnly 'tools.jackson.core:jackson-databind:3.2.0'
 
     // Spring Boot Jackson - provides JsonMapperBuilderCustomizer
-    compileOnly 'org.springframework.boot:spring-boot-jackson:4.0.6'
+    compileOnly 'org.springframework.boot:spring-boot-jackson:4.1.0'
 
     // https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api
     compileOnly 'jakarta.validation:jakarta.validation-api:3.1.1'
@@ -72,25 +72,25 @@ dependencies {
     compileOnly 'com.squareup.retrofit2:converter-jackson:3.0.0'
 
     // https://mvnrepository.com/artifact/com.squareup.okhttp3/logging-interceptor
-    compileOnly 'com.squareup.okhttp3:logging-interceptor:5.3.2'
+    compileOnly 'com.squareup.okhttp3:logging-interceptor:5.4.0'
 
     // https://mvnrepository.com/artifact/de.siegmar/logback-gelf
     compileOnly 'de.siegmar:logback-gelf:6.1.2'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
-    testImplementation 'org.springframework.boot:spring-boot-starter-web:4.0.6'
+    testImplementation 'org.springframework.boot:spring-boot-starter-web:4.1.0'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
-    testImplementation 'org.springframework.boot:spring-boot-starter-test:4.0.6'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:4.1.0'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-webmvc-test (new in Spring Boot 4 for MockMvc testing)
-    testImplementation 'org.springframework.boot:spring-boot-webmvc-test:4.0.6'
+    testImplementation 'org.springframework.boot:spring-boot-webmvc-test:4.1.0'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security
-    testImplementation 'org.springframework.boot:spring-boot-starter-security:4.0.6'
+    testImplementation 'org.springframework.boot:spring-boot-starter-security:4.1.0'
 
     // https://mvnrepository.com/artifact/org.springframework.amqp/spring-amqp
-    testImplementation 'org.springframework.boot:spring-boot-starter-amqp:4.0.6'
+    testImplementation 'org.springframework.boot:spring-boot-starter-amqp:4.1.0'
 
     // https://mvnrepository.com/artifact/org.json/json
     testImplementation 'org.json:json:20260522'
@@ -105,7 +105,7 @@ dependencies {
     testImplementation 'org.mockito:mockito-junit-jupiter:5.23.0'
 
     // https://mvnrepository.com/artifact/org.mock-server/mockserver-netty
-    testImplementation('org.mock-server:mockserver-netty:7.2.0') {
+    testImplementation('org.mock-server:mockserver-netty:7.3.0') {
         exclude group: 'junit', module: 'junit'
     }
 
