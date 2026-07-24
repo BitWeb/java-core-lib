@@ -2,7 +2,7 @@ package ee.bitweb.core.amqp;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.listener.ConditionalRejectingErrorHandler;
+import org.springframework.amqp.listener.ConditionalRejectingErrorHandler;
 
 @Slf4j
 @RequiredArgsConstructor
