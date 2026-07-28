@@ -54,10 +54,10 @@ dependencies {
     compileOnly 'org.springframework.boot:spring-boot-starter-validation:4.1.0'
 
     // Jackson 2.x - required for Retrofit converter-jackson (Retrofit doesn't support Jackson 3 yet)
-    compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.22.0'
+    compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.22.1'
 
     // Jackson 3.x - required for Spring Boot 4 (ObjectMapper, ControllerAdvisor, Audit module)
-    compileOnly 'tools.jackson.core:jackson-databind:3.1.4'
+    compileOnly 'tools.jackson.core:jackson-databind:3.2.1'
 
     // Spring Boot Jackson - provides JsonMapperBuilderCustomizer
     compileOnly 'org.springframework.boot:spring-boot-jackson:4.1.0'
@@ -72,7 +72,7 @@ dependencies {
     compileOnly 'com.squareup.retrofit2:converter-jackson:3.0.0'
 
     // https://mvnrepository.com/artifact/com.squareup.okhttp3/logging-interceptor
-    compileOnly 'com.squareup.okhttp3:logging-interceptor:5.3.2'
+    compileOnly 'com.squareup.okhttp3:logging-interceptor:5.4.0'
 
     // https://mvnrepository.com/artifact/de.siegmar/logback-gelf
     compileOnly 'de.siegmar:logback-gelf:6.1.2'
@@ -105,7 +105,7 @@ dependencies {
     testImplementation 'org.mockito:mockito-junit-jupiter:5.23.0'
 
     // https://mvnrepository.com/artifact/org.mock-server/mockserver-netty
-    testImplementation('org.mock-server:mockserver-netty:7.2.0') {
+    testImplementation('org.mock-server:mockserver-netty:7.4.0') {
         exclude group: 'junit', module: 'junit'
     }
 
