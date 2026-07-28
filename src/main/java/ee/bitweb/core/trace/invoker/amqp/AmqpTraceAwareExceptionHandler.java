@@ -2,8 +2,8 @@ package ee.bitweb.core.trace.invoker.amqp;
 
 import ee.bitweb.core.trace.context.TraceIdContext;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.listener.ConditionalRejectingErrorHandler;
-import org.springframework.amqp.rabbit.listener.FatalExceptionStrategy;
+import org.springframework.amqp.listener.ConditionalRejectingErrorHandler;
+import org.springframework.amqp.listener.FatalExceptionStrategy;
 
 @Slf4j
 public class AmqpTraceAwareExceptionHandler extends ConditionalRejectingErrorHandler {
