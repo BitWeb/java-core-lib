@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id "io.freefair.lombok" version "9.5.0"
+    id "io.freefair.lombok" version "9.7.0"
     id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
 }
 
@@ -54,10 +54,10 @@ dependencies {
     compileOnly 'org.springframework.boot:spring-boot-starter-validation:4.1.1'
 
     // Jackson 2.x - required for Retrofit converter-jackson (Retrofit doesn't support Jackson 3 yet)
-    compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.22.2'
+    compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.22.3'
 
     // Jackson 3.x - required for Spring Boot 4 (ObjectMapper, ControllerAdvisor, Audit module)
-    compileOnly 'tools.jackson.core:jackson-databind:3.2.2'
+    compileOnly 'tools.jackson.core:jackson-databind:3.2.3'
 
     // Spring Boot Jackson - provides JsonMapperBuilderCustomizer
     compileOnly 'org.springframework.boot:spring-boot-jackson:4.1.1'
@@ -99,10 +99,10 @@ dependencies {
     testImplementation 'ee.bitweb:spring-test-core:2.0.1'
 
     // https://mvnrepository.com/artifact/org.mockito/mockito-core
-    testImplementation 'org.mockito:mockito-core:5.23.0'
+    testImplementation 'org.mockito:mockito-core:5.24.0'
 
     // https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter
-    testImplementation 'org.mockito:mockito-junit-jupiter:5.23.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.24.0'
 
     // https://mvnrepository.com/artifact/org.mock-server/mockserver-netty
     testImplementation('org.mock-server:mockserver-netty:7.6.0') {
